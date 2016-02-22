@@ -1,5 +1,7 @@
 package utils;
 
+import entity.Duel;
+
 /**
  * General information - https://en.wikipedia.org/wiki/Elo_rating_system
  * Implementation -
@@ -29,9 +31,14 @@ public class eloRatingSystemCalculator
         return instance;
     }
 
-    public float[] calculate(float song1Rating, float song1Points, float song2Rating,
-            float song2Points)
+    public float[] calculate( Duel duel )
     {
+        
+        float song1Rating = duel.getSong1OldRating();
+        float song1Points = duel.getSong1Score();
+        float song2Rating = duel.getSong2OldRating();
+        float song2Points = duel.getSong2Score();
+        
         float transformedRating1 = calculateTransformedRating(song1Rating);
         float transformedRating2 = calculateTransformedRating(song2Rating);
 
