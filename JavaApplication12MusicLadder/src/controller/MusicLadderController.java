@@ -3,6 +3,7 @@ package controller;
 import entity.Duel;
 import entity.Song;
 import java.util.List;
+import model.MusicLadderModel;
 import utils.eloRatingSystemCalculator;
 
 /**
@@ -22,6 +23,28 @@ public class MusicLadderController
     public static void main(String[] args)
     {
         new MusicLadderController().helloWorld();
+    }
+    
+    private static MusicLadderController instance = null;
+    private MusicLadderModel model = null;
+
+    private MusicLadderController()
+    {
+        // Exists only to defeat instantiation.
+        model = new MusicLadderModel();
+    }
+
+    public static MusicLadderController getInstance()
+    {
+        if (instance == null)
+        {
+            instance = new MusicLadderController();
+        }
+        return instance;
+    }
+    
+    public List<Song> getSongs() {
+        return model.getSongs();
     }
     
     private void helloWorld() {
