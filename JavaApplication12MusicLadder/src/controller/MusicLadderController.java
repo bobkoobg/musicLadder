@@ -42,27 +42,20 @@ public class MusicLadderController
         System.out.println("Expected score 1 : " + expectedScore1 );
         System.out.println("Expected score 2 : " + expectedScore2 );
         
-        Integer player1Score = 10;
-        Integer player2Score = 7;
+        Integer song1Score = 16;
+        Integer song2Score = 2;
         
-        float actualScore1, actualScore2;
+        float song1ScoreRating, song2ScoreRating;
         
-        if ( player1Score > player2Score ) {
-            actualScore1 = 1;
-            actualScore2 = 0;
-        } else if ( player2Score > player1Score ) {
-            actualScore2 = 1;
-            actualScore1 = 0;
-        } else {
-            actualScore1 = 0.5f;
-            actualScore2 = 0.5f;
-        }
+        float[] actualScores = calculateActualScore(song1Score, song2Score);
+        song1ScoreRating = actualScores[0];
+        song2ScoreRating = actualScores[1];
         
-        System.out.println("Actual score 1 : " + actualScore1 );
-        System.out.println("Actual score 2 : " + actualScore2 );
+        System.out.println("Actual score 1 : " + song1ScoreRating );
+        System.out.println("Actual score 2 : " + song2ScoreRating );
         
-        float player1NewRating = calculateNewRating(r1, kFactor, actualScore1, expectedScore1);
-        float player2NewRating = calculateNewRating(r2, kFactor, actualScore2, expectedScore2);
+        float player1NewRating = calculateNewRating(r1, kFactor, song1ScoreRating, expectedScore1);
+        float player2NewRating = calculateNewRating(r2, kFactor, song2ScoreRating, expectedScore2);
         
         System.out.println("Player 1 New Rating :  " + player1NewRating );
         System.out.println("Player 2 New Rating :  " + player2NewRating );
@@ -90,6 +83,19 @@ public class MusicLadderController
         float[] expected = { e1, e2 };
         
         return expected;
+    }
+    
+    private float[] calculateActualScore(float playerScore1, float playerScore2) {
+        float as1, as2, roundValue;
+        
+        roundValue = ( playerScore1 + playerScore2 ) / 100;
+        as1 = ( ( 1 / roundValue ) * playerScore1 ) / 100;
+        as2 = ( ( 1 / roundValue ) * playerScore2 ) / 100;
+        System.out.println("roundValue " + roundValue + ", as1 : " + as1 + ", as2 : " + as2);
+        
+        float[] actualScores = { as1, as2 };
+        
+        return actualScores; 
     }
     
     private float calculateNewRating( float transformedRating, float kFactor, 
