@@ -10,8 +10,8 @@ public class MusicLadderModel
     public List<Song> getSongs() {
         List<Song> songs = new ArrayList();
         
-        Song s1 = new Song(0001,"Carly Rae Jepsen - Call Me Maybe", 950, 1000);
-        Song s2 = new Song(0002, "KOLLEGAH - John Gotti (prod. von Alexis Troy)", 1150, 1120);
+        Song s1 = new Song(0001,"Carly Rae Jepsen - Call Me Maybe", 0, 2, 5, 950, 1000);
+        Song s2 = new Song(0002, "KOLLEGAH - John Gotti (prod. von Alexis Troy)", 3, 1, 0, 1150, 1120);
         
         songs.add(s1);
         songs.add(s2);

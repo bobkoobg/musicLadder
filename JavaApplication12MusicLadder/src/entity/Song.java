@@ -8,6 +8,9 @@ public class Song
     private Integer id;
     private String name;
     private String alias;
+    private Integer wins;
+    private Integer draws;
+    private Integer loses;
     private float currentRating;
     private float formerRating;
     private List<String> genres;
@@ -15,13 +18,14 @@ public class Song
     private String description;
     private List<Duel> matches;
 
-    public Song(Integer ID, String name, String alias, float currentRating,
-            float formerRating, List<String> genres, List<String> singers,
-            String description, List<Duel> matches)
+    public Song(Integer id, String name, String alias, Integer wins, Integer draws, Integer loses, float currentRating, float formerRating, List<String> genres, List<String> singers, String description, List<Duel> matches)
     {
-        this.id = ID;
+        this.id = id;
         this.name = name;
         this.alias = alias;
+        this.wins = wins;
+        this.draws = draws;
+        this.loses = loses;
         this.currentRating = currentRating;
         this.formerRating = formerRating;
         this.genres = genres;
@@ -33,14 +37,17 @@ public class Song
     /*
      * Minimal requirements constructor
      */
-    public Song(Integer ID, String name, float currentRating, float formerRating)
+    public Song(Integer id, String name, Integer wins, Integer draws, Integer loses, float currentRating, float formerRating)
     {
-        this.id = ID;
+        this.id = id;
         this.name = name;
+        this.wins = wins;
+        this.draws = draws;
+        this.loses = loses;
         this.currentRating = currentRating;
         this.formerRating = formerRating;
     }
-
+    
     public Integer getId()
     {
         return id;
@@ -69,6 +76,48 @@ public class Song
     public void setAlias(String alias)
     {
         this.alias = alias;
+    }
+
+    public Integer getWins()
+    {
+        return wins;
+    }
+
+    public void setWins(Integer wins)
+    {
+        this.wins = wins;
+    }
+    
+    public void incrementWins() {
+        this.wins++;
+    }
+
+    public Integer getDraws()
+    {
+        return draws;
+    }
+
+    public void setDraws(Integer draws)
+    {
+        this.draws = draws;
+    }
+    
+    public void incremenetDraws() {
+        this.draws++;
+    }
+
+    public Integer getLoses()
+    {
+        return loses;
+    }
+
+    public void setLoses(Integer loses)
+    {
+        this.loses = loses;
+    }
+    
+    public void incrementLoses() {
+        this.loses++;
     }
 
     public float getCurrentRating()
@@ -134,10 +183,13 @@ public class Song
     @Override
     public String toString()
     {
-        return "Song{" + "id=" + id + ", name=" + name + ", alias=" + alias
-                + ", currentRating=" + currentRating + ", formerRating="
-                + formerRating + ", genres=" + genres + ", singers=" + singers
+        return "Song{" + "id=" + id + ", name=" + name + ", alias=" + alias 
+                + ", wins=" + wins + ", draws=" + draws + ", loses=" + loses 
+                + ", currentRating=" + currentRating + ", formerRating=" 
+                + formerRating + ", genres=" + genres + ", singers=" + singers 
                 + ", description=" + description + ", matches=" + matches + '}';
     }
+
+    
 
 }

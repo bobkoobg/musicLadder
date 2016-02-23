@@ -49,11 +49,12 @@ public class MusicLadderController
     
     private void helloWorld() {
         System.out.println("Hello World!");
-        System.out.println("song1 startup rating : 950");
-        System.out.println("song2 startup rating : 1150");
         
-        Song s1 = new Song(0001,"Carly Rae Jepsen - Call Me Maybe", 950, 1000);
-        Song s2 = new Song(0002, "KOLLEGAH - John Gotti (prod. von Alexis Troy)", 1150, 1120);
+        Song s1 = new Song(0001,"Carly Rae Jepsen - Call Me Maybe", 0, 2, 5, 950, 1000);
+        Song s2 = new Song(0002, "KOLLEGAH - John Gotti (prod. von Alexis Troy)", 3, 1, 0, 1150, 1120);
+        
+        System.out.println( "song1 startup : " + s1.toString() );
+        System.out.println( "song2 startup : " + s2.toString() );
         
         Duel d1 = new Duel(000001, s1.getId(), s2.getId(), s1.getCurrentRating(), s2.getCurrentRating() );
         
@@ -63,30 +64,42 @@ public class MusicLadderController
         eloRSC = eloRatingSystemCalculator.getInstance();
         
         float[] newSongRatings = eloRSC.calculate( d1 );
-        System.out.println("*****************");
-        System.out.println("song1 new rating : "+ newSongRatings[0]);
-        System.out.println("song2 new rating : "+ newSongRatings[1]);
-        
+         
         //after match
+        s1.incrementWins();
+        s2.incrementLoses();
+        
         s1.setFormerRating( s1.getCurrentRating() );
         s1.setCurrentRating( newSongRatings[0] );
         s2.setFormerRating( s2.getCurrentRating() );
         s2.setCurrentRating( newSongRatings[1] );
         
+        System.out.println("*****************");
+        System.out.println( "song1 new rating : " + s1.toString() );
+        System.out.println( "song2 new rating : " + s2.toString() );
+        
         //end
+        
         Duel d2 = new Duel(000002, s1.getId(), s2.getId(), s1.getCurrentRating(), s2.getCurrentRating() );
         
         d2.setSong1Score( 16 );
         d2.setSong2Score( 7 );
         
         newSongRatings = eloRSC.calculate( d2 );
-        System.out.println("*****************");
-        System.out.println("song1 new rating : "+ newSongRatings[0]);
-        System.out.println("song2 new rating : "+ newSongRatings[1]);
+        
+        //after match
+        s1.incrementWins();
+        s2.incrementLoses();
         
         s1.setFormerRating( s1.getCurrentRating() );
         s1.setCurrentRating( newSongRatings[0] );
         s2.setFormerRating( s2.getCurrentRating() );
         s2.setCurrentRating( newSongRatings[1] );
+        
+        System.out.println("*****************");
+        System.out.println( "song1 new rating : " + s1.toString() );
+        System.out.println( "song2 new rating : " + s2.toString() );
+        
+        //end
     }
 }

@@ -7,7 +7,9 @@ package view;
 
 import controller.MusicLadderController;
 import entity.Song;
+import java.awt.event.KeyEvent;
 import java.util.List;
+import javax.swing.JSlider;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
@@ -46,26 +48,28 @@ public class MusicLadder extends javax.swing.JFrame
         jScrollPane1 = new javax.swing.JScrollPane();
         jTableSongs = new javax.swing.JTable();
         jButtonGetSongs = new javax.swing.JButton();
+        jSliderSong1 = new javax.swing.JSlider();
+        jSliderSong2 = new javax.swing.JSlider();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jTableSongs.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][]
             {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
             },
             new String []
             {
-                "Name", "Score", "ELO Rating"
+                "Name", "Matches", "Wins", "Draws", "Loses", "ELO Rating"
             }
         )
         {
             Class[] types = new Class []
             {
-                java.lang.String.class, java.lang.Object.class, java.lang.Float.class
+                java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Float.class
             };
 
             public Class getColumnClass(int columnIndex)
@@ -84,25 +88,116 @@ public class MusicLadder extends javax.swing.JFrame
             }
         });
 
+        jSliderSong1.setMajorTickSpacing(1);
+        jSliderSong1.setMaximum(10);
+        jSliderSong1.setMinorTickSpacing(1);
+        jSliderSong1.setPaintLabels(true);
+        jSliderSong1.setPaintTicks(true);
+        jSliderSong1.setValue(5);
+        jSliderSong1.addMouseWheelListener(new java.awt.event.MouseWheelListener()
+        {
+            public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt)
+            {
+                jSliderSong1MouseWheelMoved(evt);
+            }
+        });
+        jSliderSong1.addMouseListener(new java.awt.event.MouseAdapter()
+        {
+            public void mouseReleased(java.awt.event.MouseEvent evt)
+            {
+                jSliderSong1MouseReleased(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt)
+            {
+                jSliderSong1MouseExited(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt)
+            {
+                jSliderSong1MouseEntered(evt);
+            }
+        });
+        jSliderSong1.addKeyListener(new java.awt.event.KeyAdapter()
+        {
+            public void keyPressed(java.awt.event.KeyEvent evt)
+            {
+                jSliderSong1KeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt)
+            {
+                jSliderSong1KeyReleased(evt);
+            }
+        });
+
+        jSliderSong2.setMajorTickSpacing(1);
+        jSliderSong2.setMaximum(10);
+        jSliderSong2.setMinorTickSpacing(1);
+        jSliderSong2.setPaintLabels(true);
+        jSliderSong2.setPaintTicks(true);
+        jSliderSong2.setValue(5);
+        jSliderSong2.addMouseWheelListener(new java.awt.event.MouseWheelListener()
+        {
+            public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt)
+            {
+                jSliderSong2MouseWheelMoved(evt);
+            }
+        });
+        jSliderSong2.addMouseListener(new java.awt.event.MouseAdapter()
+        {
+            public void mouseReleased(java.awt.event.MouseEvent evt)
+            {
+                jSliderSong2MouseReleased(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt)
+            {
+                jSliderSong2MouseExited(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt)
+            {
+                jSliderSong2MouseEntered(evt);
+            }
+        });
+        jSliderSong2.addChangeListener(new javax.swing.event.ChangeListener()
+        {
+            public void stateChanged(javax.swing.event.ChangeEvent evt)
+            {
+                jSliderSong2StateChanged(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(21, 21, 21)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButtonGetSongs)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(35, Short.MAX_VALUE))
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 950, Short.MAX_VALUE)
+                        .addComponent(jButtonGetSongs))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jSliderSong1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jSliderSong2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 439, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jButtonGetSongs)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 58, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(65, 65, 65))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(132, 132, 132)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jSliderSong1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jSliderSong2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
         pack();
@@ -113,6 +208,124 @@ public class MusicLadder extends javax.swing.JFrame
         List<Song> songs = mlc.getSongs();
         populatejTableFriends( songs );
     }//GEN-LAST:event_jButtonGetSongsActionPerformed
+
+    private void jSliderSong2StateChanged(javax.swing.event.ChangeEvent evt)//GEN-FIRST:event_jSliderSong2StateChanged
+    {//GEN-HEADEREND:event_jSliderSong2StateChanged
+
+    }//GEN-LAST:event_jSliderSong2StateChanged
+
+    private void jSliderSong2MouseReleased(java.awt.event.MouseEvent evt)//GEN-FIRST:event_jSliderSong2MouseReleased
+    {//GEN-HEADEREND:event_jSliderSong2MouseReleased
+        JSlider jss1 = jSliderSong1;
+        JSlider jss2 = jSliderSong2;
+        jss1.setValue( 10 -jss2.getValue() );
+    }//GEN-LAST:event_jSliderSong2MouseReleased
+
+    private void jSliderSong1MouseReleased(java.awt.event.MouseEvent evt)//GEN-FIRST:event_jSliderSong1MouseReleased
+    {//GEN-HEADEREND:event_jSliderSong1MouseReleased
+        JSlider jss1 = jSliderSong1;
+        JSlider jss2 = jSliderSong2;
+        jss2.setValue( 10 -jss1.getValue() );
+    }//GEN-LAST:event_jSliderSong1MouseReleased
+
+    private void jSliderSong2MouseEntered(java.awt.event.MouseEvent evt)//GEN-FIRST:event_jSliderSong2MouseEntered
+    {//GEN-HEADEREND:event_jSliderSong2MouseEntered
+
+    }//GEN-LAST:event_jSliderSong2MouseEntered
+
+    private void jSliderSong1MouseEntered(java.awt.event.MouseEvent evt)//GEN-FIRST:event_jSliderSong1MouseEntered
+    {//GEN-HEADEREND:event_jSliderSong1MouseEntered
+
+    }//GEN-LAST:event_jSliderSong1MouseEntered
+
+    private void jSliderSong1MouseExited(java.awt.event.MouseEvent evt)//GEN-FIRST:event_jSliderSong1MouseExited
+    {//GEN-HEADEREND:event_jSliderSong1MouseExited
+
+    }//GEN-LAST:event_jSliderSong1MouseExited
+
+    private void jSliderSong2MouseExited(java.awt.event.MouseEvent evt)//GEN-FIRST:event_jSliderSong2MouseExited
+    {//GEN-HEADEREND:event_jSliderSong2MouseExited
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jSliderSong2MouseExited
+
+    private void jSliderSong2MouseWheelMoved(java.awt.event.MouseWheelEvent evt)//GEN-FIRST:event_jSliderSong2MouseWheelMoved
+    {//GEN-HEADEREND:event_jSliderSong2MouseWheelMoved
+        JSlider jss1 = jSliderSong1;
+        JSlider jss2 = jSliderSong2;
+        
+        int notches = evt.getWheelRotation();
+        if (notches < 0)
+        {
+            if ( jss2.getValue() <= 10 && jss1.getValue() >= 1 )
+            {
+                jss2.setValue( jss2.getValue() + 1 );
+                jss1.setValue( jss1.getValue() - 1 );
+            }
+        } else
+        {
+            if ( jss2.getValue() >= 1 && jss1.getValue() <= 10 )
+            {
+                jss2.setValue( jss2.getValue() - 1 );
+                jss1.setValue( jss1.getValue() + 1 );
+            }
+        }
+    }//GEN-LAST:event_jSliderSong2MouseWheelMoved
+
+    private void jSliderSong1MouseWheelMoved(java.awt.event.MouseWheelEvent evt)//GEN-FIRST:event_jSliderSong1MouseWheelMoved
+    {//GEN-HEADEREND:event_jSliderSong1MouseWheelMoved
+        JSlider jss1 = jSliderSong1;
+        JSlider jss2 = jSliderSong2;
+        
+        int notches = evt.getWheelRotation();
+        if (notches < 0)
+        {
+            if ( jss2.getValue() <= 10 && jss1.getValue() >= 1 )
+            {
+                jss2.setValue( jss2.getValue() + 1 );
+                jss1.setValue( jss1.getValue() - 1 );
+            }
+        } else
+        {
+            if ( jss2.getValue() >= 1 && jss1.getValue() <= 10 )
+            {
+                jss2.setValue( jss2.getValue() - 1 );
+                jss1.setValue( jss1.getValue() + 1 );
+            }
+        }
+    }//GEN-LAST:event_jSliderSong1MouseWheelMoved
+
+    private void jSliderSong1KeyPressed(java.awt.event.KeyEvent evt)//GEN-FIRST:event_jSliderSong1KeyPressed
+    {//GEN-HEADEREND:event_jSliderSong1KeyPressed
+
+    }//GEN-LAST:event_jSliderSong1KeyPressed
+
+    private void jSliderSong1KeyReleased(java.awt.event.KeyEvent evt)//GEN-FIRST:event_jSliderSong1KeyReleased
+    {//GEN-HEADEREND:event_jSliderSong1KeyReleased
+        KeyEvent keyEvent = evt;
+        Integer way = 0;
+        JSlider jss1 = jSliderSong1;
+        JSlider jss2 = jSliderSong2;
+        
+        if( keyEvent.getKeyCode() == 38 || keyEvent.getKeyCode() == 39 ) {
+            way = 1;
+        } else if ( keyEvent.getKeyCode() == 37 || keyEvent.getKeyCode() == 40 ) {
+            way = -1;
+        }
+        
+         if (way < 0)
+        {
+            if ( jss2.getValue() <= 10 && jss1.getValue() >= 1 )
+            {   
+                jss2.setValue( jss2.getValue() + 1 );
+            }
+        } else
+        {
+            if ( jss2.getValue() >= 1 && jss1.getValue() <= 10 )
+            {
+                jss2.setValue( jss2.getValue() - 1 );
+            }
+        }
+    }//GEN-LAST:event_jSliderSong1KeyReleased
     
     public static void clearTable(final JTable table)
     {
@@ -130,19 +343,25 @@ public class MusicLadder extends javax.swing.JFrame
         clearTable( jTableSongs );
         String[] friendsTableColumnNames = new String[]
         {
-            "Name", "Score", "ELO Rating"
+            "Name", "Matches", "Wins", "Draws", "Loses", "ELO Rating"
         };
         
         Object[][] data = new Object[songs.size()][6];
         for (int i = 0; i < songs.size(); i++)
         {
             String name = songs.get(i).getName();
-            String score = "0-0-0";//listOfFriends.get(i).getFirstMessage();
+            Integer matches = ( songs.get(i).getWins() + songs.get(i).getDraws() + songs.get(i).getLoses() );
+            Integer wins = songs.get(i).getWins();
+            Integer draws = songs.get(i).getDraws();
+            Integer loses = songs.get(i).getLoses();
             Float eloRating = songs.get(i).getCurrentRating();
 
             data[i][0] = name;
-            data[i][1] = score;
-            data[i][2] = eloRating;
+            data[i][1] = matches;
+            data[i][2] = wins;
+            data[i][3] = draws;
+            data[i][4] = loses;
+            data[i][5] = eloRating;
         }
         
         jTableSongs.setModel(new DefaultTableModel(data, friendsTableColumnNames)
@@ -213,6 +432,8 @@ public class MusicLadder extends javax.swing.JFrame
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonGetSongs;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSlider jSliderSong1;
+    private javax.swing.JSlider jSliderSong2;
     private javax.swing.JTable jTableSongs;
     // End of variables declaration//GEN-END:variables
 }
