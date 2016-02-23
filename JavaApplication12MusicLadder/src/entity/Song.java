@@ -119,6 +119,10 @@ public class Song
     public void incrementLoses() {
         this.loses++;
     }
+    
+    public Integer getAmmountOfMatches() {
+        return ( this.wins + this.draws + this.loses );
+    }
 
     public float getCurrentRating()
     {
