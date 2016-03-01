@@ -34,9 +34,9 @@ public class eloRatingSystemCalculator
     public float[] calculate( Duel duel )
     {
         
-        float song1Rating = duel.getSong1OldRating();
+        float song1Rating = duel.getSong1BeforeMatchRating();
         float song1Points = duel.getSong1Score();
-        float song2Rating = duel.getSong2OldRating();
+        float song2Rating = duel.getSong1BeforeMatchRating();
         float song2Points = duel.getSong2Score();
         
         float transformedRating1 = calculateTransformedRating(song1Rating);

@@ -2,6 +2,7 @@ package controller;
 
 import entity.Duel;
 import entity.Song;
+import java.util.ArrayList;
 import java.util.List;
 import model.MusicLadderModel;
 import sun.util.calendar.CalendarUtils;
@@ -60,39 +61,63 @@ public class MusicLadderController
         return model.getDuelsMatchMax();
     }
     
+    public Integer getAmountOfDuels() {
+        return model.getAmountOfDuels();
+    }
+    
+    public List<Duel> getDuels(Integer amount) {
+        List<Duel> duels = new ArrayList();
+        for (int i = 0; i < amount; i++)
+        {
+            Duel duel = dG.generator( getAmountOfDuels(), getDuelsMatchMax() );
+            model.addDuel( duel );
+            duels.add( duel );
+        }
+        return duels;
+    }
+    
     private void helloWorld() {
         System.out.println("Hello World!");
         
-        List<Duel> nextThreeDuels = dG.getThreeDuels( getDuelsMatchMax() );
+        Float song1Rating = 2.5f;
+        Float song2Rating = 3.5f;
         
-        //Testing
+        String song1 = "A";
+        String song2 = "B";
         
-        for (int i = 0; i < nextThreeDuels.size() ; i++)
-        {
-            System.out.println("### DUEL " + i + " ### : " + nextThreeDuels.get(i).toString() );
-            
-            Duel duel = nextThreeDuels.get(i);
-
-            duel.setSong1Score( 16 );
-            duel.setSong2Score( 1 );
-
-            float[] newSongRatings = eloRSC.calculate( duel );
-
-            //after match
-            Song s1 = model.getSongByID(duel.getSong1ID() );
-            Song s2 = model.getSongByID(duel.getSong2ID() );
-            
-            s1.incrementWins();
-            s2.incrementLoses();
-
-            s1.setFormerRating( s1.getCurrentRating() );
-            s1.setCurrentRating( newSongRatings[0] );
-            s2.setFormerRating( s2.getCurrentRating() );
-            s2.setCurrentRating( newSongRatings[1] );
-
-            System.out.println("*****************");
-            System.out.println( "song1 new rating : " + s1.toString() );
-            System.out.println( "song2 new rating : " + s2.toString() );
-        }
+        System.out.println("1>>>" + Float.compare(song1Rating, song2Rating) );
+        System.out.println("2>>>" + song1.compareTo(song2) );
+        
+//        List<Duel> nextThreeDuels = getDuels( 3 );
+//        
+//        //Testing
+//        
+//        for (int i = 0; i < nextThreeDuels.size() ; i++)
+//        {
+//            System.out.println("### DUEL " + i + " ### : " + nextThreeDuels.get(i).toString() );
+//            
+//            Duel duel = nextThreeDuels.get(i);
+//
+//            duel.setSong1Score( 16 );
+//            duel.setSong2Score( 1 );
+//
+//            float[] newSongRatings = eloRSC.calculate( duel );
+//
+//            //after match
+//            Song s1 = model.getSongByID(duel.getSong1ID() );
+//            Song s2 = model.getSongByID(duel.getSong2ID() );
+//            
+//            s1.incrementWins();
+//            s2.incrementLoses();
+//
+//            s1.setFormerRating( s1.getCurrentRating() );
+//            s1.setCurrentRating( newSongRatings[0] );
+//            s2.setFormerRating( s2.getCurrentRating() );
+//            s2.setCurrentRating( newSongRatings[1] );
+//
+//            System.out.println("*****************");
+//            System.out.println( "song1 new rating : " + s1.toString() );
+//            System.out.println( "song2 new rating : " + s2.toString() );
+//        }
     }
 }

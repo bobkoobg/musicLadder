@@ -1,17 +1,23 @@
 
 package model;
 
+import entity.Duel;
 import entity.Song;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class MusicLadderModel
 {
     List<Song> songs;
+    List<Duel> duels;
 
     public MusicLadderModel()
     {
         songs = new ArrayList();
+        duels = new ArrayList();
         
         Song s1 = new Song( 1 ,"Carly Rae Jepsen - Call Me Maybe", 0, 2, 5, 950, 1000); //7
         Song s2 = new Song( 2, "KOLLEGAH - John Gotti (prod. von Alexis Troy)", 3, 1, 0, 1150, 1120); //4
@@ -36,7 +42,17 @@ public class MusicLadderModel
     
     
     public List<Song> getSongs() {
+        Collections.sort( songs, new SongRatingComparator() );
         return songs;
+    }
+    
+    public Integer getAmountOfDuels() {
+        return duels.size();
+    }
+    
+    public Boolean addDuel(Duel duel) {
+        duels.add(duel);
+        return true;
     }
     
     public Song getSongByID(Integer songId) {
@@ -70,5 +86,38 @@ public class MusicLadderModel
             }
         }
         return max;
+    }
+    
+    public static Comparator<Song> SongRatingComparator = new Comparator<Song>() {
+
+	    public int compare(Song song1, Song song2) {
+	    	
+	      Float song1Rating = song1.getCurrentRating();
+	      Float song2Rating = song2.getCurrentRating();
+	      
+	      //ascending order
+	      //return Float.compare( song1Rating, song2Rating );
+	      
+	      //descending order
+	      return Float.compare( song2Rating, song1Rating );
+	    }
+
+	};
+    
+    class SongRatingComparator implements Comparator<Song> {
+
+        @Override
+        public int compare(Song o1, Song o2)
+        {
+            Float song1Rating = o1.getCurrentRating();
+            Float song2Rating = o2.getCurrentRating();
+
+            //ascending order
+            return Float.compare( song1Rating, song2Rating );
+
+            //descending order
+            //return fruitName2.compareTo(fruitName1);
+        }
+        
     }
 }

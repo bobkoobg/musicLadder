@@ -39,33 +39,11 @@ public class duelGenerator
     {
         this.songs = songs;
     }
-
-    public List<Duel> getThreeDuels( Integer duelsSum )
-    {
-        List<Duel> duelList = new ArrayList();
-        for (int i = 0; i < 3; i++)
-        {
-            duelList.add( generator( duelsSum ) );
-        }
-        System.out.println("size ? : " + duelList.size());
-        return duelList;
-
-    }
-
-    public Duel getSigularDuel( Integer duelsSum  )
-    {
-        return generator( duelsSum  );
-
-    }
     
     /*
-    * Probability rates as follows :
-    *   - Less than 10 matches (including) - 10 times higher chance.
-    *   - Less than 25 matches (including) - 7 times higher chance.
-    *   - Less than 50 matches (including) - 4 times higher chance.
-    *   - More than 50 matches (excluding) - 1 time - normal chance.
+    * Probability generator
     */
-    private Duel generator( Integer duelsSum )
+    public Duel generator( Integer amountOfDuels, Integer duelsSum )
     {
        
         List<Integer> probabilitySongMap = new ArrayList();
@@ -111,7 +89,7 @@ public class duelGenerator
             }
         }
         
-        return new Duel(participant1ID, participant2ID, participant1Rating, participant2Rating);
+        return new Duel( ( amountOfDuels+1 ) ,participant1ID, participant2ID, participant1Rating, participant2Rating);
     }
 
 }

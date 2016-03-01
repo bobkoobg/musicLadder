@@ -6,6 +6,7 @@
 package view;
 
 import controller.MusicLadderController;
+import entity.Duel;
 import entity.Song;
 import java.awt.event.KeyEvent;
 import java.util.List;
@@ -32,7 +33,23 @@ public class MusicLadder extends javax.swing.JFrame
     }
     
     private void initSecondaryComponents() {
+        //Set GUI centered 
+        this.setLocationRelativeTo( null );
+        
+        //Load Controller
         mlc = MusicLadderController.getInstance();
+        
+        //Load songs
+        List<Song> songs = mlc.getSongs();
+        populatejTableFriends( songs );
+        
+        //Load Duels
+        List<Duel> duels = mlc.getDuels( 5 );
+        for (int i = 0; i < duels.size(); i++)
+        {
+            System.out.println( "#" + i + " : " + duels.get(i).toString() );
+        }
+        populatejTableDuels( duels );
     }
 
     /**
@@ -47,11 +64,20 @@ public class MusicLadder extends javax.swing.JFrame
 
         jScrollPane1 = new javax.swing.JScrollPane();
         jTableSongs = new javax.swing.JTable();
-        jButtonGetSongs = new javax.swing.JButton();
         jSliderSong1 = new javax.swing.JSlider();
         jSliderSong2 = new javax.swing.JSlider();
+        jLabelSong1Name = new javax.swing.JLabel();
+        jLabelSong2Name = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTableNextMatches = new javax.swing.JTable();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTablePreviousMatches = new javax.swing.JTable();
+        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Music Ladder");
 
         jTableSongs.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][]
@@ -78,15 +104,6 @@ public class MusicLadder extends javax.swing.JFrame
             }
         });
         jScrollPane1.setViewportView(jTableSongs);
-
-        jButtonGetSongs.setText("Get Songs");
-        jButtonGetSongs.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                jButtonGetSongsActionPerformed(evt);
-            }
-        });
 
         jSliderSong1.setMajorTickSpacing(1);
         jSliderSong1.setMaximum(10);
@@ -163,6 +180,49 @@ public class MusicLadder extends javax.swing.JFrame
                 jSliderSong2StateChanged(evt);
             }
         });
+        jSliderSong2.addKeyListener(new java.awt.event.KeyAdapter()
+        {
+            public void keyReleased(java.awt.event.KeyEvent evt)
+            {
+                jSliderSong2KeyReleased(evt);
+            }
+        });
+
+        jTableNextMatches.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][]
+            {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String []
+            {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane2.setViewportView(jTableNextMatches);
+
+        jLabel1.setText("Next Matches :");
+
+        jLabel2.setText("Previous Matches :");
+
+        jTablePreviousMatches.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][]
+            {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String []
+            {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane3.setViewportView(jTablePreviousMatches);
+
+        jLabel3.setText("Music Ladder");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -171,43 +231,56 @@ public class MusicLadder extends javax.swing.JFrame
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 950, Short.MAX_VALUE)
-                        .addComponent(jButtonGetSongs))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jSliderSong1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jSliderSong2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 439, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addGap(175, 175, 175)
+                        .addComponent(jLabel3))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jSliderSong1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabelSong1Name, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGap(18, 18, 18)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jSliderSong2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabelSong2Name, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel1)
+                        .addComponent(jLabel2)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 640, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButtonGetSongs)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 598, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(132, 132, 132)
+                        .addComponent(jLabel3)
+                        .addGap(41, 41, 41)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabelSong1Name, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabelSong2Name, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(40, 40, 40)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jSliderSong1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jSliderSong2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addGap(22, 22, 22)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))
         );
+
+        jLabelSong1Name.getAccessibleContext().setAccessibleName("jLabelSongName1");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jButtonGetSongsActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButtonGetSongsActionPerformed
-    {//GEN-HEADEREND:event_jButtonGetSongsActionPerformed
-        List<Song> songs = mlc.getSongs();
-        populatejTableFriends( songs );
-    }//GEN-LAST:event_jButtonGetSongsActionPerformed
 
     private void jSliderSong2StateChanged(javax.swing.event.ChangeEvent evt)//GEN-FIRST:event_jSliderSong2StateChanged
     {//GEN-HEADEREND:event_jSliderSong2StateChanged
@@ -314,18 +387,46 @@ public class MusicLadder extends javax.swing.JFrame
         
          if (way < 0)
         {
-            if ( jss2.getValue() <= 10 && jss1.getValue() >= 1 )
+            if ( jss2.getValue() <= 10 && jss1.getValue() >= 0 )
             {   
                 jss2.setValue( jss2.getValue() + 1 );
             }
         } else
         {
-            if ( jss2.getValue() >= 1 && jss1.getValue() <= 10 )
+            if ( jss2.getValue() >= 0 && jss1.getValue() <= 10 )
             {
                 jss2.setValue( jss2.getValue() - 1 );
             }
         }
     }//GEN-LAST:event_jSliderSong1KeyReleased
+
+    private void jSliderSong2KeyReleased(java.awt.event.KeyEvent evt)//GEN-FIRST:event_jSliderSong2KeyReleased
+    {//GEN-HEADEREND:event_jSliderSong2KeyReleased
+        KeyEvent keyEvent = evt;
+        Integer way = 0;
+        JSlider jss1 = jSliderSong1;
+        JSlider jss2 = jSliderSong2;
+        
+        if( keyEvent.getKeyCode() == 38 || keyEvent.getKeyCode() == 39 ) {
+            way = 1;
+        } else if ( keyEvent.getKeyCode() == 37 || keyEvent.getKeyCode() == 40 ) {
+            way = -1;
+        }
+        
+         if (way < 0)
+        {
+            if ( jss1.getValue() <= 10 && jss2.getValue() >= 0 )
+            {   
+                jss1.setValue( jss1.getValue() + 1 );
+            }
+        } else
+        {
+            if ( jss1.getValue() >= 0 && jss2.getValue() <= 10 )
+            {
+                jss1.setValue( jss1.getValue() - 1 );
+            }
+        }
+    }//GEN-LAST:event_jSliderSong2KeyReleased
     
     public static void clearTable(final JTable table)
     {
@@ -343,12 +444,13 @@ public class MusicLadder extends javax.swing.JFrame
         clearTable( jTableSongs );
         String[] friendsTableColumnNames = new String[]
         {
-            "Name", "Matches", "Wins", "Draws", "Loses", "ELO Rating"
+            "ID", "Name", "Matches", "Wins", "Draws", "Loses", "ELO Rating"
         };
         
-        Object[][] data = new Object[songs.size()][6];
+        Object[][] data = new Object[songs.size()][7];
         for (int i = 0; i < songs.size(); i++)
         {
+            Integer songID = songs.get(i).getId();
             String name = songs.get(i).getName();
             Integer matches = ( songs.get(i).getWins() + songs.get(i).getDraws() + songs.get(i).getLoses() );
             Integer wins = songs.get(i).getWins();
@@ -356,12 +458,13 @@ public class MusicLadder extends javax.swing.JFrame
             Integer loses = songs.get(i).getLoses();
             Float eloRating = songs.get(i).getCurrentRating();
 
-            data[i][0] = name;
-            data[i][1] = matches;
-            data[i][2] = wins;
-            data[i][3] = draws;
-            data[i][4] = loses;
-            data[i][5] = eloRating;
+            data[i][0] = songID;
+            data[i][1] = name;
+            data[i][2] = matches;
+            data[i][3] = wins;
+            data[i][4] = draws;
+            data[i][5] = loses;
+            data[i][6] = eloRating;
         }
         
         jTableSongs.setModel(new DefaultTableModel(data, friendsTableColumnNames)
@@ -373,12 +476,49 @@ public class MusicLadder extends javax.swing.JFrame
             }
         });
 
-//        jTableFriends.getColumnModel().getColumn(0).setPreferredWidth(3);
-//        jTableFriends.getColumnModel().getColumn(1).setPreferredWidth(10);
-//        jTableFriends.getColumnModel().getColumn(2).setPreferredWidth(5);
-//        jTableFriends.getColumnModel().getColumn(3).setPreferredWidth(10);
-//        jTableFriends.getColumnModel().getColumn(4).setPreferredWidth(10);
-//        jTableFriends.getColumnModel().getColumn(5).setPreferredWidth(7);
+        jTableSongs.getColumnModel().getColumn(0).setPreferredWidth(2);
+        jTableSongs.getColumnModel().getColumn(1).setPreferredWidth(300);
+        jTableSongs.getColumnModel().getColumn(2).setPreferredWidth(5);
+        jTableSongs.getColumnModel().getColumn(3).setPreferredWidth(2);
+        jTableSongs.getColumnModel().getColumn(4).setPreferredWidth(2);
+        jTableSongs.getColumnModel().getColumn(5).setPreferredWidth(2);
+        jTableSongs.getColumnModel().getColumn(6).setPreferredWidth(50);
+    }
+    
+    private void populatejTableDuels(List<Duel> duels) {
+        clearTable( jTableNextMatches );
+        
+        String[] duelsTableColumnNames = new String[]
+        {
+            "ID", "Song 1 ID", "Rating Song 1", "Song 2 ID", "Rating Song 2", "..."
+        };
+        
+        Object[][] data = new Object[duels.size()][6];
+        for (int i = 0; i < duels.size(); i++)
+        {
+            Integer songID = duels.get(i).getDuelID();
+            Integer song1ID = duels.get(i).getSong1ID();
+            Float song1Rating = duels.get(i).getSong1BeforeMatchRating();
+            Integer song2ID = duels.get(i).getSong2ID();
+            Float song2Rating = duels.get(i).getSong2BeforeMatchRating();
+            String others = "...";
+
+            data[i][0] = songID;
+            data[i][1] = song1ID;
+            data[i][2] = song1Rating;
+            data[i][3] = song2ID;
+            data[i][4] = song2Rating;
+            data[i][5] = others;
+        }
+        
+        jTableNextMatches.setModel(new DefaultTableModel(data, duelsTableColumnNames)
+        {
+            @Override
+            public boolean isCellEditable(int row, int column)
+            {
+                return false;
+            }
+        });
     }
     /**
      * @param args the command line arguments
@@ -430,10 +570,18 @@ public class MusicLadder extends javax.swing.JFrame
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButtonGetSongs;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabelSong1Name;
+    private javax.swing.JLabel jLabelSong2Name;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSlider jSliderSong1;
     private javax.swing.JSlider jSliderSong2;
+    private javax.swing.JTable jTableNextMatches;
+    private javax.swing.JTable jTablePreviousMatches;
     private javax.swing.JTable jTableSongs;
     // End of variables declaration//GEN-END:variables
 }
