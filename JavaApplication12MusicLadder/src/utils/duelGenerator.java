@@ -66,8 +66,10 @@ public class duelGenerator
     */
     private Duel generator()
     {
+        //future implementation
         Integer generalMatchCounter = 0;
-        Map<Integer, Integer> probabilitySongMap = new HashMap();
+        
+        List<Integer> probabilitySongMap = new ArrayList();
         Integer probabilityRate;
         Integer ammountOfMatches;
         for (int i = 0; i < songs.size(); i++)
@@ -90,62 +92,29 @@ public class duelGenerator
             {
                 probabilityRate = 1;
             }
-            //System.out.println("Matches : " + ammountOfMatches + ", probabilityRate? : " + probabilityRate + " for : " + songs.get(i).getName() );
+            
             for (int j = 0; j < probabilityRate; j++)
             {
-                probabilitySongMap.put( ( probabilitySongMap.size()+1 ), songs.get(i).getId());
+                probabilitySongMap.add( songs.get(i).getId() );
             }
 
             generalMatchCounter += ammountOfMatches;
         }
         
-        //Testing purposes
-        //System.out.println("Overal matches : " + generalMatchCounter);
-
-        for (Map.Entry<Integer, Integer> entry : probabilitySongMap.entrySet()) 
-        {
-
-            Integer key = entry.getKey();
-            Integer value = entry.getValue();
-            //System.out.println(key + " " + value);
-
-        }
-        //end
-        
         Random rn = new Random();
-        int i = rn.nextInt( probabilitySongMap.size() ) + 1;
-        //System.out.println("i is : " + i );
+        int i = rn.nextInt( probabilitySongMap.size() );
+        Integer participant1 = probabilitySongMap.get(i);
         
-        Integer participant1 = probabilitySongMap.get(i).intValue();
-        //System.out.println("id if participant #1 is : "+ participant1);
+        while(probabilitySongMap.remove( participant1 )) {};
         
-        probabilitySongMap.values().removeAll(Collections.singleton( participant1 ));
-        
-        //Testing purposes
-        //System.out.println("Overal matches : " + generalMatchCounter);
-
-        for (Map.Entry<Integer, Integer> entry : probabilitySongMap.entrySet()) 
-        {
-
-            Integer key = entry.getKey();
-            Integer value = entry.getValue();
-            System.out.println(key + " " + value);
-
-        }
-        //end
-        
-        //do random number while you catch exception
-        //if not exception - continue
         int j = rn.nextInt( probabilitySongMap.size() );
-        System.out.println("J is : " + j );
-        
-        Integer participant2 = probabilitySongMap.get(j).intValue();
-        System.out.println("id if participant #2 is : "+ participant2);
+        Integer participant2 = probabilitySongMap.get(j);
         
         Integer participant1ID = null;
         Float participant1Rating = null;
         Integer participant2ID = null;
         Float participant2Rating = null;
+        
         for (int k = 0; k < songs.size(); k++)
         {
             if( songs.get(k).getId() == participant1 ) {
@@ -156,10 +125,6 @@ public class duelGenerator
                 participant2Rating = songs.get(k).getCurrentRating();
             }
         }
-        System.out.println("participant1ID : " + participant1ID );
-        System.out.println("participant2ID : " + participant2ID );
-        System.out.println("participant1Rating : " + participant1Rating );
-        System.out.println("participant1Rating : " + participant2Rating );
         
         return new Duel(participant1ID, participant2ID, participant1Rating, participant2Rating);
     }
