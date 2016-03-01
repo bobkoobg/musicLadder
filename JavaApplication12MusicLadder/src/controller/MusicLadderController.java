@@ -53,6 +53,10 @@ public class MusicLadderController
         return model.getSongs();
     }
     
+    public Song getSongByID( Integer songID ) {
+        return model.getSongByID( songID );
+    }
+    
     public Integer getDuelsSum() {
         return model.getDuelsSum();
     }
@@ -74,6 +78,45 @@ public class MusicLadderController
             duels.add( duel );
         }
         return duels;
+    }
+    
+    public List<Song> saveDuel(Duel duel, Integer song1Score, Integer song2Score) {
+        
+        duel.setSong1Score( song1Score );
+        duel.setSong2Score( song2Score );
+        
+        System.out.println("duel ? : " + duel.toString() );
+        
+        float[] newSongRatings = eloRSC.calculate( duel );
+        
+        //after match
+        Song s1 = model.getSongByID(duel.getSong1ID() );
+        Song s2 = model.getSongByID(duel.getSong2ID() );
+        
+        System.out.println("song1Socre : " + song1Score);
+        System.out.println("song2Socre : " + song2Score);
+        
+        if( song1Score > song2Score ) {
+            s1.incrementWins();
+            s2.incrementLoses();
+            System.out.println("1 wins");
+        } else if ( song1Score < song2Score ) {
+            s1.incrementLoses();
+            s2.incrementWins();
+            System.out.println("2 wins");
+        } else  {
+            s1.incremenetDraws();
+            s2.incremenetDraws();
+            System.out.println("draw");
+        }
+        System.out.println( "New song rating 1 : " + newSongRatings[0] );
+        System.out.println( "New song rating 2 : " + newSongRatings[1] );
+        s1.setFormerRating( s1.getCurrentRating() );
+        s1.setCurrentRating( newSongRatings[0] );
+        s2.setFormerRating( s2.getCurrentRating() );
+        s2.setCurrentRating( newSongRatings[1] );
+
+        return getSongs();
     }
     
     private void helloWorld() {
