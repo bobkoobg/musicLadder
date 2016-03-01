@@ -6,9 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MusicLadderModel
-{   
-    public List<Song> getSongs() {
-        List<Song> songs = new ArrayList();
+{
+    List<Song> songs;
+
+    public MusicLadderModel()
+    {
+        songs = new ArrayList();
         
         Song s1 = new Song( 1 ,"Carly Rae Jepsen - Call Me Maybe", 0, 2, 5, 950, 1000); //7
         Song s2 = new Song( 2, "KOLLEGAH - John Gotti (prod. von Alexis Troy)", 3, 1, 0, 1150, 1120); //4
@@ -29,7 +32,43 @@ public class MusicLadderModel
         songs.add(s22);
         songs.add(s44);
         songs.add(s66);
+    }
     
+    
+    public List<Song> getSongs() {
         return songs;
+    }
+    
+    public Song getSongByID(Integer songId) {
+        Song song = null;
+        for (int i = 0; i < songs.size(); i++)
+        {
+            if( songs.get(i).getId() == songId ) {
+                song = songs.get(i);
+                break;
+            }
+        }
+        return song;
+    }
+    
+    public Integer getDuelsSum() {
+        Integer sum = 0;
+        for (int i = 0; i < songs.size(); i++)
+        {
+            sum += songs.get(i).getAmmountOfMatches();
+        }
+        return sum;
+    }
+    
+    public Integer getDuelsMatchMax() {
+        Integer max = 0, currentMax = 0;
+        for (int i = 0; i < songs.size(); i++)
+        {
+            currentMax = songs.get(i).getAmmountOfMatches();
+            if( max < currentMax ) {
+                max = currentMax;
+            }
+        }
+        return max;
     }
 }

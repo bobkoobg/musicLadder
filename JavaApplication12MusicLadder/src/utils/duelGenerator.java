@@ -19,6 +19,7 @@ public class duelGenerator
     private List<Song> songs;
 
     private static duelGenerator instance = null;
+    private static Integer probabilityRateLevels = 10;
 
     private duelGenerator()
     {
@@ -39,21 +40,21 @@ public class duelGenerator
         this.songs = songs;
     }
 
-    public List<Duel> getThreeDuels()
+    public List<Duel> getThreeDuels( Integer duelsSum )
     {
         List<Duel> duelList = new ArrayList();
         for (int i = 0; i < 3; i++)
         {
-            duelList.add( generator() );
+            duelList.add( generator( duelsSum ) );
         }
         System.out.println("size ? : " + duelList.size());
         return duelList;
 
     }
 
-    public Duel getSigularDuel()
+    public Duel getSigularDuel( Integer duelsSum  )
     {
-        return generator();
+        return generator( duelsSum  );
 
     }
     
@@ -64,41 +65,25 @@ public class duelGenerator
     *   - Less than 50 matches (including) - 4 times higher chance.
     *   - More than 50 matches (excluding) - 1 time - normal chance.
     */
-    private Duel generator()
+    private Duel generator( Integer duelsSum )
     {
-        //future implementation
-        Integer generalMatchCounter = 0;
-        
+       
         List<Integer> probabilitySongMap = new ArrayList();
-        Integer probabilityRate;
-        Integer ammountOfMatches;
+        Integer probabilityRange = duelsSum / probabilityRateLevels;
+        Integer probabilityRate, ammountOfMatches;
+        
         for (int i = 0; i < songs.size(); i++)
         {
             ammountOfMatches = songs.get(i).getAmmountOfMatches();
-
-            if (ammountOfMatches <= 10)
-            {
-                probabilityRate = 10;
-            }
-            else if (ammountOfMatches > 10 && ammountOfMatches <= 25)
-            {
-                probabilityRate = 7;
-            }
-            else if (ammountOfMatches > 25 && ammountOfMatches <= 50)
-            {
-                probabilityRate = 4;
-            }
-            else
-            {
-                probabilityRate = 1;
-            }
+            
+            probabilityRate = (10 - Math.round( ( ammountOfMatches / probabilityRange ) ) );
+            //Rank up songs with most songs to ProbabilityRate 1.
+            probabilityRate = (probabilityRate == 0) ? probabilityRate += 1 : probabilityRate;
             
             for (int j = 0; j < probabilityRate; j++)
             {
                 probabilitySongMap.add( songs.get(i).getId() );
             }
-
-            generalMatchCounter += ammountOfMatches;
         }
         
         Random rn = new Random();
