@@ -88,22 +88,6 @@ public class MusicLadderModel
         return max;
     }
     
-    public static Comparator<Song> SongRatingComparator = new Comparator<Song>() {
-
-	    public int compare(Song song1, Song song2) {
-	    	
-	      Float song1Rating = song1.getCurrentRating();
-	      Float song2Rating = song2.getCurrentRating();
-	      
-	      //ascending order
-	      //return Float.compare( song1Rating, song2Rating );
-	      
-	      //descending order
-	      return Float.compare( song2Rating, song1Rating );
-	    }
-
-	};
-    
     class SongRatingComparator implements Comparator<Song> {
 
         @Override
@@ -113,10 +97,10 @@ public class MusicLadderModel
             Float song2Rating = o2.getCurrentRating();
 
             //ascending order
-            return Float.compare( song1Rating, song2Rating );
+            //return Float.compare( song1Rating, song2Rating );
 
             //descending order
-            //return fruitName2.compareTo(fruitName1);
+            return Float.compare( song2Rating, song1Rating );
         }
         
     }
