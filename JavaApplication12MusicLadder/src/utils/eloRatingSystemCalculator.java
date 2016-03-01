@@ -33,24 +33,24 @@ public class eloRatingSystemCalculator
 
     public float[] calculate( Duel duel )
     {
-        
+             
         float song1Rating = duel.getSong1BeforeMatchRating();
         float song1Points = duel.getSong1Score();
-        float song2Rating = duel.getSong1BeforeMatchRating();
+        float song2Rating = duel.getSong2BeforeMatchRating();
         float song2Points = duel.getSong2Score();
         
         float transformedRating1 = calculateTransformedRating(song1Rating);
         float transformedRating2 = calculateTransformedRating(song2Rating);
-
+        
         float[] expectedScoreList = calculateExpectedScore(transformedRating1,
                                                            transformedRating2);
         float expectedScore1 = expectedScoreList[0];
         float expectedScore2 = expectedScoreList[1];
-
+        
         float[] actualScores = calculateActualScore(song1Points, song2Points);
         float song1ScoreRating = actualScores[0];
         float song2ScoreRating = actualScores[1];
-
+        
         float player1NewRating = calculateNewELORating(song1Rating, song1ScoreRating,
                                                        expectedScore1);
         float player2NewRating = calculateNewELORating(song2Rating, song2ScoreRating,
@@ -66,7 +66,8 @@ public class eloRatingSystemCalculator
     }
 
     /*
-     * 1rd step
+     * 1st step 
+     * Calculate Transformed rating based on the songs current rating
      */
     private float calculateTransformedRating(Float r)
     {
@@ -82,7 +83,8 @@ public class eloRatingSystemCalculator
     }
 
     /*
-     * 2rd step
+     * 2nd step
+     * Calculate the expected scores for both songs based on the transformed rating
      */
     private float[] calculateExpectedScore(Float t1, Float t2)
     {
@@ -101,6 +103,7 @@ public class eloRatingSystemCalculator
 
     /*
      * 3rd step
+     * Calculate their actual score based on the point they scored in the match
      */
     private float[] calculateActualScore(float song1Points, float song2Points)
     {
@@ -120,6 +123,8 @@ public class eloRatingSystemCalculator
 
     /*
      * 4th step
+     * Calculate the new ELO Rating based on the transformed rating, the actial 
+     *      calculated score of the songs and the expected calculated score
      */
     private float calculateNewELORating(float transformedRating, float actualScore,
             float expectedScore)
