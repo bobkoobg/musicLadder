@@ -15,15 +15,6 @@ import utils.eloRatingSystemCalculator;
  */
 public class MusicLadderController
 {
-
-    /**
-     * @param args the command line arguments
-     * Testing purposes!
-     */ 
-    public static void main(String[] args)
-    {
-        new MusicLadderController().helloWorld();
-    }
     
     private static MusicLadderController instance = null;
     
@@ -109,12 +100,16 @@ public class MusicLadderController
             s2.incremenetDraws();
             System.out.println("draw");
         }
-        System.out.println( "New song rating 1 : " + newSongRatings[0] );
-        System.out.println( "New song rating 2 : " + newSongRatings[1] );
+        
         s1.setFormerRating( s1.getCurrentRating() );
         s1.setCurrentRating( newSongRatings[0] );
         s2.setFormerRating( s2.getCurrentRating() );
         s2.setCurrentRating( newSongRatings[1] );
+        
+        System.out.println( "New song rating 1 : " + s1.toString() );
+        System.out.println( "New song rating 2 : " + s2.toString() );
+        System.out.println("1 : " + model.saveSong(s1) );
+        System.out.println("2 : " + model.saveSong(s2) );
 
         return getSongs();
     }

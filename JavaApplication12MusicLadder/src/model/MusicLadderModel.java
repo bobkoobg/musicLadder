@@ -67,6 +67,17 @@ public class MusicLadderModel
         return song;
     }
     
+    public Boolean saveSong( Song song ) {
+        for (int i = 0; i < songs.size(); i++)
+        {
+            if (song.getId() == songs.get(i).getId()) {
+                songs.set(i, song);
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public Integer getDuelsSum() {
         Integer sum = 0;
         for (int i = 0; i < songs.size(); i++)

@@ -22,6 +22,8 @@ public class MusicLadder extends javax.swing.JFrame
 {
     
     private MusicLadderController mlc = null;
+    private List<Song> songs = null;
+    private List<Duel> duels = null;
     private Duel currentDuel = null;
 
     /**
@@ -41,11 +43,11 @@ public class MusicLadder extends javax.swing.JFrame
         mlc = MusicLadderController.getInstance();
         
         //Load songs
-        List<Song> songs = mlc.getSongs();
+        songs = mlc.getSongs();
         populatejTableSongs( songs );
         
         //Load Duels
-        List<Duel> duels = mlc.getDuels( 5 );
+        duels = mlc.getDuels( 5 );
         populatejTableDuels( duels );
         
         currentDuel = duels.get(0);
@@ -490,7 +492,35 @@ public class MusicLadder extends javax.swing.JFrame
     {//GEN-HEADEREND:event_jButtonSaveResultActionPerformed
         Integer song1Score = jSliderSong1.getValue();
         Integer song2Score = jSliderSong2.getValue();
-        populatejTableSongs( mlc.saveDuel(currentDuel, song1Score, song2Score) );
+        
+        songs = mlc.saveDuel(currentDuel, song1Score, song2Score);
+        populatejTableSongs( songs );
+        
+        Float song1BeforeMatchRating = null, song2BeforeMatchRating = null;
+        
+        tableMatrixLoop:
+        for (int row = 0; row <= jTableSongs.getRowCount() - 1; row++) {
+
+            for (int col = 0; col <= jTableSongs.getColumnCount() - 1; col++) {
+                
+                for (int i = 0; i < songs.size(); i++)
+                {
+                    if ( currentDuel.getSong1ID() == songs.get(i).getId() ) {
+                        if ( songs.get(i).getName().equals(jTableSongs.getValueAt(row, col))) {
+                            song1BeforeMatchRating = (Float) jTableSongs.getValueAt(row, 6);
+                        }
+                    }
+                    
+                    if ( currentDuel.getSong2ID() == songs.get(i).getId() ) {
+                        if (songs.get(i).getName().equals(jTableSongs.getValueAt(row, col))) {
+                            song2BeforeMatchRating = (Float) jTableSongs.getValueAt(row, 6);
+                        }
+                    }
+                }
+            }
+        }
+        
+        currentDuel = new Duel(1231231, currentDuel.getSong1ID(), currentDuel.getSong2ID(), song1BeforeMatchRating, song2BeforeMatchRating);
     }//GEN-LAST:event_jButtonSaveResultActionPerformed
     
     private void selectValueFromjTableSongs( String songName ) {
