@@ -46,15 +46,6 @@ public class MusicLadderModel
         return songs;
     }
     
-    public Integer getAmountOfDuels() {
-        return duels.size();
-    }
-    
-    public Boolean addDuel(Duel duel) {
-        duels.add(duel);
-        return true;
-    }
-    
     public Song getSongByID(Integer songId) {
         Song song = null;
         for (int i = 0; i < songs.size(); i++)
@@ -76,6 +67,28 @@ public class MusicLadderModel
             }
         }
         return false;
+    }
+    
+    public List<Duel> getDuels( Integer amount ) {
+        List<Duel> playedDuels = new ArrayList();
+        for (int i = 0; i < duels.size(); i++)
+        {
+            if( duels.get(i).getSong1AfterMatchRating() != 0.0f &&
+                    duels.get(i).getSong2AfterMatchRating() != 0.0f ) {
+                playedDuels.add( duels.get(i) );
+            }
+        }
+        Collections.sort( playedDuels, new DuelRatingComparator() );
+        return playedDuels;
+    }
+    
+    public Integer getAmountOfDuels() {
+        return duels.size();
+    }
+    
+    public Boolean addDuel(Duel duel) {
+        duels.add(duel);
+        return true;
     }
     
     public Integer getDuelsSum() {
@@ -112,6 +125,23 @@ public class MusicLadderModel
 
             //descending order
             return Float.compare( song2Rating, song1Rating );
+        }
+        
+    }
+    
+    class DuelRatingComparator implements Comparator<Duel> {
+
+        @Override
+        public int compare(Duel o1, Duel o2)
+        {
+            Integer song1Rating = o1.getDuelID();
+            Integer song2Rating = o2.getDuelID();
+
+            //ascending order
+            //return Integer.compare( song1Rating, song2Rating );
+
+            //descending order
+            return Integer.compare( song2Rating, song1Rating );
         }
         
     }
