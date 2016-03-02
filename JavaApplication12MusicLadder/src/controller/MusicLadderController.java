@@ -115,4 +115,8 @@ public class MusicLadderController
 
         return getSongs();
     }
+    
+    public float[] predictDuelResults( Duel duel ) {
+        return eloRSC.calculate(duel);
+    }
 }
