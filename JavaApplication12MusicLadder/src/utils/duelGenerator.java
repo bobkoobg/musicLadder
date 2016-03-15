@@ -50,8 +50,11 @@ public class duelGenerator
         for (int i = 0; i < songs.size(); i++)
         {
             ammountOfMatches = songs.get(i).getAmmountOfMatches();
-            
-            probabilityRate = (10 - Math.round( ( ammountOfMatches / probabilityRange ) ) );
+            if( probabilityRange > 0 ) {
+                probabilityRate = (10 - Math.round( ( ammountOfMatches / probabilityRange ) ) );
+            } else {
+                probabilityRate = 10;
+            }
             //Rank up songs with most songs to ProbabilityRate 1.
             probabilityRate = (probabilityRate == 0) ? probabilityRate += 1 : probabilityRate;
             

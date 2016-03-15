@@ -48,6 +48,20 @@ public class Song
         this.formerRating = formerRating;
     }
     
+    /*
+     * Minimal requirements constructor
+     */
+    public Song(Integer id, String name)
+    {
+        this.id = id;
+        this.name = name;
+        this.wins = 0;
+        this.draws = 0;
+        this.loses = 0;
+        this.currentRating = 1000;
+        this.formerRating = 1000;
+    }
+    
     public Integer getId()
     {
         return id;

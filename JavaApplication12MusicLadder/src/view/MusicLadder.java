@@ -638,21 +638,33 @@ public class MusicLadder extends javax.swing.JFrame
         clearTable( jTableSongs );
         String[] friendsTableColumnNames = new String[]
         {
-            "ID", "Name", "Matches", "Wins", "Draws", "Loses", "ELO Rating"
+            "Rank", "Name", "Matches", "Wins", "Draws", "Loses", "ELO Rating"
         };
         
         Object[][] data = new Object[songs.size()][7];
+        Integer previousRank = 1;
+        Float previousScore = 0.0f;
         for (int i = 0; i < songs.size(); i++)
         {
-            Integer songID = songs.get(i).getId();
+            if( i == 0 ) {
+                previousRank = i + 1;
+                previousScore = songs.get(i).getCurrentRating();
+            } else {
+                if ( previousScore != songs.get(i).getCurrentRating() ){
+                    previousRank = i + 1;
+                    previousScore = songs.get(i).getCurrentRating();
+                }
+            }
+            
+            String rank = ( songs.get(i).getCurrentRating() != 1000 ? previousRank + "" : "N/A" );
             String name = songs.get(i).getName();
             Integer matches = ( songs.get(i).getWins() + songs.get(i).getDraws() + songs.get(i).getLoses() );
             Integer wins = songs.get(i).getWins();
             Integer draws = songs.get(i).getDraws();
             Integer loses = songs.get(i).getLoses();
-            Float eloRating = songs.get(i).getCurrentRating();
+            String eloRating = String.format("%.2f", songs.get(i).getCurrentRating() );
 
-            data[i][0] = songID;
+            data[i][0] = rank;
             data[i][1] = name;
             data[i][2] = matches;
             data[i][3] = wins;
@@ -722,32 +734,34 @@ public class MusicLadder extends javax.swing.JFrame
         
         String[] duelsTableColumnNames = new String[]
         {
-            "DID", "Song1", "S1 Pts","S1 Pts +/-", "S1 Score", "S2 Score" ,"S2 Pts +/-", "S2 Pts", "Song2"
+            "DID", "Song1", "s1 Old Pts", "S1 New Pts", "S1 Score","+/-", "S2 Score", "S2 New Pts","s2 Old Pts", "Song2"
         };
         
-        Object[][] data = new Object[duels.size()][9];
+        Object[][] data = new Object[duels.size()][10];
         for (int i = 0; i < duels.size(); i++)
         {
             Integer songID = duels.get(i).getDuelID();
             String song1Name = mlc.getSongByID( duels.get(i).getSong1ID() ).getName();
+            Float song1OldRating = duels.get(i).getSong1BeforeMatchRating();
             Float song1Rating = duels.get(i).getSong1AfterMatchRating();
-            Float song1RatingChange = ( duels.get(i).getSong1AfterMatchRating() - duels.get(i).getSong1BeforeMatchRating() );
             Integer song1Points = duels.get(i).getSong1Score();
+            float range = Math.abs( duels.get(i).getSong1AfterMatchRating() - duels.get(i).getSong1BeforeMatchRating() );
             Integer song2Points = duels.get(i).getSong2Score();
-            Float song2RatingChange = ( duels.get(i).getSong2AfterMatchRating() - duels.get(i).getSong2BeforeMatchRating() );
             Float song2Rating = duels.get(i).getSong2AfterMatchRating();
+            Float song2OldRating = duels.get(i).getSong2BeforeMatchRating();
             String song2Name = mlc.getSongByID( duels.get(i).getSong2ID() ).getName();
             
 
             data[i][0] = songID;
             data[i][1] = song1Name;
-            data[i][2] = song1Rating;
-            data[i][3] = song1RatingChange;
+            data[i][2] = song1OldRating;
+            data[i][3] = song1Rating;
             data[i][4] = song1Points;
-            data[i][5] = song2Points;
-            data[i][6] = song2RatingChange;
+            data[i][5] = range;
+            data[i][6] = song2Points;
             data[i][7] = song2Rating;
-            data[i][8] = song2Name;
+            data[i][8] = song2OldRating;
+            data[i][9] = song2Name;
             
         }
         

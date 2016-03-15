@@ -2,11 +2,13 @@ package controller;
 
 import entity.Duel;
 import entity.Song;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import model.MusicLadderModel;
 import utils.duelGenerator;
 import utils.eloRatingSystemCalculator;
+import utils.songReader;
 
 public class MusicLadderController
 {
@@ -21,7 +23,7 @@ public class MusicLadderController
     }
     
     private void helloWorld() {
-        System.out.println("Hello World!");
+        System.out.println("Hello World!");   
     }
     */
     
@@ -37,6 +39,13 @@ public class MusicLadderController
         model = new MusicLadderModel();
         eloRSC = eloRatingSystemCalculator.getInstance();
         dG = duelGenerator.getInstance();
+        
+        songReader sr = new songReader();
+        File[] songFiles = sr.finder("/media/bobkoo/SWAG/Music/Flashback OldSchool Mix/");
+        for (int i = 0; i < songFiles.length; i++)
+        {
+            model.saveSong( new Song( model.getSongsCount(), songFiles[i].getName() ) );
+        }
         dG.setSongs( model.getSongs() );
     }
 
