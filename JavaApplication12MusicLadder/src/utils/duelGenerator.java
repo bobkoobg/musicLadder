@@ -13,8 +13,6 @@ import java.util.Random;
 public class duelGenerator
 {
 
-    private List<Song> songs;
-
     private static duelGenerator instance = null;
     private static Integer probabilityRateLevels = 10;
 
@@ -31,16 +29,11 @@ public class duelGenerator
         }
         return instance;
     }
-
-    public void setSongs(List<Song> songs)
-    {
-        this.songs = songs;
-    }
     
     /*
     * Probability generator
     */
-    public Duel generator( Integer amountOfDuels, Integer duelsSum )
+    public Duel generator( List<Song> songs, Integer amountOfDuels, Integer duelsSum )
     {
        
         List<Integer> probabilitySongMap = new ArrayList();

@@ -99,6 +99,15 @@ public class MusicLadderModel
         return max;
     }
     
+    //cleanup
+    public void clearSongs() {
+        songs = new ArrayList<Song>();
+    }
+    
+    public void clearDuels() {
+        duels = new ArrayList<Duel>();
+    }
+    
     class SongRatingComparator implements Comparator<Song> {
 
         @Override

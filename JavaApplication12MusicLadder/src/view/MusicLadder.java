@@ -11,6 +11,7 @@ import entity.Song;
 import java.awt.event.KeyEvent;
 import java.text.DecimalFormat;
 import java.util.List;
+import javax.swing.JFileChooser;
 import javax.swing.JSlider;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -29,6 +30,7 @@ public class MusicLadder extends javax.swing.JFrame
     List<Duel> previousDuels = null;
     private Song song1 = null;
     private Song song2 = null;
+    private String currentDirectory = null;
 
     /**
      * Creates new form MusicLadder
@@ -46,26 +48,8 @@ public class MusicLadder extends javax.swing.JFrame
         //Load Controller
         mlc = MusicLadderController.getInstance();
         
-        //Load songs
-        songs = mlc.getSongs();
-        populatejTableSongs( songs );
-        
-        //Load Duels
-        duels = mlc.generateDuels( 5 );
-        populatejTableDuels( duels );
-        
-        //Load previous duels
-        previousDuels = mlc.getDuels( 10 );
-        populatejTablePreviousMatches( previousDuels );
-        
-        currentDuel = duels.get(0);
-        song1 = mlc.getSongByID( currentDuel.getSong1ID() );
-        song2 = mlc.getSongByID( currentDuel.getSong2ID() );
-        
-        jLabelSong1Name.setText( song1.getName() );
-        jLabelSong2Name.setText( song2.getName() );
-        
-        loadPredictions();
+        jTextFieldFileLocation.setEditable(false);
+        jButtonSaveResult.setEnabled(false);
         
     }
 
@@ -99,6 +83,8 @@ public class MusicLadder extends javax.swing.JFrame
         jLabelSong2MinPts = new javax.swing.JLabel();
         jLabelSong2AvgPts = new javax.swing.JLabel();
         jLabelSong2MaxPts = new javax.swing.JLabel();
+        jButtonBrowse = new javax.swing.JButton();
+        jTextFieldFileLocation = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Music Ladder");
@@ -106,6 +92,22 @@ public class MusicLadder extends javax.swing.JFrame
         jTableSongs.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][]
             {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
                 {null, null, null, null, null, null},
                 {null, null, null, null, null, null},
                 {null, null, null, null, null, null},
@@ -237,16 +239,28 @@ public class MusicLadder extends javax.swing.JFrame
         jTableNextMatches.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][]
             {
-                {},
-                {},
-                {},
-                {}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String []
             {
-
+                "ID", "Song 1 Name", "S.R. 1", "Song 2 Name", "S.R. 2"
             }
-        ));
+        )
+        {
+            Class[] types = new Class []
+            {
+                java.lang.Integer.class, java.lang.String.class, java.lang.Float.class, java.lang.String.class, java.lang.Float.class
+            };
+
+            public Class getColumnClass(int columnIndex)
+            {
+                return types [columnIndex];
+            }
+        });
         jScrollPane2.setViewportView(jTableNextMatches);
 
         jLabel1.setText("Next Matches :");
@@ -256,16 +270,30 @@ public class MusicLadder extends javax.swing.JFrame
         jTablePreviousMatches.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][]
             {
-                {},
-                {},
-                {},
-                {}
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null}
             },
             new String []
             {
-
+                "DID", "Song1", "S1 Old Pts", "S1 New Pts", "S1 Score", "+/-", "S2 Score", "S2 New Pts", "S2 Old Pts", "Song2"
             }
-        ));
+        )
+        {
+            Class[] types = new Class []
+            {
+                java.lang.Integer.class, java.lang.String.class, java.lang.Float.class, java.lang.Float.class, java.lang.Integer.class, java.lang.Float.class, java.lang.Integer.class, java.lang.Float.class, java.lang.Float.class, java.lang.String.class
+            };
+
+            public Class getColumnClass(int columnIndex)
+            {
+                return types [columnIndex];
+            }
+        });
         jScrollPane3.setViewportView(jTablePreviousMatches);
 
         jLabel3.setText("Music Ladder");
@@ -279,6 +307,15 @@ public class MusicLadder extends javax.swing.JFrame
             }
         });
 
+        jButtonBrowse.setText("Browse");
+        jButtonBrowse.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                jButtonBrowseActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -286,13 +323,13 @@ public class MusicLadder extends javax.swing.JFrame
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane3))
+                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                        .addGap(175, 175, 175)
-                                        .addComponent(jLabel3))
                                     .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING)
@@ -318,38 +355,43 @@ public class MusicLadder extends javax.swing.JFrame
                                                 .addComponent(jLabelSong2MaxPts, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))))))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(174, 174, 174)
-                                .addComponent(jButtonSaveResult)))
+                                .addComponent(jButtonSaveResult))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(185, 185, 185)
+                                .addComponent(jLabel3)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 640, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane3)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jTextFieldFileLocation)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButtonBrowse, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 640, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonBrowse)
+                    .addComponent(jTextFieldFileLocation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel3)
+                        .addGap(17, 17, 17)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabelSong1Name, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabelSong2Name, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(41, 41, 41)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabelSong1Name, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabelSong2Name, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabelSong1AvgPts, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabelSong1MaxPts, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabelSong2MinPts, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabelSong2MaxPts, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabelSong2AvgPts, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jLabelSong1MinPts, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jLabelSong1AvgPts, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabelSong1MaxPts, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabelSong2MinPts, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabelSong2MaxPts, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabelSong2AvgPts, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jLabelSong1MinPts, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jSliderSong1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jSliderSong2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -361,9 +403,12 @@ public class MusicLadder extends javax.swing.JFrame
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel2))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 355, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jLabelSong1Name.getAccessibleContext().setAccessibleName("jLabelSongName1");
@@ -545,7 +590,7 @@ public class MusicLadder extends javax.swing.JFrame
         jSliderSong2.setValue( 5 );
         
         previousDuels = mlc.getDuels( 10 );
-        populatejTablePreviousMatches( previousDuels );
+        populatejTablePreviousDuels(previousDuels );
         
         if( duels.size() > 0 ) {
             currentDuel = duels.get(0);
@@ -559,6 +604,9 @@ public class MusicLadder extends javax.swing.JFrame
             loadPredictions();
             
             duels.add( mlc.generateDuels( 1 ).get(0) );
+            
+            jTableNextMatches.getSelectionModel().clearSelection();
+            jTableNextMatches.setRowSelectionInterval(0, 0);
             
         } else {
             jButtonSaveResult.setEnabled( false );
@@ -574,6 +622,67 @@ public class MusicLadder extends javax.swing.JFrame
         
         populatejTableDuels( duels );
     }//GEN-LAST:event_jButtonSaveResultActionPerformed
+
+    private void jButtonBrowseActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButtonBrowseActionPerformed
+    {//GEN-HEADEREND:event_jButtonBrowseActionPerformed
+        String chooserTitle = "Choose a directory filled with music.";
+        JFileChooser fileChooser = new JFileChooser(); 
+        
+        //Start from current directory
+        fileChooser.setCurrentDirectory(new java.io.File( ( currentDirectory == null ? "." : currentDirectory )));
+        
+        //Set title of browse window
+        fileChooser.setDialogTitle(chooserTitle);
+        
+        //Directories only
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        
+        //Do not accept file selections
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        
+        //If a directory is chosen    
+        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) { 
+            //System.out.println( "getCurrentDirectory(): " +  fileChooser.getCurrentDirectory() );
+            //System.out.println( "getSelectedFile() : " +  fileChooser.getSelectedFile() );
+            currentDirectory = fileChooser.getSelectedFile().toString();
+            jTextFieldFileLocation.setText( currentDirectory );
+            
+            //Load songs
+            mlc.clearSystem();
+            jButtonSaveResult.setEnabled(false);
+            songs = mlc.loadSongs( currentDirectory );
+            populatejTableSongs( songs );
+            
+            //Load previous duels
+            previousDuels = mlc.getDuels( 10 );
+            populatejTablePreviousDuels( previousDuels );
+            
+            clearTable( jTableNextMatches );
+            
+            if( songs.size() > 0 ) {
+                jButtonSaveResult.setEnabled(true);
+                //Load Duels
+                duels = mlc.generateDuels( 5 );
+                populatejTableDuels( duels );
+                
+                //set current duel GUI settings
+                currentDuel = duels.get(0);
+                song1 = mlc.getSongByID( currentDuel.getSong1ID() );
+                song2 = mlc.getSongByID( currentDuel.getSong2ID() );
+
+                jLabelSong1Name.setText( song1.getName() );
+                jLabelSong2Name.setText( song2.getName() );
+                
+                loadPredictions();
+                
+                jTableNextMatches.getSelectionModel().clearSelection();
+                jTableNextMatches.setRowSelectionInterval(1, 1);
+            } else {
+                clearTable(jTableSongs);
+                clearTable(jTablePreviousMatches);
+            }
+        }   
+    }//GEN-LAST:event_jButtonBrowseActionPerformed
     
     private void loadPredictions() {
         Duel prediction1 = currentDuel;
@@ -729,7 +838,7 @@ public class MusicLadder extends javax.swing.JFrame
          jTableNextMatches.getColumnModel().getColumn(3).setPreferredWidth(130);
     }
     
-    private void populatejTablePreviousMatches(List<Duel> duels) {
+    private void populatejTablePreviousDuels(List<Duel> duels) {
         clearTable( jTablePreviousMatches );
         
         String[] duelsTableColumnNames = new String[]
@@ -826,6 +935,7 @@ public class MusicLadder extends javax.swing.JFrame
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButtonBrowse;
     private javax.swing.JButton jButtonSaveResult;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -846,5 +956,6 @@ public class MusicLadder extends javax.swing.JFrame
     private javax.swing.JTable jTableNextMatches;
     private javax.swing.JTable jTablePreviousMatches;
     private javax.swing.JTable jTableSongs;
+    private javax.swing.JTextField jTextFieldFileLocation;
     // End of variables declaration//GEN-END:variables
 }

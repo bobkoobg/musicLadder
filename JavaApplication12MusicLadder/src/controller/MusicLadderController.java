@@ -32,6 +32,7 @@ public class MusicLadderController
     private MusicLadderModel model = null;  
     private eloRatingSystemCalculator eloRSC = null;
     private duelGenerator dG = null;
+    private songReader sr = null;
 
     private MusicLadderController()
     {
@@ -39,14 +40,7 @@ public class MusicLadderController
         model = new MusicLadderModel();
         eloRSC = eloRatingSystemCalculator.getInstance();
         dG = duelGenerator.getInstance();
-        
-        songReader sr = new songReader();
-        File[] songFiles = sr.finder("/media/bobkoo/SWAG/Music/Flashback OldSchool Mix/");
-        for (int i = 0; i < songFiles.length; i++)
-        {
-            model.saveSong( new Song( model.getSongsCount(), songFiles[i].getName() ) );
-        }
-        dG.setSongs( model.getSongs() );
+        sr = new songReader();
     }
 
     public static MusicLadderController getInstance()
@@ -56,6 +50,23 @@ public class MusicLadderController
             instance = new MusicLadderController();
         }
         return instance;
+    }
+    
+    public List<Song> loadSongs( String path) {
+        File[] songFiles = sr.finder( path );
+        for (int i = 0; i < songFiles.length; i++)
+        {
+            model.saveSong( new Song( model.getSongsCount(), songFiles[i].getName() ) );
+        }
+        
+        List<Song> songList = model.getSongs();
+        return songList;
+    }
+    
+    //Cleanup before insert
+    public void clearSystem() {
+        model.clearDuels();
+        model.clearSongs();
     }
     
     public List<Song> getSongs() {
@@ -86,7 +97,7 @@ public class MusicLadderController
         List<Duel> duels = new ArrayList();
         for (int i = 0; i < amount; i++)
         {
-            Duel duel = dG.generator( getAmountOfDuels(), getDuelsMatchMax() );
+            Duel duel = dG.generator( model.getSongs(), getAmountOfDuels(), getDuelsMatchMax() );
             model.addDuel( duel );
             duels.add( duel );
         }
