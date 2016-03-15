@@ -648,6 +648,7 @@ public class MusicLadder extends javax.swing.JFrame
             jTextFieldFileLocation.setText( currentDirectory );
             
             //Load songs
+            //TODO (for cleaning GUI - Clear Duel area when pointing to directory with no songs)
             mlc.clearSystem();
             jButtonSaveResult.setEnabled(false);
             songs = mlc.loadSongs( currentDirectory );
