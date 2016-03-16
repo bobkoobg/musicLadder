@@ -6,16 +6,16 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import model.MusicLadderModel;
-import utils.duelGenerator;
-import utils.eloRatingSystemCalculator;
-import utils.songReader;
+import utils.DuelGenerator;
+import utils.EloRatingSystemCalculator;
+import utils.SongReader;
 
 public class MusicLadderController
 {
     
     /*
     * Testing purposes
-    * /
+    */
     
     public static void main(String[] args)
     {
@@ -24,23 +24,25 @@ public class MusicLadderController
     
     private void helloWorld() {
         System.out.println("Hello World!");   
+        Facade f = Facade.getInstance();
+        f.initializeConnection();
+        f.closeConnection();
     }
-    */
     
     private static MusicLadderController instance = null;
     
     private MusicLadderModel model = null;  
-    private eloRatingSystemCalculator eloRSC = null;
-    private duelGenerator dG = null;
-    private songReader sr = null;
+    private EloRatingSystemCalculator eloRSC = null;
+    private DuelGenerator dG = null;
+    private SongReader sr = null;
 
     private MusicLadderController()
     {
         // Exists only to defeat instantiation.
         model = new MusicLadderModel();
-        eloRSC = eloRatingSystemCalculator.getInstance();
-        dG = duelGenerator.getInstance();
-        sr = new songReader();
+        eloRSC = EloRatingSystemCalculator.getInstance();
+        dG = DuelGenerator.getInstance();
+        sr = new SongReader();
     }
 
     public static MusicLadderController getInstance()
