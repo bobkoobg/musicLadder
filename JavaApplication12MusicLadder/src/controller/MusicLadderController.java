@@ -26,6 +26,7 @@ public class MusicLadderController
         System.out.println("Hello World!");   
         Facade f = Facade.getInstance();
         f.initializeConnection();
+        f.insertSong("ZHU - Faded");
         f.closeConnection();
     }
     

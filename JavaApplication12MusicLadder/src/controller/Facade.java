@@ -5,8 +5,10 @@
  */
 package controller;
 
+import entity.Song;
 import java.sql.Connection;
 import java.sql.SQLException;
+import mapper.SongMapper;
 import utils.DatabaseConnector;
 
 /**
@@ -24,11 +26,13 @@ public class Facade
 //    private static String databaseHost = "jdbc:oracle:thin:@datdb.cphbusiness.dk:1521:dat";
 //    private static String databaseUsername = "cphbs96";
 //    private static String databasePassword = "cphbs96";
+    private SongMapper songMapper = null;
     
     private Facade()
     {
         // Exists only to defeat instantiation.
         databaseConnector = new DatabaseConnector(databaseHost, databaseUsername, databasePassword);
+        songMapper = new SongMapper();
     }
 
     public static Facade getInstance()
@@ -95,5 +99,9 @@ public class Facade
         }
         System.out.println("Connection closed");
         return true;
+    }
+    
+    public boolean insertSong(String name) {
+        return songMapper.insert(connection, name);
     }
 }
