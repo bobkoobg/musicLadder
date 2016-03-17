@@ -43,10 +43,9 @@ public class PerformanceLogger
             fh.setFormatter(formatter);  
 
         } catch (SecurityException | IOException e) { 
-            System.out.println("FATAL ERROR while trying to create and add a handler to the logger :  " + e );
+            System.out.println("SecurityException or IOException while trying to create and add a handler to the logger :  " + e );
         }
-        System.out.println("Hello ?!");
-        logger.info("***** NEW SESSION *****");
+        logger.info("\n***** NEW SESSION *****\n");
         logger.info(logger.getName() + " Logger started!");
         return logger;
 

@@ -1,11 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller;
 
-import entity.Song;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Logger;
@@ -20,19 +14,18 @@ public class Facade
 {   
     private static Facade instance = null;
     private Connection connection;
-    private DatabaseConnector databaseConnector;
-    private static String databaseHost = "jdbc:oracle:thin:@127.0.0.1:1521:XE";
-    private static String databaseUsername = "bobkoo";
-    private static String databasePassword = "qwerty12345";
-//    private static String databaseHost = "jdbc:oracle:thin:@datdb.cphbusiness.dk:1521:dat";
-//    private static String databaseUsername = "cphbs96";
-//    private static String databasePassword = "cphbs96";
-    private SongMapper songMapper = null;
+    private DatabaseConnector databaseConnector;  
+    private SongMapper songMapper;
+    
+    //Database authentication
+    private static String[] databaseHost = { "jdbc:oracle:thin:@127.0.0.1:1521:XE", "jdbc:oracle:thin:@datdb.cphbusiness.dk:1521:dat"};
+    private static String[] databaseUsername = { "bobkoo", "cphbs96" };
+    private static String[] databasePassword = { "qwerty12345", "cphbs96" };
     
     private Facade()
     {
         // Exists only to defeat instantiation.
-        databaseConnector = new DatabaseConnector(databaseHost, databaseUsername, databasePassword);
+        databaseConnector = new DatabaseConnector( databaseHost[0], databaseUsername[0], databasePassword[0] );
         songMapper = new SongMapper();
     }
 
@@ -45,9 +38,10 @@ public class Facade
         return instance;
     }
     
-    public boolean initializeConnection() {
+    public Boolean initializeConnection(Logger logger) {
         if ( connection != null ) {
             System.out.println("Connection already existing");
+            logger.info("Connection with database is already existing!");
             return true;
         } else {
             connection = databaseConnector.getConnection();
@@ -59,50 +53,48 @@ public class Facade
             }
             catch (SQLException ex)
             {
-                System.out.println("SQL Exception while trying to connect to db");
-                System.out.println("ex : " + ex);
+                logger.severe("SQL Exception while trying to connect to db " + ex );
                 return false;
             }
-            System.out.println("Connection initialized!");
+            logger.info("Connection with database initialized");
         }
         return true;
     }
 
-    public boolean resetConnection(Connection connection, String dbHost, String dbUsername, String dbPassword)
-    {
-        connection = new DatabaseConnector(dbHost, dbUsername, dbPassword).getConnection();
-        try
-        {
-            connection.setAutoCommit(true);
-            // termination by the garbage collector
-        }
-        catch (SQLException ex)
-        {
-            System.out.println("SQL Exception while reseting connection to db");
-            System.out.println("ex : " + ex);
-            return false;
-        }
-        System.out.println("Connection reset!");
-        return true;
-    }
+//    public boolean resetConnection(Connection connection, String dbHost, String dbUsername, String dbPassword)
+//    {
+//        connection = new DatabaseConnector(dbHost, dbUsername, dbPassword).getConnection();
+//        try
+//        {
+//            connection.setAutoCommit(true);
+//            // termination by the garbage collector
+//        }
+//        catch (SQLException ex)
+//        {
+//            System.out.println("SQL Exception while reseting connection to db");
+//            System.out.println("ex : " + ex);
+//            return false;
+//        }
+//        System.out.println("Connection reset!");
+//        return true;
+//    }
 
-    public boolean closeConnection()
+    public boolean closeConnection(Logger logger)
     {
         try
         {
             connection.close();
         }
-        catch (SQLException ex)
+        catch (SQLException e)
         {
-            System.out.println("SQL Exception while close connection to db");
-            System.out.println("ex : " + ex);
+            logger.severe("SQL Exception while trying to close the connection to db " + e );
             return false;
         }
-        System.out.println("Connection closed");
+        logger.info("Connection with database closed successfully!");
         return true;
     }
     
     public boolean insertSong(Logger logger, String name) {
-        return songMapper.insert(logger, connection, name);
+        return songMapper.insertNewSong(logger, connection, name);
     }
 }

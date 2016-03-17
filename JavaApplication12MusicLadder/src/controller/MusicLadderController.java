@@ -26,13 +26,15 @@ public class MusicLadderController
     
     private void helloWorld() {
         System.out.println("Hello World!");   
-        System.out.println("Working Directory = " + System.getProperty("user.dir"));
+        
         PerformanceLogger pl = new PerformanceLogger();
         Logger logger = pl.logMessage();
         Facade f = Facade.getInstance();
-        f.initializeConnection();
-        f.insertSong(logger, "ZHU - Faded5");
-        f.closeConnection();
+        
+        f.initializeConnection(logger);
+        
+        f.insertSong(logger, "ZHU - Faded10");
+        f.closeConnection(logger);
     }
     
     private static MusicLadderController instance = null;
