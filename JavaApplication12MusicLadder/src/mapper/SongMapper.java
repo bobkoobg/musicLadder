@@ -4,83 +4,34 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Logger;
 
 public class SongMapper
 {
-    public Boolean insertNewSong(Logger logger, Connection connection, String name)
+    public Integer insertNewSong(Logger logger, Connection connection, String name)
     {
-        PreparedStatement preparedStatement;
+        PreparedStatement preparedStatement = null;
         String insertTableSQL;
+        Integer songID = null;
 
-        //Step 1 - Insert a new Song into Song Table
-        try
-        {
-            insertTableSQL = "INSERT INTO ML_SONG_TBL"
-                    + "(SONG_ID, SONG_NAME, SONG_YOUTUBE_LINK, SONG_LADDER, "
-                    + "SONG_WINS, SONG_DRAWS, SONG_LOSSES) VALUES"
-                    + "(song_id.nextval, ?, ?, ?, ?, ?, ?)";
-
-            preparedStatement = connection.prepareStatement(insertTableSQL);
-
-            preparedStatement.setString(1, name);
-            preparedStatement.setString(2, "");
-            preparedStatement.setInt(3, 1);
-            preparedStatement.setInt(4, 0);
-            preparedStatement.setInt(5, 0);
-            preparedStatement.setInt(6, 0);
-
-            // execute insert SQL stetement
-            preparedStatement.executeUpdate();
-        }
-        catch (SQLException e)
-        {
-            logger.severe("SQL Exception while inserting song " + name + " into song table " + e);
-            return false;
-        }
-
-        //Step 2 - Get the ID of the inserted song
-        Integer userId = null;
-        try
-        {
-            String selectSQL = "SELECT SONG_ID FROM ML_SONG_TBL WHERE SONG_NAME = ?";
-
-            preparedStatement = connection.prepareStatement(selectSQL);
-
-            preparedStatement.setString(1, name);
-
+        //Step 1 - Extract next SONG ID
+        try {
+            String SQLString = "select SONG_ID.nextval from dual";
+            preparedStatement = connection.prepareStatement(SQLString);
             ResultSet rs = preparedStatement.executeQuery();
-            while (rs.next())
-            {
-                userId = rs.getInt("SONG_ID");
+            try {
+                if (rs.next()) {
+                    songID = rs.getInt(1);
+                }
             }
-        }
-        catch (SQLException e)
-        {
-            logger.severe("SQL Exception while inserting song " + name + " into song table " + e);
-            return false;
-        }
-
-        //Step 3 - Insert a new record into Song Ranking Table 
-        try
-        {
-            insertTableSQL = "INSERT INTO ML_SONG_RANKING_TBL"
-                    + "(SONG_ID, SONG_CURRENTRATING, SONG_PREVIOUSRATING, SONG_RANKCHANGE) VALUES"
-                    + "(?, ?, ?, ?)";
-            preparedStatement = connection.prepareStatement(insertTableSQL);
-            preparedStatement.setInt(1, userId);
-            preparedStatement.setFloat(2, 1000f);
-            preparedStatement.setFloat(3, 1000f);
-            preparedStatement.setInt(4, 0);
-            // execute insert SQL stetement
-            preparedStatement.executeUpdate();
-        }
-        catch (SQLException e)
-        {
-            logger.severe("SQL Exception while inserting song " + name + " into song table " + e);
-            return false;
-        }
-        finally // must close statement
+            finally {
+                try { rs.close(); } catch (Exception ignore) { }
+            }
+        } catch (Exception e) {
+            logger.severe("Statement Exception while trying to close the prepared statement while taking next song id " + e);
+            return -1;
+        } finally //The statement must be closed, because of : java.sql.SQLException: ORA-01000
         {
             try
             {
@@ -91,14 +42,133 @@ public class SongMapper
             }
             catch (SQLException e)
             {
-                logger.severe("SQL Exception while trying to close the prepared statement song " + e);
-                return false;
+                logger.severe("SQL Exception while trying to close the prepared statement while taking next song id " + e);
+                return -1;
             }
         }
+        
+        if( songID != null ) {
+            //Step 2 - Insert a new Song into Song Table
+            try
+            {
+                insertTableSQL = "INSERT INTO ML_SONG_TBL"
+                        + "(SONG_ID, SONG_NAME, SONG_YOUTUBE_LINK, SONG_LADDER, "
+                        + "SONG_WINS, SONG_DRAWS, SONG_LOSSES) VALUES"
+                        + "(?, ?, ?, ?, ?, ?, ?)";
 
-        System.out.println("Insert into Song ranking table!");
+                preparedStatement = connection.prepareStatement(insertTableSQL);
 
-        logger.info("Successfully inserted song with name " + name);
+                preparedStatement.setInt(1, songID);
+                preparedStatement.setString(2, name);
+                preparedStatement.setString(3, "");
+                preparedStatement.setInt(4, 1);
+                preparedStatement.setInt(5, 0);
+                preparedStatement.setInt(6, 0);
+                preparedStatement.setInt(7, 0);
+
+                // execute insert SQL stetement
+                preparedStatement.executeUpdate();
+            }
+            catch (SQLException e)
+            {
+                logger.severe("SQL Exception while inserting song " + name + " into song table " + e);
+                return -1;
+            } finally //The statement must be closed, because of : java.sql.SQLException: ORA-01000
+            {
+                try
+                {
+                    if (preparedStatement != null)
+                    {
+                        preparedStatement.close();
+                    }
+                }
+                catch (SQLException e)
+                {
+                    logger.severe("SQL Exception while trying to close the prepared statement song " + e);
+                    return -1;
+                }
+            }
+
+            //Step 2 - Insert a new record into Song Ranking Table 
+            try
+            {
+                insertTableSQL = "INSERT INTO ML_SONG_RANKING_TBL"
+                        + "(SONG_ID, SONG_CURRENTRATING, SONG_PREVIOUSRATING, SONG_RANKCHANGE) VALUES"
+                        + "(?, ?, ?, ?)";
+                
+                preparedStatement = connection.prepareStatement(insertTableSQL);
+                
+                preparedStatement.setInt(1, songID);
+                preparedStatement.setFloat(2, 1000f);
+                preparedStatement.setFloat(3, 1000f);
+                preparedStatement.setInt(4, 0);
+                
+                // execute insert SQL stetement
+                preparedStatement.executeUpdate();
+            }
+            catch (SQLException e)
+            {
+                logger.severe("SQL Exception while inserting song " + name + " into song table " + e);
+                return -1;
+            }
+            finally //The statement must be closed, because of : java.sql.SQLException: ORA-01000
+            {
+                try
+                {
+                    if (preparedStatement != null)
+                    {
+                        preparedStatement.close();
+                    }
+                }
+                catch (SQLException e)
+                {
+                    logger.severe("SQL Exception while trying to close the prepared statement song " + e);
+                    return -1;
+                }
+            }
+
+            logger.info("Successfully inserted song with name " + name);
+            return songID;
+        }
+        logger.severe("SQL Sequence error ID is NULL");
+        return -1;
+    }
+    
+    public Boolean wipeDatabase(Connection connection, Logger logger) {
+        Statement statement = null;
+        String sql;
+        String[] databasesToWipe = {"ML_SONG_RANKING_TBL", "ML_SONG_TBL" };
+        
+        for (int i = 0; i < databasesToWipe.length; i++)
+        {
+            try
+            {
+                statement = connection.createStatement();
+                sql = "DELETE FROM " + databasesToWipe[i]; 
+                statement.executeUpdate(sql);
+            }
+            catch (SQLException e)
+            {
+                logger.severe("SQL Exception while trying to wipe out table " + databasesToWipe[i] + " : " + e);
+                return false;
+            } finally //The statement must be closed, because of : java.sql.SQLException: ORA-01000
+            {
+                try
+                {
+                    if (statement != null)
+                    {
+                        statement.close();
+                    }
+                }
+                catch (SQLException e)
+                {
+                    logger.severe("[SQL Exception while trying to close the prepared statement song for wiping out table " + databasesToWipe[i] + " : " + e);
+                    return false;
+                }
+            }
+            logger.info("Successfully wiped out database " + databasesToWipe[i]);
+        
+        }
         return true;
     }
 }

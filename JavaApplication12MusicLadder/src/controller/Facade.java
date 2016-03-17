@@ -1,8 +1,10 @@
 package controller;
 
+import entity.Duel;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Logger;
+import mapper.DuelMapper;
 import mapper.SongMapper;
 import utils.DatabaseConnector;
 
@@ -16,6 +18,7 @@ public class Facade
     private Connection connection;
     private DatabaseConnector databaseConnector;  
     private SongMapper songMapper;
+    private DuelMapper duelMapper;
     
     //Database authentication
     private static String[] databaseHost = { "jdbc:oracle:thin:@127.0.0.1:1521:XE", "jdbc:oracle:thin:@datdb.cphbusiness.dk:1521:dat"};
@@ -27,6 +30,7 @@ public class Facade
         // Exists only to defeat instantiation.
         databaseConnector = new DatabaseConnector( databaseHost[0], databaseUsername[0], databasePassword[0] );
         songMapper = new SongMapper();
+        duelMapper = new DuelMapper();
     }
 
     public static Facade getInstance()
@@ -79,7 +83,7 @@ public class Facade
 //        return true;
 //    }
 
-    public boolean closeConnection(Logger logger)
+    public Boolean closeConnection(Logger logger)
     {
         try
         {
@@ -94,7 +98,19 @@ public class Facade
         return true;
     }
     
-    public boolean insertSong(Logger logger, String name) {
+    public Integer insertSong(Logger logger, String name) {
         return songMapper.insertNewSong(logger, connection, name);
+    }
+    
+    public Boolean wipeSongDatabases( Logger logger ) {
+        return songMapper.wipeDatabase(connection, logger);
+    }
+    
+    public Duel insertDuel( Logger logger, Duel duel) {
+        return duelMapper.insertNewDuel(logger, connection, duel);
+    }
+    
+    public Boolean wipeDuelDatabases( Logger logger ) {
+        return duelMapper.wipeDatabase(connection, logger);
     }
 }

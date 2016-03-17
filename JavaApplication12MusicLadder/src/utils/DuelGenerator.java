@@ -33,7 +33,7 @@ public class DuelGenerator
     /*
     * Probability generator
     */
-    public Duel generator( List<Song> songs, Integer amountOfDuels, Integer duelsSum )
+    public Duel generator( List<Song> songs, Integer duelsSum )
     {
        
         List<Integer> probabilitySongMap = new ArrayList();
@@ -82,7 +82,7 @@ public class DuelGenerator
             }
         }
         
-        return new Duel( ( amountOfDuels+1 ) ,participant1ID, participant2ID, participant1Rating, participant2Rating);
+        return new Duel( participant1ID, participant2ID, participant1Rating, participant2Rating );
     }
 
 }

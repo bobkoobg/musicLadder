@@ -78,7 +78,7 @@ CREATE TABLE ML_DUEL_TBL (
    song2_score NUMBER(2),
    song1_rating_after NUMBER(9,5),
    song2_rating_after NUMBER(9,5),
-   duel_time DATE NOT NULL
+   duel_datetime TIMESTAMP NOT NULL
 );
 
 --Will not be used for version 1.0
@@ -102,12 +102,12 @@ CREATE TABLE ML_SONG_SINGER_TBL (
 
 INSERT INTO ML_LADDER_TBL VALUES(ladder_id.nextval, 'cool ladder', '/home/go/here');
 
-INSERT INTO ML_SONG_TBL VALUES (song_id.nextval, 'blah blah', '', 1, 5, 3, 8);
-INSERT INTO ML_SONG_TBL VALUES (song_id.nextval, 'song 2', '', 1, 5, 3, 8);
-INSERT INTO ML_SONG_TBL VALUES (song_id.nextval, 'blah blah 2 ', '', 1, 5, 3, 8);
-INSERT INTO ML_SONG_TBL VALUES (song_id.nextval, 'song', '', 1, 5, 3, 8);
-
-INSERT INTO ML_SONG_RANKING_TBL VALUES ( 1, 1200, 1000, 3);
-INSERT INTO ML_SONG_RANKING_TBL VALUES ( 2, 1200.123456, 1000.1234, -5);
-INSERT INTO ML_SONG_RANKING_TBL VALUES ( 3, 1200.3333359, 1000.1234977, -13);
-INSERT INTO ML_SONG_RANKING_TBL VALUES ( 4, 1200.3333359, 1000.1233877, 1);
+--INSERT INTO ML_SONG_TBL VALUES (song_id.nextval, 'blah blah', '', 1, 5, 3, 8);
+--INSERT INTO ML_SONG_TBL VALUES (song_id.nextval, 'song 2', '', 1, 5, 3, 8);
+--INSERT INTO ML_SONG_TBL VALUES (song_id.nextval, 'blah blah 2 ', '', 1, 5, 3, 8);
+--INSERT INTO ML_SONG_TBL VALUES (song_id.nextval, 'song', '', 1, 5, 3, 8);
+--
+--INSERT INTO ML_SONG_RANKING_TBL VALUES ( 1, 1200, 1000, 3);
+--INSERT INTO ML_SONG_RANKING_TBL VALUES ( 2, 1200.123456, 1000.1234, -5);
+--INSERT INTO ML_SONG_RANKING_TBL VALUES ( 3, 1200.3333359, 1000.1234977, -13);
+--INSERT INTO ML_SONG_RANKING_TBL VALUES ( 4, 1200.3333359, 1000.1233877, 1);

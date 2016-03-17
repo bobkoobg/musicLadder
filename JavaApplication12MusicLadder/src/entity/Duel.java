@@ -35,9 +35,8 @@ public class Duel
     /*
      * Minimal requirements constructor
      */
-    public Duel(Integer duelID, Integer song1ID, Integer song2ID, float song1BeforeMatchRating, float song2BeforeMatchRating)
+    public Duel(Integer song1ID, Integer song2ID, float song1BeforeMatchRating, float song2BeforeMatchRating)
     {
-        this.duelID = duelID;
         this.song1ID = song1ID;
         this.song2ID = song2ID;
         this.song1BeforeMatchRating = song1BeforeMatchRating;

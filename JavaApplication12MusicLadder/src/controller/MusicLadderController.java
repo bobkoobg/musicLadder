@@ -17,7 +17,7 @@ public class MusicLadderController
     
     /*
     * Testing purposes
-    * /
+    */
     
     public static void main(String[] args)
     {
@@ -32,11 +32,11 @@ public class MusicLadderController
         Facade f = Facade.getInstance();
         
         f.initializeConnection(logger);
-        
-        f.insertSong(logger, "ZHU - Faded10");
+        f.wipeDuelDatabases(logger);
+        f.wipeSongDatabases(logger);
         f.closeConnection(logger);
     }
-    */
+    //*/
     
     private static MusicLadderController instance = null;
     
@@ -79,14 +79,29 @@ public class MusicLadderController
         File[] songFiles = sr.finder( path );
         for (int i = 0; i < songFiles.length; i++)
         {
-            model.saveSong( new Song( model.getSongsCount(), songFiles[i].getName() ) );
-            facade.insertSong(logger, songFiles[i].getName());
+            Integer songId = facade.insertSong(logger, songFiles[i].getName());
+            if (songId != -1 ) {
+                model.saveSong( new Song( songId, songFiles[i].getName() ) );
+            }
+            //should handle -1 error somewhere here
         }
-        
         List<Song> songList = model.getSongs();
-        
-        facade.closeConnection(logger);
         return songList;
+    }
+    
+    public List<Duel> generateDuels(Integer amount) {
+        List<Duel> duels = new ArrayList();
+        for (int i = 0; i < amount; i++)
+        {
+            Duel duel = dG.generator( model.getSongs(), getDuelsMatchMax() );
+            duel = facade.insertDuel(logger, duel);
+            if ( duel != null ) {
+                model.addDuel( duel );
+            }
+            //should handle null error somewhere here
+            duels.add( duel );
+        }
+        return duels;
     }
     
     //Cleanup before insert
@@ -117,17 +132,6 @@ public class MusicLadderController
     
     public List<Duel> getDuels( Integer amount ) {
         return model.getDuels( amount );
-    }
-    
-    public List<Duel> generateDuels(Integer amount) {
-        List<Duel> duels = new ArrayList();
-        for (int i = 0; i < amount; i++)
-        {
-            Duel duel = dG.generator( model.getSongs(), getAmountOfDuels(), getDuelsMatchMax() );
-            model.addDuel( duel );
-            duels.add( duel );
-        }
-        return duels;
     }
     
     public List<Song> saveDuel(Duel duel, Integer song1Score, Integer song2Score) {
