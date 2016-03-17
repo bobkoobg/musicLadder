@@ -16,16 +16,13 @@ public class PerformanceLogger
         if(!yourFile.exists()) {
             try
             {
-                System.out.println("I do not exist, creating!");
                 yourFile.createNewFile();
             }
             catch (IOException ex)
             {
                 Logger.getLogger(PerformanceLogger.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } else {
-            System.out.println("I do exist!");
-        } 
+        }
         
         FileHandler fh;  
 
@@ -44,6 +41,7 @@ public class PerformanceLogger
 
         } catch (SecurityException | IOException e) { 
             System.out.println("SecurityException or IOException while trying to create and add a handler to the logger :  " + e );
+            Logger.getLogger(PerformanceLogger.class.getName()).log(Level.SEVERE, null, e);
         }
         logger.info("\n***** NEW SESSION *****\n");
         logger.info(logger.getName() + " Logger started!");

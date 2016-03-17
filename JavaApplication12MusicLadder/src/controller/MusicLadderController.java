@@ -17,7 +17,7 @@ public class MusicLadderController
     
     /*
     * Testing purposes
-    */
+    * /
     
     public static void main(String[] args)
     {
@@ -36,9 +36,13 @@ public class MusicLadderController
         f.insertSong(logger, "ZHU - Faded10");
         f.closeConnection(logger);
     }
+    */
     
     private static MusicLadderController instance = null;
     
+    private PerformanceLogger pl = null;
+    private Logger logger = null;
+    private Facade facade = null;
     private MusicLadderModel model = null;  
     private EloRatingSystemCalculator eloRSC = null;
     private DuelGenerator dG = null;
@@ -47,10 +51,19 @@ public class MusicLadderController
     private MusicLadderController()
     {
         // Exists only to defeat instantiation.
+        
+        //Logger functionality
+        pl = new PerformanceLogger();
+        logger = pl.logMessage();
+        
+        facade = Facade.getInstance();
+        facade.initializeConnection(logger);
+        
         model = new MusicLadderModel();
         eloRSC = EloRatingSystemCalculator.getInstance();
         dG = DuelGenerator.getInstance();
         sr = new SongReader();
+
     }
 
     public static MusicLadderController getInstance()
@@ -67,9 +80,12 @@ public class MusicLadderController
         for (int i = 0; i < songFiles.length; i++)
         {
             model.saveSong( new Song( model.getSongsCount(), songFiles[i].getName() ) );
+            facade.insertSong(logger, songFiles[i].getName());
         }
         
         List<Song> songList = model.getSongs();
+        
+        facade.closeConnection(logger);
         return songList;
     }
     
