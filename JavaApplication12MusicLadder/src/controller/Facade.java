@@ -8,6 +8,7 @@ package controller;
 import entity.Song;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.logging.Logger;
 import mapper.SongMapper;
 import utils.DatabaseConnector;
 
@@ -101,7 +102,7 @@ public class Facade
         return true;
     }
     
-    public boolean insertSong(String name) {
-        return songMapper.insert(connection, name);
+    public boolean insertSong(Logger logger, String name) {
+        return songMapper.insert(logger, connection, name);
     }
 }

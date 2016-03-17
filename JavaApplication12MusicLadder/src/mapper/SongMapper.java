@@ -7,14 +7,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import utils.PerformanceLogger;
 
 public class SongMapper
 {
-    public Boolean insert(Connection connection, String name) {
+    //private static final Logger log= Logger.getLogger( SongMapper.class.getName() );
+    
+    public Boolean insert(Logger logger, Connection connection, String name) {
         try
         {
             String insertTableSQL = "INSERT INTO ML_SONG_TBL"
-                    + "(SONG_ID, SONG_NAME, SONG_YOUTUBE_LINK, SONG_LADDER, SONG_WINS, SONG_DRAWS, SONG_LOSSES) VALUES"
+                    + "(SONG_ID, SONG_NAME, SONG_YOUTUBE_LINK, SONG_LADDER, "
+                    + "SONG_WINS, SONG_DRAWS, SONG_LOSSES) VALUES"
                     + "(song_id.nextval, ?, ?, ?, ?, ?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(insertTableSQL);
             preparedStatement.setString(1, name );
@@ -57,8 +61,11 @@ public class SongMapper
             System.out.println("Failed to insert");
             System.out.println(ex);
             //Logger.getLogger(SongMapper.class.getName()).log(Level.SEVERE, null, ex);
+            //logger.log( Level.SEVERE, ex.toString(), ex );
+            logger.severe("Error while executing SQL : " + ex);
             return false;
         }
+        logger.info("Successfully inserted song with name " + name);
         return true;
     }
 }

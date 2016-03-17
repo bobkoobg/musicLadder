@@ -5,9 +5,11 @@ import entity.Song;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import model.MusicLadderModel;
 import utils.DuelGenerator;
 import utils.EloRatingSystemCalculator;
+import utils.PerformanceLogger;
 import utils.SongReader;
 
 public class MusicLadderController
@@ -24,9 +26,12 @@ public class MusicLadderController
     
     private void helloWorld() {
         System.out.println("Hello World!");   
+        System.out.println("Working Directory = " + System.getProperty("user.dir"));
+        PerformanceLogger pl = new PerformanceLogger();
+        Logger logger = pl.logMessage();
         Facade f = Facade.getInstance();
         f.initializeConnection();
-        f.insertSong("ZHU - Faded");
+        f.insertSong(logger, "ZHU - Faded5");
         f.closeConnection();
     }
     
