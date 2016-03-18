@@ -1,8 +1,10 @@
 package controller;
 
 import entity.Duel;
+import entity.Song;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.logging.Logger;
 import mapper.DuelMapper;
 import mapper.SongMapper;
@@ -98,12 +100,20 @@ public class Facade
         return true;
     }
     
+    public List<Song> getAllSongs(Logger logger, Integer ladderId) {
+        return songMapper.getAllSongs(logger, connection, ladderId);
+    }
+    
     public Integer insertSong(Logger logger, String name) {
         return songMapper.insertNewSong(logger, connection, name);
     }
     
     public Boolean wipeSongDatabases( Logger logger ) {
         return songMapper.wipeDatabase(connection, logger);
+    }
+    
+    public List<Duel> getAllDuels(Logger logger, Integer ignore ) {
+        return duelMapper.getAllDuels( logger, connection, ignore );
     }
     
     public Duel insertDuel( Logger logger, Duel duel) {

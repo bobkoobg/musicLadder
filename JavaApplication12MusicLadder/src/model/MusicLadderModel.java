@@ -24,16 +24,44 @@ public class MusicLadderModel
         return songs;
     }
     
+    public List<Duel> getPlayedDuels() {
+        List<Duel> playedDuels = new ArrayList();
+
+        for(Duel d : duels) {
+            if( d.getSong1Score() != null && d.getSong2Score() != null
+                && d.getSong1AfterMatchRating() != 0.0f && d.getSong2AfterMatchRating() != 0.0f ) {
+                playedDuels.add(d);
+            }
+        }
+        return playedDuels;
+    }
+
+    public void setSongs(List<Song> songs)
+    {
+        this.songs = songs;
+    }
+
+    public void setDuels(List<Duel> duels)
+    {
+        this.duels = duels;
+    }
+    
+    public List<Duel> getDuels() {
+        return duels;
+    }
+    
     public Integer getSongsCount() {
         return songs.size();
     }
     
     public Song getSongByID(Integer songId) {
+        System.out.println("Searching song by ID : " + songId + " in " + songs.size());
         Song song = null;
         for (int i = 0; i < songs.size(); i++)
         {
             if( songs.get(i).getId() == songId ) {
                 song = songs.get(i);
+                System.out.println("found it!");
                 break;
             }
         }

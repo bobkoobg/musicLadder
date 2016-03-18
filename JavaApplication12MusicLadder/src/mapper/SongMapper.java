@@ -1,10 +1,13 @@
 package mapper;
 
+import entity.Song;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class SongMapper
@@ -132,6 +135,68 @@ public class SongMapper
         }
         logger.severe("SQL Sequence error ID is NULL");
         return -1;
+    }
+    
+    public List<Song> getAllSongs(Logger logger, Connection connection, Integer ladderId) {
+        List<Song> songs = new ArrayList();
+        PreparedStatement preparedStatement = null;
+        Song song = null;
+        
+        try {
+            String SQLString = "SELECT * "
+                    + "FROM ML_SONG_TBL song "
+                    + "JOIN ML_SONG_RANKING_TBL songranking  "
+                    + "ON song.song_id = songranking.song_id "
+                    + "WHERE song.SONG_LADDER = ?";
+            
+            preparedStatement = connection.prepareStatement(SQLString);
+            preparedStatement.setInt(1, ladderId);
+            
+            ResultSet rs = preparedStatement.executeQuery();
+            try {
+                while(rs.next()) {
+                    
+                        song = new Song();
+
+                        song.setId(rs.getInt(1));
+                        song.setName(rs.getString(2));
+                        song.setLadderId(rs.getInt(4));
+                        song.setWins(rs.getInt(5));
+                        song.setDraws(rs.getInt(6));
+                        song.setLoses(rs.getInt(7));
+                        song.setCurrentRating(rs.getFloat(9));
+                        song.setFormerRating(rs.getFloat(10));
+                        
+                        if (song.getId() == 134) {
+                            System.out.println("WRONG :  " + song.toString());
+                        }
+
+                        songs.add(song);
+                    } 
+                
+            }
+            finally {
+                try { rs.close(); } catch (Exception ignore) { }
+            }
+        } catch (Exception e) {
+            logger.severe("Statement Exception while trying to close the prepared statement while taking next song id " + e);
+            return null;
+        } finally //The statement must be closed, because of : java.sql.SQLException: ORA-01000
+        {
+            try
+            {
+                if (preparedStatement != null)
+                {
+                    preparedStatement.close();
+                }
+            }
+            catch (SQLException e)
+            {
+                logger.severe("SQL Exception while trying to close the prepared statement while taking next song id " + e);
+                return null;
+            }
+        }
+        return songs;
     }
     
     public Boolean wipeDatabase(Connection connection, Logger logger) {

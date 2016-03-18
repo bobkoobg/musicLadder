@@ -44,6 +44,10 @@ public class Duel
         this.matchTime = new Date();
     }
 
+    public Duel()
+    {
+    }
+
     public Integer getDuelID()
     {
         return duelID;

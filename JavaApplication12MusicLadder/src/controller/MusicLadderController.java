@@ -75,63 +75,47 @@ public class MusicLadderController
         return instance;
     }
     
-    public List<Song> loadSongs( String path) {
+    public List<Song> loadSongs( Integer ladderId ) {
+        List<Song> localSongs = facade.getAllSongs(logger, ladderId );
+        model.setSongs(localSongs);
+        return localSongs;
+    }
+    
+    public List<Duel> loadPlayedDuels( Integer ignore ) {
+        List<Duel> duels = facade.getAllDuels(logger, ignore);
+        model.setDuels(duels);
+        //return model.getPlayedDuels();
+        return duels;
+    }
+    
+    public List<Song> insertAndLoadSongs( String path) {
         File[] songFiles = sr.finder( path );
         for (int i = 0; i < songFiles.length; i++)
         {
             Integer songId = facade.insertSong(logger, songFiles[i].getName());
             if (songId != -1 ) {
                 model.saveSong( new Song( songId, songFiles[i].getName() ) );
+            } else {
+                //Please cry!
             }
-            //should handle -1 error somewhere here
         }
         List<Song> songList = model.getSongs();
         return songList;
     }
     
     public List<Duel> generateDuels(Integer amount) {
-        List<Duel> duels = new ArrayList();
         for (int i = 0; i < amount; i++)
         {
             Duel duel = dG.generator( model.getSongs(), getDuelsMatchMax() );
             duel = facade.insertDuel(logger, duel);
             if ( duel != null ) {
                 model.addDuel( duel );
+            } else {
+                //Please cry!
             }
-            //should handle null error somewhere here
-            duels.add( duel );
         }
+         List<Duel> duels = model.getDuels();
         return duels;
-    }
-    
-    //Cleanup before insert
-    public void clearSystem() {
-        model.clearDuels();
-        model.clearSongs();
-    }
-    
-    public List<Song> getSongs() {
-        return model.getSongs();
-    }
-    
-    public Song getSongByID( Integer songID ) {
-        return model.getSongByID( songID );
-    }
-    
-    public Integer getDuelsSum() {
-        return model.getDuelsSum();
-    }
-    
-    public Integer getDuelsMatchMax() {
-        return model.getDuelsMatchMax();
-    }
-    
-    public Integer getAmountOfDuels() {
-        return model.getAmountOfDuels();
-    }
-    
-    public List<Duel> getDuels( Integer amount ) {
-        return model.getDuels( amount );
     }
     
     public List<Song> saveDuel(Duel duel, Integer song1Score, Integer song2Score) {
@@ -164,6 +148,36 @@ public class MusicLadderController
         s2.setCurrentRating( newSongRatings[1] );
 
         return getSongs();
+    }
+    
+    //Cleanup before insert
+    public void clearSystem() {
+        model.clearDuels();
+        model.clearSongs();
+    }
+    
+    public List<Song> getSongs() {
+        return model.getSongs();
+    }
+    
+    public Song getSongByID( Integer songID ) {
+        return model.getSongByID( songID );
+    }
+    
+    public Integer getDuelsSum() {
+        return model.getDuelsSum();
+    }
+    
+    public Integer getDuelsMatchMax() {
+        return model.getDuelsMatchMax();
+    }
+    
+    public Integer getAmountOfDuels() {
+        return model.getAmountOfDuels();
+    }
+    
+    public List<Duel> getDuels( Integer amount ) {
+        return model.getDuels( amount );
     }
     
     public float[] predictDuelResults( Duel duel ) {

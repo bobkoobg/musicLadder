@@ -27,7 +27,7 @@ public class MusicLadder extends javax.swing.JFrame
     private List<Song> songs = null;
     private List<Duel> duels = null;
     private Duel currentDuel = null;
-    List<Duel> previousDuels = null;
+    private List<Duel> previousDuels = null;
     private Song song1 = null;
     private Song song2 = null;
     private String currentDirectory = null;
@@ -47,6 +47,12 @@ public class MusicLadder extends javax.swing.JFrame
         
         //Load Controller
         mlc = MusicLadderController.getInstance();
+        
+        songs = mlc.loadSongs( 1 );
+        populatejTableSongs( songs );
+        
+        previousDuels = mlc.loadPlayedDuels( 123 );
+        populatejTablePreviousDuels(previousDuels);
         
         jTextFieldFileLocation.setEditable(false);
         jButtonSaveResult.setEnabled(false);
@@ -651,7 +657,7 @@ public class MusicLadder extends javax.swing.JFrame
             //TODO (for cleaning GUI - Clear Duel area when pointing to directory with no songs)
             mlc.clearSystem();
             jButtonSaveResult.setEnabled(false);
-            songs = mlc.loadSongs( currentDirectory );
+            songs = mlc.insertAndLoadSongs( currentDirectory );
             populatejTableSongs( songs );
             
             //Load previous duels
@@ -851,7 +857,7 @@ public class MusicLadder extends javax.swing.JFrame
         for (int i = 0; i < duels.size(); i++)
         {
             Integer songID = duels.get(i).getDuelID();
-            String song1Name = mlc.getSongByID( duels.get(i).getSong1ID() ).getName();
+            String song1Name = ( mlc.getSongByID( duels.get(i).getSong1ID() ).getName() != "" ? mlc.getSongByID( duels.get(i).getSong1ID() ).getName() : "hehehehe" );
             Float song1OldRating = duels.get(i).getSong1BeforeMatchRating();
             Float song1Rating = duels.get(i).getSong1AfterMatchRating();
             Integer song1Points = duels.get(i).getSong1Score();
@@ -859,11 +865,11 @@ public class MusicLadder extends javax.swing.JFrame
             Integer song2Points = duels.get(i).getSong2Score();
             Float song2Rating = duels.get(i).getSong2AfterMatchRating();
             Float song2OldRating = duels.get(i).getSong2BeforeMatchRating();
-            String song2Name = mlc.getSongByID( duels.get(i).getSong2ID() ).getName();
-            
+            //String song2Name =  ( mlc.getSongByID( duels.get(i).getSong2ID() ).getName() != "" ? mlc.getSongByID( duels.get(i).getSong2ID() ).getName() : "hey !");
+           // System.out.println(mlc.getSongByID( duels.get(i).getSong2ID() ).getId() + "song2Name ? : " + song2Name);
 
             data[i][0] = songID;
-            data[i][1] = song1Name;
+            data[i][1] = song1Name + "";
             data[i][2] = song1OldRating;
             data[i][3] = song1Rating;
             data[i][4] = song1Points;
@@ -871,7 +877,7 @@ public class MusicLadder extends javax.swing.JFrame
             data[i][6] = song2Points;
             data[i][7] = song2Rating;
             data[i][8] = song2OldRating;
-            data[i][9] = song2Name;
+            data[i][9] = "";
             
         }
         

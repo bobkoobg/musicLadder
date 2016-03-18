@@ -8,6 +8,8 @@ public class Song
     private Integer id;
     private String name;
     private String alias;
+    private String youtubeLink;
+    private Integer ladderId;
     private Integer wins;
     private Integer draws;
     private Integer loses;
@@ -61,6 +63,12 @@ public class Song
         this.currentRating = 1000;
         this.formerRating = 1000;
     }
+
+    public Song()
+    {
+    }
+    
+    
     
     public Integer getId()
     {
@@ -196,6 +204,26 @@ public class Song
     public void setMatches(List<Duel> matches)
     {
         this.matches = matches;
+    }
+
+    public Integer getLadderId()
+    {
+        return ladderId;
+    }
+
+    public void setLadderId(Integer ladderId)
+    {
+        this.ladderId = ladderId;
+    }
+
+    public String getYoutubeLink()
+    {
+        return youtubeLink;
+    }
+
+    public void setYoutubeLink(String youtubeLink)
+    {
+        this.youtubeLink = youtubeLink;
     }
 
     @Override
