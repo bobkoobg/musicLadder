@@ -104,6 +104,10 @@ public class Facade
         return songMapper.getAllSongs(logger, connection, ladderId);
     }
     
+    public Song getSong(Logger logger, Integer songId) {
+        return songMapper.getSong(logger, connection, songId);
+    }
+    
     public Integer insertSong(Logger logger, String name) {
         return songMapper.insertNewSong(logger, connection, name);
     }
@@ -112,12 +116,20 @@ public class Facade
         return songMapper.wipeDatabase(connection, logger);
     }
     
-    public List<Duel> getAllDuels(Logger logger, Integer ignore ) {
-        return duelMapper.getAllDuels( logger, connection, ignore );
+    public List<Duel> getNPlayedDuels( Logger logger, Integer amount ) {
+        return duelMapper.getNPlayedDuels(logger, connection, amount );
+    }
+    
+    public List<Duel> getNDuelsToPlay( Logger logger, Integer amount ) {
+        return duelMapper.getNDuelsToPlay(logger, connection, amount);
     }
     
     public Duel insertDuel( Logger logger, Duel duel) {
         return duelMapper.insertNewDuel(logger, connection, duel);
+    }
+    
+    public Duel saveDuel( Logger logger, Duel duel ) {
+        return duelMapper.saveDuel(logger, connection, duel);
     }
     
     public Boolean wipeDuelDatabases( Logger logger ) {

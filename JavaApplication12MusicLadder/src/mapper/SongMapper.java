@@ -145,7 +145,7 @@ public class SongMapper
         try {
             String SQLString = "SELECT * "
                     + "FROM ML_SONG_TBL song "
-                    + "JOIN ML_SONG_RANKING_TBL songranking  "
+                    + "JOIN ML_SONG_RANKING_TBL songranking "
                     + "ON song.song_id = songranking.song_id "
                     + "WHERE song.SONG_LADDER = ?";
             
@@ -166,10 +166,6 @@ public class SongMapper
                         song.setLoses(rs.getInt(7));
                         song.setCurrentRating(rs.getFloat(9));
                         song.setFormerRating(rs.getFloat(10));
-                        
-                        if (song.getId() == 134) {
-                            System.out.println("WRONG :  " + song.toString());
-                        }
 
                         songs.add(song);
                     } 
@@ -197,6 +193,59 @@ public class SongMapper
             }
         }
         return songs;
+    }
+    
+    public Song getSong(Logger logger, Connection connection, Integer songId) {
+        Song song = new Song();
+        PreparedStatement preparedStatement = null;
+        
+        try {
+            String SQLString = "SELECT * FROM ML_SONG_TBL song " +
+                    "JOIN ML_SONG_RANKING_TBL songranking " +
+                    "ON song.song_id = songranking.song_id " +
+                    "WHERE song.SONG_ID = ?";
+            
+            preparedStatement = connection.prepareStatement(SQLString);
+            preparedStatement.setInt(1, songId);
+            
+            ResultSet rs = preparedStatement.executeQuery();
+            try {
+                while(rs.next()) {
+
+                        song.setId(rs.getInt(1));
+                        song.setName(rs.getString(2));
+                        song.setLadderId(rs.getInt(4));
+                        song.setWins(rs.getInt(5));
+                        song.setDraws(rs.getInt(6));
+                        song.setLoses(rs.getInt(7));
+                        song.setCurrentRating(rs.getFloat(9));
+                        song.setFormerRating(rs.getFloat(10));
+                    } 
+            }
+            finally {
+                try { rs.close(); } catch (Exception ignore) { }
+            }
+        } catch (Exception e) {
+            logger.severe("Statement Exception (getSong) " + e);
+            return null;
+        } finally //The statement must be closed, because of : java.sql.SQLException: ORA-01000
+        {
+            try
+            {
+                if (preparedStatement != null)
+                {
+                    preparedStatement.close();
+                }
+            }
+            catch (SQLException e)
+            {
+                logger.severe("SQL Exception (getSong) " + e);
+                return null;
+            }
+        }
+        
+        
+        return song;
     }
     
     public Boolean wipeDatabase(Connection connection, Logger logger) {

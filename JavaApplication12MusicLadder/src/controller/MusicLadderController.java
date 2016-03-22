@@ -81,10 +81,16 @@ public class MusicLadderController
         return localSongs;
     }
     
-    public List<Duel> loadPlayedDuels( Integer ignore ) {
-        List<Duel> duels = facade.getAllDuels(logger, ignore);
-        model.setDuels(duels);
+    public List<Duel> loadNPlayedDuels( Integer amount ) {
+        List<Duel> duels = facade.getNPlayedDuels(logger, amount);
+        model.joinDuelsLists(duels);
         //return model.getPlayedDuels();
+        return duels;
+    }
+    
+    public List<Duel> loadNDuelsToPlay( Integer amount ) {
+        List<Duel> duels = facade.getNDuelsToPlay(logger, amount);
+        model.joinDuelsLists(duels);
         return duels;
     }
     
@@ -130,7 +136,8 @@ public class MusicLadderController
 
         Song s1 = model.getSongByID(duel.getSong1ID() );
         Song s2 = model.getSongByID(duel.getSong2ID() );
-        
+        System.out.println("s1 is : " + s1.toString());
+        System.out.println("s2 is : " + s2.toString());
         if( song1Score > song2Score ) {
             s1.incrementWins();
             s2.incrementLoses();
@@ -146,6 +153,13 @@ public class MusicLadderController
         s1.setCurrentRating( newSongRatings[0] );
         s2.setFormerRating( s2.getCurrentRating() );
         s2.setCurrentRating( newSongRatings[1] );
+        
+        facade.saveDuel(logger, duel);
+        
+        System.out.println("duel is : " + duel.toString());
+        System.out.println("s1 final is : " + s1.toString());
+        System.out.println("s2 final is : " + s2.toString());
+        
 
         return getSongs();
     }
@@ -161,7 +175,7 @@ public class MusicLadderController
     }
     
     public Song getSongByID( Integer songID ) {
-        return model.getSongByID( songID );
+        return facade.getSong(logger, songID);
     }
     
     public Integer getDuelsSum() {

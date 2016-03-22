@@ -46,6 +46,10 @@ public class MusicLadderModel
         this.duels = duels;
     }
     
+    public void joinDuelsLists(List<Duel> duels) {
+        this.duels.addAll(duels);
+    }
+    
     public List<Duel> getDuels() {
         return duels;
     }

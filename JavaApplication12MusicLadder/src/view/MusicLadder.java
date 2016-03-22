@@ -51,11 +51,27 @@ public class MusicLadder extends javax.swing.JFrame
         songs = mlc.loadSongs( 1 );
         populatejTableSongs( songs );
         
-        previousDuels = mlc.loadPlayedDuels( 123 );
-        populatejTablePreviousDuels(previousDuels);
+        previousDuels = mlc.loadNPlayedDuels( 3 );
+        populatejTablePreviousDuels( previousDuels );
+        
+        duels = mlc.loadNDuelsToPlay( 5 );
+        populatejTableDuels( duels );
         
         jTextFieldFileLocation.setEditable(false);
-        jButtonSaveResult.setEnabled(false);
+        //jButtonSaveResult.setEnabled(false);
+        
+         //set current duel GUI settings
+        currentDuel = duels.get(0);
+        song1 = mlc.getSongByID( currentDuel.getSong1ID() );
+        song2 = mlc.getSongByID( currentDuel.getSong2ID() );
+
+        jLabelSong1Name.setText( song1.getName() );
+        jLabelSong2Name.setText( song2.getName() );
+
+        loadPredictions();
+
+        jTableNextMatches.getSelectionModel().clearSelection();
+        jTableNextMatches.setRowSelectionInterval(1, 1);
         
     }
 
@@ -588,45 +604,45 @@ public class MusicLadder extends javax.swing.JFrame
         Integer song2Score = jSliderSong2.getValue();
         
         songs = mlc.saveDuel(currentDuel, song1Score, song2Score);
-        populatejTableSongs( songs );
-                
-        duels.remove( currentDuel );
-        
-        jSliderSong1.setValue( 5 );
-        jSliderSong2.setValue( 5 );
-        
-        previousDuels = mlc.getDuels( 10 );
-        populatejTablePreviousDuels(previousDuels );
-        
-        if( duels.size() > 0 ) {
-            currentDuel = duels.get(0);
-
-            song1 = mlc.getSongByID( currentDuel.getSong1ID() );
-            song2 = mlc.getSongByID( currentDuel.getSong2ID() );
-
-            jLabelSong1Name.setText( song1.getName() );
-            jLabelSong2Name.setText( song2.getName() );
-            
-            loadPredictions();
-            
-            duels.add( mlc.generateDuels( 1 ).get(0) );
-            
-            jTableNextMatches.getSelectionModel().clearSelection();
-            jTableNextMatches.setRowSelectionInterval(0, 0);
-            
-        } else {
-            jButtonSaveResult.setEnabled( false );
-            jLabelSong1Name.setText( "N/A" );
-            jLabelSong2Name.setText( "N/A" );
-            jLabelSong1MinPts.setText( "N/A" );
-            jLabelSong1AvgPts.setText( "N/A" );
-            jLabelSong1MaxPts.setText( "N/A" );
-            jLabelSong2MinPts.setText( "N/A" );
-            jLabelSong2AvgPts.setText( "N/A" );
-            jLabelSong2MaxPts.setText( "N/A" );
-        }
-        
-        populatejTableDuels( duels );
+//        populatejTableSongs( songs );
+//                
+//        duels.remove( currentDuel );
+//        
+//        jSliderSong1.setValue( 5 );
+//        jSliderSong2.setValue( 5 );
+//        
+//        previousDuels = mlc.getDuels( 10 );
+//        populatejTablePreviousDuels(previousDuels );
+//        
+//        if( duels.size() > 0 ) {
+//            currentDuel = duels.get(0);
+//
+//            song1 = mlc.getSongByID( currentDuel.getSong1ID() );
+//            song2 = mlc.getSongByID( currentDuel.getSong2ID() );
+//
+//            jLabelSong1Name.setText( song1.getName() );
+//            jLabelSong2Name.setText( song2.getName() );
+//            
+//            loadPredictions();
+//            
+//            duels.add( mlc.generateDuels( 1 ).get(0) );
+//            
+//            jTableNextMatches.getSelectionModel().clearSelection();
+//            jTableNextMatches.setRowSelectionInterval(0, 0);
+//            
+//        } else {
+//            jButtonSaveResult.setEnabled( false );
+//            jLabelSong1Name.setText( "N/A" );
+//            jLabelSong2Name.setText( "N/A" );
+//            jLabelSong1MinPts.setText( "N/A" );
+//            jLabelSong1AvgPts.setText( "N/A" );
+//            jLabelSong1MaxPts.setText( "N/A" );
+//            jLabelSong2MinPts.setText( "N/A" );
+//            jLabelSong2AvgPts.setText( "N/A" );
+//            jLabelSong2MaxPts.setText( "N/A" );
+//        }
+//        
+//        populatejTableDuels( duels );
     }//GEN-LAST:event_jButtonSaveResultActionPerformed
 
     private void jButtonBrowseActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButtonBrowseActionPerformed
@@ -857,7 +873,7 @@ public class MusicLadder extends javax.swing.JFrame
         for (int i = 0; i < duels.size(); i++)
         {
             Integer songID = duels.get(i).getDuelID();
-            String song1Name = ( mlc.getSongByID( duels.get(i).getSong1ID() ).getName() != "" ? mlc.getSongByID( duels.get(i).getSong1ID() ).getName() : "hehehehe" );
+            String song1Name = mlc.getSongByID( duels.get(i).getSong1ID() ).getName();
             Float song1OldRating = duels.get(i).getSong1BeforeMatchRating();
             Float song1Rating = duels.get(i).getSong1AfterMatchRating();
             Integer song1Points = duels.get(i).getSong1Score();
@@ -865,7 +881,7 @@ public class MusicLadder extends javax.swing.JFrame
             Integer song2Points = duels.get(i).getSong2Score();
             Float song2Rating = duels.get(i).getSong2AfterMatchRating();
             Float song2OldRating = duels.get(i).getSong2BeforeMatchRating();
-            //String song2Name =  ( mlc.getSongByID( duels.get(i).getSong2ID() ).getName() != "" ? mlc.getSongByID( duels.get(i).getSong2ID() ).getName() : "hey !");
+            String song2Name =  mlc.getSongByID( duels.get(i).getSong2ID() ).getName();
            // System.out.println(mlc.getSongByID( duels.get(i).getSong2ID() ).getId() + "song2Name ? : " + song2Name);
 
             data[i][0] = songID;
@@ -877,7 +893,7 @@ public class MusicLadder extends javax.swing.JFrame
             data[i][6] = song2Points;
             data[i][7] = song2Rating;
             data[i][8] = song2OldRating;
-            data[i][9] = "";
+            data[i][9] = song2Name;
             
         }
         

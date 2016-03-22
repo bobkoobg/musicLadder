@@ -107,7 +107,7 @@ public class DuelMapper
         return null;
     }
     
-    public List<Duel> getAllDuels(Logger logger, Connection connection, Integer ignoreForNow) {
+    public List<Duel> getNPlayedDuels(Logger logger, Connection connection, Integer amount) {
         List<Duel> duels = new ArrayList();
         Statement preparedStatement = null;
         Duel duel = null;
@@ -115,15 +115,16 @@ public class DuelMapper
         try {
             //this may become pain when you include ladders 
             String SQLString = "SELECT * "
-                    + "FROM ML_DUEL_TBL";
+                    + "FROM ML_DUEL_TBL "
+                    + "WHERE SONG1_SCORE IS NOT NULL "
+                    + "AND SONG2_SCORE IS NOT NULL "
+                    + "AND ROWNUM <= " + amount + " "
+                    + "ORDER BY ROWNUM";
             
             preparedStatement = connection.createStatement();
             ResultSet rs = preparedStatement.executeQuery( SQLString );
             
-            try {
-                
-   
-                    
+            try { 
                     while ( rs.next() ) {
                         duel = new Duel();
 
@@ -139,11 +140,7 @@ public class DuelMapper
                         //and also the date... eventually!
 
                         duels.add(duel);
-                        System.out.println("Hey : " + duel.toString());
-                    }
-                    
-                    
-                
+                    }     
             }
             finally {
                 try { rs.close(); } catch (Exception ignore) { }
@@ -169,6 +166,65 @@ public class DuelMapper
         return duels;
     }
     
+        public List<Duel> getNDuelsToPlay(Logger logger, Connection connection, Integer amount) {
+        List<Duel> duels = new ArrayList();
+        Statement preparedStatement = null;
+        Duel duel = null;
+        
+        try {
+            //this may become pain when you include ladders 
+            String SQLString = "SELECT * "
+                    + "FROM ML_DUEL_TBL "
+                    + "WHERE SONG1_SCORE IS NULL "
+                    + "AND SONG2_SCORE IS NULL "
+                    + "AND ROWNUM <= " + amount + " "
+                    + "ORDER BY ROWNUM";
+            
+            preparedStatement = connection.createStatement();
+            ResultSet rs = preparedStatement.executeQuery( SQLString );
+            
+            try { 
+                    while ( rs.next() ) {
+                        duel = new Duel();
+
+                        duel.setDuelID(rs.getInt(1));
+                        duel.setSong1ID(rs.getInt(2));
+                        duel.setSong2ID(rs.getInt(3));
+                        duel.setSong1BeforeMatchRating(rs.getFloat(4));
+                        duel.setSong2BeforeMatchRating(rs.getFloat(5));
+                        duel.setSong1Score(rs.getInt(6));
+                        duel.setSong2Score(rs.getInt(7));
+                        duel.setSong1AfterMatchRating(rs.getFloat(8));
+                        duel.setSong2AfterMatchRating(rs.getFloat(9));
+                        //and also the date... eventually!
+
+                        duels.add(duel);
+                    }     
+            }
+            finally {
+                try { rs.close(); } catch (Exception ignore) { }
+            }
+        } catch (Exception e) {
+            logger.severe("Statement Exception while trying to close the prepared statement while taking next duel id (duels to play) " + e);
+            return null;
+        } finally //The statement must be closed, because of : java.sql.SQLException: ORA-01000
+        {
+            try
+            {
+                if (preparedStatement != null)
+                {
+                    preparedStatement.close();
+                }
+            }
+            catch (SQLException e)
+            {
+                logger.severe("SQL Exception while trying to close the prepared statement while taking next duel id (duels to play)" + e);
+                return null;
+            }
+        }
+        return duels;
+    }
+        
     public Duel saveDuel(Logger logger, Connection connection, Duel duel ) {
             PreparedStatement preparedStatement = null;
             String insertTableSQL;
@@ -180,11 +236,11 @@ public class DuelMapper
             
             try
             {
-                insertTableSQL = "UPDATE ML_DUEL_TBL AS duel"
-                        + "SET duel.SONG1_SCORE = ?, duel.SONG2_SCORE = ?, "
-                        + "duel.SONG1_RATING_AFTER = ?, duel.SONG2_RATING_AFTER = ?, "
-                        + "duel.DUEL_DATETIME = ? "
-                        + "WHERE duel.DUEL_ID = ?";
+                insertTableSQL = "UPDATE ML_DUEL_TBL "
+                        + "SET SONG1_SCORE = ?, SONG2_SCORE = ?, "
+                        + "SONG1_RATING_AFTER = ?, SONG2_RATING_AFTER = ?, "
+                        + "DUEL_DATETIME = ? "
+                        + "WHERE DUEL_ID = ?";
 
                 preparedStatement = connection.prepareStatement(insertTableSQL);
                 
