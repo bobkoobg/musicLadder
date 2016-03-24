@@ -59,11 +59,10 @@ public class MusicLadderModel
     }
     
     public Song getSongByID(Integer songId) {
-        System.out.println("Searching song by ID : " + songId + " in " + songs.size());
         Song song = null;
         for (int i = 0; i < songs.size(); i++)
         {
-            if( songs.get(i).getId() == songId ) {
+            if( songId == songs.get(i).getId().intValue() ) {
                 song = songs.get(i);
                 System.out.println("found it!");
                 break;
@@ -75,7 +74,7 @@ public class MusicLadderModel
     public Boolean updateSong( Song song ) {
         for (int i = 0; i < songs.size(); i++)
         {
-            if (song.getId() == songs.get(i).getId()) {
+            if ( song.getId().intValue() == songs.get(i).getId().intValue() ) {
                 songs.set(i, song);
                 return true;
             }

@@ -248,6 +248,101 @@ public class SongMapper
         return song;
     }
     
+    public Song updateSong(Logger logger, Connection connection, Song song ) {
+            PreparedStatement preparedStatement = null;
+            String insertTableSQL;
+            
+            try
+            {
+                //Not working...
+                //insertTableSQL = "UPDATE ( " +
+                //    "SELECT * FROM ML_SONG_TBL song " +
+                //    "JOIN ML_SONG_RANKING_TBL ranking ON song.SONG_ID = ranking.SONG_ID " +
+                //    "WHERE song.SONG_ID = ? " +
+                //    " ) mergedSongTBL " +
+                //    "SET mergedSongTBL.SONG_WINS = ?, mergedSongTBL.SONG_DRAWS = ?, "
+                //        + "mergedSongTBL.SONG_LOSSES = ?, mergedSongTBL.SONG_PREVIOUSRATING = ?, "
+                //        + "mergedSongTBL.SONG_CURRENTRATING = ?";
+                //Possible solution : 
+                //  http://www.cla5h.com/ora-01776-i-can-t-insert-on-a-view-comprised-by-two-tables.html
+
+                
+                 insertTableSQL = "UPDATE ML_SONG_TBL "
+                        + "SET SONG_WINS = ?, SONG_DRAWS = ?, "
+                        + "SONG_LOSSES = ? "
+                        + "WHERE SONG_ID = ?";
+
+                preparedStatement = connection.prepareStatement( insertTableSQL );
+                
+                preparedStatement.setInt( 1, song.getWins());
+                preparedStatement.setInt( 2, song.getDraws());
+                preparedStatement.setInt( 3, song.getLoses());
+                preparedStatement.setInt( 4, song.getId().intValue() );
+
+                // execute insert SQL stetement
+                preparedStatement.executeUpdate();
+            }
+            catch (SQLException e)
+            {
+                logger.severe("SQL Exception while updating song " + song.toString() + " into song tbl " + e);
+                return null;
+            } finally //The statement must be closed, because of : java.sql.SQLException: ORA-01000
+            {
+                try
+                {
+                    if (preparedStatement != null)
+                    {
+                        preparedStatement.close();
+                    }
+                }
+                catch (SQLException e)
+                {
+                    logger.severe("SQL Exception while trying to close the prepared statement while updating song tbl " + e);
+                    return null;
+                }
+            }
+            
+            logger.info( "Successfully updated song tbl, ID : " + song.getId());
+            
+            try
+            {   
+                 insertTableSQL = "UPDATE ML_SONG_RANKING_TBL "
+                        + "SET SONG_PREVIOUSRATING = ?, SONG_CURRENTRATING = ? "
+                        + "WHERE SONG_ID = ?";
+
+                preparedStatement = connection.prepareStatement( insertTableSQL );
+                
+                preparedStatement.setFloat( 1, song.getFormerRating() );
+                preparedStatement.setFloat( 2, song.getCurrentRating() );
+                preparedStatement.setInt( 3, song.getId().intValue() );
+
+                // execute insert SQL stetement
+                preparedStatement.executeUpdate();
+            }
+            catch (SQLException e)
+            {
+                logger.severe("SQL Exception while updating song " + song.toString() + " into song ranking tbl " + e);
+                return null;
+            } finally //The statement must be closed, because of : java.sql.SQLException: ORA-01000
+            {
+                try
+                {
+                    if (preparedStatement != null)
+                    {
+                        preparedStatement.close();
+                    }
+                }
+                catch (SQLException e)
+                {
+                    logger.severe("SQL Exception while trying to close the prepared statement while updating song ranking tbl " + e);
+                    return null;
+                }
+            }
+
+            logger.info( "Successfully updated song ranking tbl, ID : " + song.getId());
+            return song;
+    }
+ 
     public Boolean wipeDatabase(Connection connection, Logger logger) {
         Statement statement = null;
         String sql;

@@ -6,16 +6,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
 public class DuelMapper
 {
-    public Duel insertNewDuel(Logger logger, Connection connection, Duel duel)
+    public Duel insertDuel(Logger logger, Connection connection, Duel duel)
     {
         PreparedStatement preparedStatement = null;
         String insertTableSQL;
@@ -118,14 +115,15 @@ public class DuelMapper
                     + "FROM ML_DUEL_TBL "
                     + "WHERE SONG1_SCORE IS NOT NULL "
                     + "AND SONG2_SCORE IS NOT NULL "
-                    + "AND ROWNUM <= " + amount + " "
-                    + "ORDER BY ROWNUM";
+                    + "ORDER BY DUEL_ID DESC";
             
             preparedStatement = connection.createStatement();
             ResultSet rs = preparedStatement.executeQuery( SQLString );
             
-            try { 
+            try {
+                    Integer loops = 0;
                     while ( rs.next() ) {
+                        loops++;
                         duel = new Duel();
 
                         duel.setDuelID(rs.getInt(1));
@@ -140,6 +138,9 @@ public class DuelMapper
                         //and also the date... eventually!
 
                         duels.add(duel);
+                        if( loops.intValue() == amount ) {
+                            break;
+                        }
                     }     
             }
             finally {
@@ -166,7 +167,7 @@ public class DuelMapper
         return duels;
     }
     
-        public List<Duel> getNDuelsToPlay(Logger logger, Connection connection, Integer amount) {
+    public List<Duel> getNDuelsToPlay(Logger logger, Connection connection, Integer amount) {
         List<Duel> duels = new ArrayList();
         Statement preparedStatement = null;
         Duel duel = null;
@@ -178,7 +179,7 @@ public class DuelMapper
                     + "WHERE SONG1_SCORE IS NULL "
                     + "AND SONG2_SCORE IS NULL "
                     + "AND ROWNUM <= " + amount + " "
-                    + "ORDER BY ROWNUM";
+                    + "ORDER BY DUEL_ID DESC";
             
             preparedStatement = connection.createStatement();
             ResultSet rs = preparedStatement.executeQuery( SQLString );
@@ -225,7 +226,7 @@ public class DuelMapper
         return duels;
     }
         
-    public Duel saveDuel(Logger logger, Connection connection, Duel duel ) {
+    public Duel updateDuel(Logger logger, Connection connection, Duel duel ) {
             PreparedStatement preparedStatement = null;
             String insertTableSQL;
             
@@ -277,18 +278,6 @@ public class DuelMapper
             logger.info( "Successfully updated duel, ID : " + duel.getDuelID() );
             return duel;
     }
-    
-//    private static java.sql.Date getCurrentDate() {
-//        
-//        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-//        Date date = new Date();
-//        System.out.println(dateFormat.format(date)); //2014/08/06 15:59:48
-//        
-//        java.util.Date today = new java.util.Date();
-//        
-//        today.
-//        return new java.sql.Date(dateFormat.format(date));
-//    }
     
     public Boolean wipeDatabase(Connection connection, Logger logger) {
         Statement statement = null;

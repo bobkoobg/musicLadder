@@ -112,6 +112,10 @@ public class Facade
         return songMapper.insertNewSong(logger, connection, name);
     }
     
+    public Song updateSong( Logger logger, Song song ) {
+        return songMapper.updateSong(logger, connection, song);
+    }
+    
     public Boolean wipeSongDatabases( Logger logger ) {
         return songMapper.wipeDatabase(connection, logger);
     }
@@ -125,11 +129,11 @@ public class Facade
     }
     
     public Duel insertDuel( Logger logger, Duel duel) {
-        return duelMapper.insertNewDuel(logger, connection, duel);
+        return duelMapper.insertDuel(logger, connection, duel);
     }
     
-    public Duel saveDuel( Logger logger, Duel duel ) {
-        return duelMapper.saveDuel(logger, connection, duel);
+    public Duel updateDuel( Logger logger, Duel duel ) {
+        return duelMapper.updateDuel(logger, connection, duel);
     }
     
     public Boolean wipeDuelDatabases( Logger logger ) {
