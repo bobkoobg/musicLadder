@@ -15,10 +15,9 @@ public class DuelMapper
     public Duel insertDuel(Logger logger, Connection connection, Duel duel)
     {
         PreparedStatement preparedStatement = null;
-        String insertTableSQL;
         Integer duelID = null;
-        String SQLString = "select DUEL_ID.nextval from dual";
         
+        String SQLString = "select DUEL_ID.nextval from dual";
         try {
             preparedStatement = connection.prepareStatement(SQLString);
             ResultSet rs = preparedStatement.executeQuery();
@@ -30,8 +29,8 @@ public class DuelMapper
             finally {
                 try { rs.close(); } catch (Exception ignore) { }
             }
-        } catch (Exception e) {
-            logger.severe("Statement Exception while trying to close the prepared statement while taking next duel id " + e);
+        } catch (SQLException e) {
+            logger.severe("Method insertDuel (Part1) - Execution SQL Exception : [ " + e + " ]");
             return null;
         } finally //The statement must be closed, because of : java.sql.SQLException: ORA-01000
         {
@@ -44,12 +43,14 @@ public class DuelMapper
             }
             catch (SQLException e)
             {
-                logger.severe("SQL Exception while trying to close the prepared statement while taking next duel id " + e);
+                logger.severe("Method insertDuel (Part1) - Closing SQL Exception : [ " + e + " ]");
                 return null;
             }
         }
         
         if ( duelID != null ) {
+            String insertTableSQL;
+            
             duel.setDuelID( duelID );
             
             java.util.Date date = new java.util.Date();
@@ -75,12 +76,11 @@ public class DuelMapper
                 preparedStatement.setNull( 9, java.sql.Types.FLOAT );
                 preparedStatement.setTimestamp(10, sqlTimestamp );
 
-                // execute insert SQL stetement
                 preparedStatement.executeUpdate();
             }
             catch (SQLException e)
             {
-                logger.severe("SQL Exception while inserting duel " + duel.toString() + " into duel table " + e);
+                logger.severe("Method insertDuel (Part2) - Execution SQL Exception : [ " + e + " ], Duel content : [" + duel.toString() + "]");
                 return null;
             } finally //The statement must be closed, because of : java.sql.SQLException: ORA-01000
             {
@@ -93,14 +93,15 @@ public class DuelMapper
                 }
                 catch (SQLException e)
                 {
-                    logger.severe("SQL Exception while trying to close the prepared statement while inserting duel into duel table " + e);
+                    logger.severe("Method insertDuel (Part2) - Closing SQL Exception : [ " + e + " ], Duel content : [" + duel.toString() + "]");
                     return null;
                 }
             }
 
-            logger.info( "Successfully inserted duel, ID : " + duel.getDuelID() );
+            logger.info( "Method insertDuel success! : [ Duel ID : " + duel.getDuelID() + "]" );
             return duel;
         }
+        logger.severe("Method insertDuel (Part1) - [ Duel ID : " + duelID + ", Duel : " + duel.toString() + " ]");
         return null;
     }
     
@@ -179,7 +180,7 @@ public class DuelMapper
                     + "WHERE SONG1_SCORE IS NULL "
                     + "AND SONG2_SCORE IS NULL "
                     + "AND ROWNUM <= " + amount + " "
-                    + "ORDER BY DUEL_ID DESC";
+                    + "ORDER BY DUEL_ID ASC";
             
             preparedStatement = connection.createStatement();
             ResultSet rs = preparedStatement.executeQuery( SQLString );

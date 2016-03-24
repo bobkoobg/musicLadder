@@ -17,26 +17,26 @@ public class MusicLadderController
     
     /*
     * Testing purposes
-    */
+    * /
     
-//    public static void main(String[] args)
-//    {
-//        new MusicLadderController().helloWorld();
-//    }
-//    
-//    private void helloWorld() {
-//        System.out.println("Hello World!");   
-//        
-//        PerformanceLogger pl = new PerformanceLogger();
-//        Logger logger = pl.logMessage();
-//        Facade f = Facade.getInstance();
-//        
-//        f.initializeConnection(logger);
-//        f.wipeDuelDatabases(logger);
-//        f.wipeSongDatabases(logger);
-//        f.closeConnection(logger);
-//    }
-    //*/
+    public static void main(String[] args)
+    {
+        new MusicLadderController().helloWorld();
+    }
+    
+    private void helloWorld() {
+        System.out.println("Hello World!");   
+        
+        PerformanceLogger pl = new PerformanceLogger();
+        Logger logger = pl.logMessage();
+        Facade f = Facade.getInstance();
+        
+        f.initializeConnection(logger);
+        f.wipeDuelDatabases(logger);
+        f.wipeSongDatabases(logger);
+        f.closeConnection(logger);
+    }
+    */
     
     private static MusicLadderController instance = null;
     
@@ -76,7 +76,7 @@ public class MusicLadderController
     }
     
     public List<Song> loadSongs( Integer ladderId ) {
-        List<Song> localSongs = facade.getAllSongs(logger, ladderId );
+        List<Song> localSongs = facade.getSongs(logger, ladderId );
         model.setSongs(localSongs);
         return model.getSongs();
     }
@@ -84,7 +84,6 @@ public class MusicLadderController
     public List<Duel> loadNPlayedDuels( Integer amount ) {
         List<Duel> duels = facade.getNPlayedDuels(logger, amount);
         model.joinDuelsLists(duels);
-        //return model.getPlayedDuels();
         return duels;
     }
     
@@ -110,6 +109,10 @@ public class MusicLadderController
         return songList;
     }
     
+    private Integer getDuelsMatchMax() {
+        return model.getDuelsMatchMax();
+    }
+    
     public List<Duel> generateDuels(Integer amount) {
         for (int i = 0; i < amount; i++)
         {
@@ -125,6 +128,10 @@ public class MusicLadderController
         return duels;
     }
     
+    private List<Song> getSongs() {
+        return model.getSongs();
+    }
+    
     public List<Song> generateResultsAndUpdateDuel(Duel duel, Integer song1Score, Integer song2Score) {
         
         duel.setSong1Score( song1Score );
@@ -135,10 +142,9 @@ public class MusicLadderController
         duel.setSong1AfterMatchRating( newSongRatings[0] );
         duel.setSong2AfterMatchRating( newSongRatings[1] );
 
-        Song s1 = facade.getSong(logger, duel.getSong1ID() );
-        Song s2 = facade.getSong(logger, duel.getSong2ID() );
-        System.out.println("s1 is : " + s1.toString());
-        System.out.println("s2 is : " + s2.toString());
+        Song s1 = model.getSongByID( duel.getSong1ID() );
+        Song s2 = model.getSongByID( duel.getSong2ID() );
+        
         if( song1Score > song2Score ) {
             s1.incrementWins();
             s2.incrementLoses();
@@ -159,36 +165,15 @@ public class MusicLadderController
         facade.updateSong(logger, s2);
         facade.updateDuel(logger, duel);
         
-        Boolean checkOne = model.updateSong(s1);
-        Boolean checkTwo = model.updateSong(s2);
-        System.out.println("Model updated : " + checkOne + " - " + checkTwo);
+        //No inner error handling at any point
+        model.updateSong(s1);
+        model.updateSong(s2);
+        
         return getSongs();
     }
     
-    //Cleanup before insert
-    public void clearSystem() {
-        model.clearDuels();
-        model.clearSongs();
-    }
-    
-    public List<Song> getSongs() {
-        return model.getSongs();
-    }
-    
     public Song getSongByID( Integer songID ) {
-        return facade.getSong(logger, songID);
-    }
-    
-    public Integer getDuelsSum() {
-        return model.getDuelsSum();
-    }
-    
-    public Integer getDuelsMatchMax() {
-        return model.getDuelsMatchMax();
-    }
-    
-    public Integer getAmountOfDuels() {
-        return model.getAmountOfDuels();
+        return model.getSongByID(songID);
     }
     
     public List<Duel> getDuels( Integer amount ) {
@@ -197,5 +182,11 @@ public class MusicLadderController
     
     public float[] predictDuelResults( Duel duel ) {
         return eloRSC.calculate(duel);
+    }
+    
+    //Cleanup before insert
+    public void clearSystem() {
+        model.clearDuels();
+        model.clearSongs();
     }
 }

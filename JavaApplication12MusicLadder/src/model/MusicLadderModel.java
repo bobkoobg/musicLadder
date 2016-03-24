@@ -18,44 +18,22 @@ public class MusicLadderModel
         songs = new ArrayList();
         duels = new ArrayList();
     }
-      
+    
+    //Songs
+    
     public List<Song> getSongs() {
         Collections.sort( songs, new SongRatingComparator() );
         return songs;
-    }
-    
-    public List<Duel> getPlayedDuels() {
-        List<Duel> playedDuels = new ArrayList();
-
-        for(Duel d : duels) {
-            if( d.getSong1Score() != null && d.getSong2Score() != null
-                && d.getSong1AfterMatchRating() != 0.0f && d.getSong2AfterMatchRating() != 0.0f ) {
-                playedDuels.add(d);
-            }
-        }
-        return playedDuels;
     }
 
     public void setSongs(List<Song> songs)
     {
         this.songs = songs;
     }
-
-    public void setDuels(List<Duel> duels)
-    {
-        this.duels = duels;
-    }
     
-    public void joinDuelsLists(List<Duel> duels) {
-        this.duels.addAll(duels);
-    }
-    
-    public List<Duel> getDuels() {
-        return duels;
-    }
-    
-    public Integer getSongsCount() {
-        return songs.size();
+    public Boolean saveSong( Song song ) {
+        songs.add(song);
+        return true;
     }
     
     public Song getSongByID(Integer songId) {
@@ -64,7 +42,6 @@ public class MusicLadderModel
         {
             if( songId == songs.get(i).getId().intValue() ) {
                 song = songs.get(i);
-                System.out.println("found it!");
                 break;
             }
         }
@@ -82,11 +59,23 @@ public class MusicLadderModel
         return false;
     }
     
-    public Boolean saveSong( Song song ) {
-        songs.add(song);
-        return true;
+    //Duels
+    
+    public List<Duel> getDuels() {
+        return duels;
+    }
+
+    //The issue here is which duels? Maybe 2x lists with duels is the solution?
+    //Else if 1 list - use the getPlayedDuels method at the bottom ? 
+    public void setDuels(List<Duel> duels)
+    {
+        this.duels = duels;
     }
     
+    public void joinDuelsLists(List<Duel> duels) {
+        this.duels.addAll(duels);
+    }
+
     public List<Duel> getDuels( Integer amount ) {
         List<Duel> playedDuels = new ArrayList();
         for (int i = 0; i < duels.size(); i++)
@@ -100,22 +89,9 @@ public class MusicLadderModel
         return playedDuels;
     }
     
-    public Integer getAmountOfDuels() {
-        return duels.size();
-    }
-    
     public Boolean addDuel(Duel duel) {
         duels.add(duel);
         return true;
-    }
-    
-    public Integer getDuelsSum() {
-        Integer sum = 0;
-        for (int i = 0; i < songs.size(); i++)
-        {
-            sum += songs.get(i).getAmmountOfMatches();
-        }
-        return sum;
     }
     
     public Integer getDuelsMatchMax() {
@@ -130,7 +106,8 @@ public class MusicLadderModel
         return max;
     }
     
-    //cleanup
+    //Cleanup
+    
     public void clearSongs() {
         songs = new ArrayList<Song>();
     }
@@ -138,6 +115,8 @@ public class MusicLadderModel
     public void clearDuels() {
         duels = new ArrayList<Duel>();
     }
+    
+    //Sorting
     
     class SongRatingComparator implements Comparator<Song> {
 
@@ -176,5 +155,18 @@ public class MusicLadderModel
             return Integer.compare( song2Rating, song1Rating );
         }
         
+    }
+    
+    //Helpful, but useless functionality for the moment getPlayedDuels
+    public List<Duel> getPlayedDuels() {
+        List<Duel> playedDuels = new ArrayList();
+
+        for(Duel d : duels) {
+            if( d.getSong1Score() != null && d.getSong2Score() != null
+                && d.getSong1AfterMatchRating() != 0.0f && d.getSong2AfterMatchRating() != 0.0f ) {
+                playedDuels.add(d);
+            }
+        }
+        return playedDuels;
     }
 }

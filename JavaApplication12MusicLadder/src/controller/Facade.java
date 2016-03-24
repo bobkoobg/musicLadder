@@ -10,10 +10,6 @@ import mapper.DuelMapper;
 import mapper.SongMapper;
 import utils.DatabaseConnector;
 
-/**
- *
- * @author root
- */
 public class Facade
 {   
     private static Facade instance = null;
@@ -67,24 +63,6 @@ public class Facade
         return true;
     }
 
-//    public boolean resetConnection(Connection connection, String dbHost, String dbUsername, String dbPassword)
-//    {
-//        connection = new DatabaseConnector(dbHost, dbUsername, dbPassword).getConnection();
-//        try
-//        {
-//            connection.setAutoCommit(true);
-//            // termination by the garbage collector
-//        }
-//        catch (SQLException ex)
-//        {
-//            System.out.println("SQL Exception while reseting connection to db");
-//            System.out.println("ex : " + ex);
-//            return false;
-//        }
-//        System.out.println("Connection reset!");
-//        return true;
-//    }
-
     public Boolean closeConnection(Logger logger)
     {
         try
@@ -100,24 +78,16 @@ public class Facade
         return true;
     }
     
-    public List<Song> getAllSongs(Logger logger, Integer ladderId) {
-        return songMapper.getAllSongs(logger, connection, ladderId);
-    }
-    
-    public Song getSong(Logger logger, Integer songId) {
-        return songMapper.getSong(logger, connection, songId);
+    public List<Song> getSongs(Logger logger, Integer ladderId) {
+        return songMapper.getSongs(logger, connection, ladderId);
     }
     
     public Integer insertSong(Logger logger, String name) {
-        return songMapper.insertNewSong(logger, connection, name);
+        return songMapper.insertSong(logger, connection, name);
     }
     
     public Song updateSong( Logger logger, Song song ) {
         return songMapper.updateSong(logger, connection, song);
-    }
-    
-    public Boolean wipeSongDatabases( Logger logger ) {
-        return songMapper.wipeDatabase(connection, logger);
     }
     
     public List<Duel> getNPlayedDuels( Logger logger, Integer amount ) {
@@ -136,7 +106,17 @@ public class Facade
         return duelMapper.updateDuel(logger, connection, duel);
     }
     
+    //Helpful, but useless functionality for the moment getSong, 
+    //  wipeDuelDatabases, wipeSongDatabases
+    public Song getSong(Logger logger, Integer songId) {
+        return songMapper.getSong(logger, connection, songId);
+    }
+    
     public Boolean wipeDuelDatabases( Logger logger ) {
         return duelMapper.wipeDatabase(connection, logger);
+    }
+    
+    public Boolean wipeSongDatabases( Logger logger ) {
+        return songMapper.wipeDatabase(connection, logger);
     }
 }

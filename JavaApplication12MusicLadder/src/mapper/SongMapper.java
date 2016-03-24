@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 public class SongMapper
 {
-    public Integer insertNewSong(Logger logger, Connection connection, String name)
+    public Integer insertSong(Logger logger, Connection connection, String name)
     {
         PreparedStatement preparedStatement = null;
         String insertTableSQL;
@@ -137,7 +137,7 @@ public class SongMapper
         return -1;
     }
     
-    public List<Song> getAllSongs(Logger logger, Connection connection, Integer ladderId) {
+    public List<Song> getSongs(Logger logger, Connection connection, Integer ladderId) {
         List<Song> songs = new ArrayList();
         PreparedStatement preparedStatement = null;
         Song song = null;
