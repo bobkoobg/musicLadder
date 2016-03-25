@@ -8,10 +8,15 @@ package view;
 import controller.MusicLadderController;
 import entity.Duel;
 import entity.Song;
+import java.awt.Component;
+import java.awt.Frame;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.text.DecimalFormat;
 import java.util.List;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JSlider;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -23,7 +28,7 @@ import javax.swing.table.DefaultTableModel;
 public class MusicLadder extends javax.swing.JFrame
 {
     
-    private MusicLadderController mlc = null;
+    private MusicLadderController controller = null;
     private List<Song> songs = null;
     private List<Duel> duels = null;
     private Duel currentDuel = null;
@@ -46,20 +51,20 @@ public class MusicLadder extends javax.swing.JFrame
         this.setLocationRelativeTo( null );
         
         //Load Controller
-        mlc = MusicLadderController.getInstance();
+        controller = MusicLadderController.getInstance();
         
-        songs = mlc.loadSongs( 1 );
+        songs = controller.loadSongs( 1 );
         populatejTableSongs( songs );
         if ( songs.size() > 10 ) { 
             
-            previousDuels = mlc.loadNPlayedDuels( 20 );
+            previousDuels = controller.loadNPlayedDuels( 20 );
             populatejTablePreviousDuels( previousDuels );
 
-            duels = mlc.loadNDuelsToPlay( 5 );
+            duels = controller.loadNDuelsToPlay( 5 );
             if (duels.size() < 5 ) {
-                mlc.generateDuels( ( 5 - duels.size() ) );
+                controller.generateDuels( ( 5 - duels.size() ) );
             }
-            duels = mlc.loadNDuelsToPlay( 5 );
+            duels = controller.loadNDuelsToPlay( 5 );
             populatejTableDuels( duels );
 
             jTextFieldFileLocation.setEditable(false);
@@ -67,8 +72,8 @@ public class MusicLadder extends javax.swing.JFrame
 
              //set current duel GUI settings
             currentDuel = duels.get(0);
-            song1 = mlc.getSongByID( currentDuel.getSong1ID() );
-            song2 = mlc.getSongByID( currentDuel.getSong2ID() );
+            song1 = controller.getSongByID( currentDuel.getSong1ID() );
+            song2 = controller.getSongByID( currentDuel.getSong2ID() );
 
             jLabelSong1Name.setText( song1.getName() );
             jLabelSong2Name.setText( song2.getName() );
@@ -78,10 +83,9 @@ public class MusicLadder extends javax.swing.JFrame
             jTableNextMatches.getSelectionModel().clearSelection();
             jTableNextMatches.setRowSelectionInterval(1, 1);
         
-        }
-        
+        }  
     }
-
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -117,6 +121,13 @@ public class MusicLadder extends javax.swing.JFrame
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Music Ladder");
+        addWindowListener(new java.awt.event.WindowAdapter()
+        {
+            public void windowClosing(java.awt.event.WindowEvent evt)
+            {
+                formWindowClosing(evt);
+            }
+        });
 
         jTableSongs.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][]
@@ -610,24 +621,24 @@ public class MusicLadder extends javax.swing.JFrame
         Integer song1Score = jSliderSong1.getValue();
         Integer song2Score = jSliderSong2.getValue();
         
-        songs = mlc.generateResultsAndUpdateDuel(currentDuel, song1Score, song2Score);
+        songs = controller.generateResultsAndUpdateDuel(currentDuel, song1Score, song2Score);
 
         populatejTableSongs( songs );
         
-        previousDuels = mlc.loadNPlayedDuels( 20 );
+        previousDuels = controller.loadNPlayedDuels( 20 );
         populatejTablePreviousDuels( previousDuels );
         
-        duels = mlc.loadNDuelsToPlay( 5 );
+        duels = controller.loadNDuelsToPlay( 5 );
         if (duels.size() < 5 ) {
-            mlc.generateDuels( ( 5 - duels.size() ) );
+            controller.generateDuels( ( 5 - duels.size() ) );
         }
-        duels = mlc.loadNDuelsToPlay( 5 );
+        duels = controller.loadNDuelsToPlay( 5 );
         populatejTableDuels( duels );
         
         currentDuel = duels.get(0);
         
-        song1 = mlc.getSongByID( currentDuel.getSong1ID() );
-        song2 = mlc.getSongByID( currentDuel.getSong2ID() );
+        song1 = controller.getSongByID( currentDuel.getSong1ID() );
+        song2 = controller.getSongByID( currentDuel.getSong2ID() );
 
         jLabelSong1Name.setText( song1.getName() );
         jLabelSong2Name.setText( song2.getName() );
@@ -667,13 +678,13 @@ public class MusicLadder extends javax.swing.JFrame
             
             //Load songs
             //TODO (for cleaning GUI - Clear Duel area when pointing to directory with no songs)
-            mlc.clearSystem();
+            controller.clearSystem();
             jButtonSaveResult.setEnabled(false);
-            songs = mlc.insertAndLoadSongs( currentDirectory );
+            songs = controller.insertAndLoadSongs( currentDirectory );
             populatejTableSongs( songs );
             
             //Load previous duels
-            previousDuels = mlc.getDuels( 10 );
+            previousDuels = controller.getDuels( 10 );
             populatejTablePreviousDuels( previousDuels );
             
             clearTable( jTableNextMatches );
@@ -681,13 +692,13 @@ public class MusicLadder extends javax.swing.JFrame
             if( songs.size() > 0 ) {
                 jButtonSaveResult.setEnabled(true);
                 //Load Duels
-                duels = mlc.generateDuels( 5 );
+                duels = controller.generateDuels( 5 );
                 populatejTableDuels( duels );
                 
                 //set current duel GUI settings
                 currentDuel = duels.get(0);
-                song1 = mlc.getSongByID( currentDuel.getSong1ID() );
-                song2 = mlc.getSongByID( currentDuel.getSong2ID() );
+                song1 = controller.getSongByID( currentDuel.getSong1ID() );
+                song2 = controller.getSongByID( currentDuel.getSong2ID() );
 
                 jLabelSong1Name.setText( song1.getName() );
                 jLabelSong2Name.setText( song2.getName() );
@@ -702,23 +713,34 @@ public class MusicLadder extends javax.swing.JFrame
             }
         }   
     }//GEN-LAST:event_jButtonBrowseActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt)//GEN-FIRST:event_formWindowClosing
+    {//GEN-HEADEREND:event_formWindowClosing
+        System.out.println("hi");
+        if (JOptionPane.showConfirmDialog(this, 
+                "Are you sure to close this window?", "Really Closing?", 
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+            controller.closeConnection();
+        }
+    }//GEN-LAST:event_formWindowClosing
     
     private void loadPredictions() {
         Duel prediction1 = currentDuel;
         prediction1.setSong1Score( 10 );
         prediction1.setSong2Score( 0 );
 
-        float predictions1[] = mlc.predictDuelResults(prediction1);
+        float predictions1[] = controller.predictDuelResults(prediction1);
 
         prediction1.setSong1Score( 0 );
         prediction1.setSong2Score( 10 );
 
-        float predictions2[] = mlc.predictDuelResults( prediction1 );
+        float predictions2[] = controller.predictDuelResults( prediction1 );
 
         prediction1.setSong1Score( 5 );
         prediction1.setSong2Score( 5 );
 
-        float predictions3[] = mlc.predictDuelResults( prediction1 );
+        float predictions3[] = controller.predictDuelResults( prediction1 );
         
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(2);
@@ -831,9 +853,9 @@ public class MusicLadder extends javax.swing.JFrame
         for (int i = 0; i < duels.size(); i++)
         {
             Integer songID = duels.get(i).getDuelID();
-            String song1Name = mlc.getSongByID( duels.get(i).getSong1ID() ).getName();
+            String song1Name = controller.getSongByID( duels.get(i).getSong1ID() ).getName();
             Float song1Rating = duels.get(i).getSong1BeforeMatchRating();
-            String song2Name = mlc.getSongByID( duels.get(i).getSong2ID() ).getName();
+            String song2Name = controller.getSongByID( duels.get(i).getSong2ID() ).getName();
             Float song2Rating = duels.get(i).getSong2BeforeMatchRating();
 
             data[i][0] = songID;
@@ -869,7 +891,7 @@ public class MusicLadder extends javax.swing.JFrame
         for (int i = 0; i < duels.size(); i++)
         {
             Integer songID = duels.get(i).getDuelID();
-            String song1Name = mlc.getSongByID( duels.get(i).getSong1ID() ).getName();
+            String song1Name = controller.getSongByID( duels.get(i).getSong1ID() ).getName();
             Float song1OldRating = duels.get(i).getSong1BeforeMatchRating();
             Float song1Rating = duels.get(i).getSong1AfterMatchRating();
             Integer song1Points = duels.get(i).getSong1Score();
@@ -877,7 +899,7 @@ public class MusicLadder extends javax.swing.JFrame
             Integer song2Points = duels.get(i).getSong2Score();
             Float song2Rating = duels.get(i).getSong2AfterMatchRating();
             Float song2OldRating = duels.get(i).getSong2BeforeMatchRating();
-            String song2Name =  mlc.getSongByID( duels.get(i).getSong2ID() ).getName();
+            String song2Name =  controller.getSongByID( duels.get(i).getSong2ID() ).getName();
            // System.out.println(mlc.getSongByID( duels.get(i).getSong2ID() ).getId() + "song2Name ? : " + song2Name);
 
             data[i][0] = songID;
