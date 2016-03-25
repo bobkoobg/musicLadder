@@ -4,7 +4,6 @@ import java.util.List;
 
 public class Song
 {
-
     private Integer id;
     private String name;
     private String alias;
@@ -19,36 +18,6 @@ public class Song
     private List<String> singers;
     private String description;
     private List<Duel> matches;
-
-    public Song(Integer id, String name, String alias, Integer wins, Integer draws, Integer loses, float currentRating, float formerRating, List<String> genres, List<String> singers, String description, List<Duel> matches)
-    {
-        this.id = id;
-        this.name = name;
-        this.alias = alias;
-        this.wins = wins;
-        this.draws = draws;
-        this.loses = loses;
-        this.currentRating = currentRating;
-        this.formerRating = formerRating;
-        this.genres = genres;
-        this.singers = singers;
-        this.description = description;
-        this.matches = matches;
-    }
-
-    /*
-     * Minimal requirements constructor
-     */
-    public Song(Integer id, String name, Integer wins, Integer draws, Integer loses, float currentRating, float formerRating)
-    {
-        this.id = id;
-        this.name = name;
-        this.wins = wins;
-        this.draws = draws;
-        this.loses = loses;
-        this.currentRating = currentRating;
-        this.formerRating = formerRating;
-    }
     
     /*
      * Minimal requirements constructor
@@ -67,9 +36,7 @@ public class Song
     public Song()
     {
     }
-    
-    
-    
+
     public Integer getId()
     {
         return id;
@@ -235,7 +202,5 @@ public class Song
                 + formerRating + ", genres=" + genres + ", singers=" + singers 
                 + ", description=" + description + ", matches=" + matches + '}';
     }
-
-    
 
 }

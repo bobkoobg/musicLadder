@@ -184,6 +184,10 @@ public class MusicLadderController
         return eloRSC.calculate(duel);
     }
     
+    public void closeConnection() {
+        facade.closeConnection(logger);
+    }
+    
     //Cleanup before insert
     public void clearSystem() {
         model.clearDuels();

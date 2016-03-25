@@ -16,22 +16,6 @@ public class Duel
     private float song2AfterMatchRating;
     private Date matchTime;
 
-    public Duel(Integer duelID, Integer song1ID, Integer song2ID,
-            float song1OldRating, float song2OldRating, Integer song1Score,
-            Integer song2Score, float song1NewRating, float song2NewRating)
-    {
-        this.duelID = duelID;
-        this.song1ID = song1ID;
-        this.song2ID = song2ID;
-        this.song1BeforeMatchRating = song1OldRating;
-        this.song2BeforeMatchRating = song2OldRating;
-        this.song1Score = song1Score;
-        this.song2Score = song2Score;
-        this.song1AfterMatchRating = song1NewRating;
-        this.song2AfterMatchRating = song2NewRating;
-        this.matchTime = new Date();
-    }
-
     /*
      * Minimal requirements constructor
      */
