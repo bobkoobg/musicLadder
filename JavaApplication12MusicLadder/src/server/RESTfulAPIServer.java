@@ -11,7 +11,7 @@ public class RESTfulAPIServer
     static String ip = "127.0.0.1";
     static String publicFolder = "src/pages/";//"src/html/";
     static String startFile = "index.html";
-    static String filesUri = "/pages";
+    static String filesUri = "/";
     static final boolean DEVELOPMENT_MODE = true;
 
     //static Facadelogic facade;

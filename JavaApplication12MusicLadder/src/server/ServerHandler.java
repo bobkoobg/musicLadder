@@ -25,23 +25,43 @@ public class ServerHandler implements HttpHandler
         String mime = null;
 
         String requestedFile = he.getRequestURI().toString();
+        System.out.println("Req. file : " + requestedFile);
         String f = requestedFile.substring(requestedFile.lastIndexOf("/") + 1);
-        try
-        {
-            String extension = f.substring(f.lastIndexOf("."));
-            mime = getMime(extension);
-            System.out.println("My mime : " + mime);
-            File file = new File(publicFolder + f);
-            System.out.println(publicFolder + f);
+        System.out.println("f is : " + f);
+        
+        //now this one becomes main.
+        //If not substring then redirect to main one
+        
+        //every req different than normal should not give 404 but redirect to main one.
+        //exclude pdf's etc.
+        //learn how to use javascript in this shit
+        if( f == null || f.isEmpty() ) {
+            
+            mime = getMime(".html");
+            File file = new File(publicFolder + "index.html");
+            System.out.println(publicFolder + "index.html");
             bytesToSend = new byte[(int) file.length()];
             BufferedInputStream bis = new BufferedInputStream( new FileInputStream( file ) );
             bis.read(bytesToSend, 0, bytesToSend.length);
             responseCode = 200;
-        }
-        catch (Exception e)
-        {
-            responseCode = 404;
-            errorMsg = "<h1>404 Not Found Hint, try : http://localhost:8084/pages/index.html </h1>No context found for request" + e;
+        } else {
+            try
+            {
+                String extension = f.substring(f.lastIndexOf("."));
+                mime = getMime(extension);
+                System.out.println("My mime : " + mime);
+                File file = new File(publicFolder + f);
+                System.out.println(publicFolder + f);
+                bytesToSend = new byte[(int) file.length()];
+                BufferedInputStream bis = new BufferedInputStream( new FileInputStream( file ) );
+                bis.read(bytesToSend, 0, bytesToSend.length);
+                responseCode = 200;
+            }
+            catch (Exception e)
+            {
+                responseCode = 404;
+                errorMsg = "<h1>404 Not Found Hint, try : http://localhost:8084/pages/index.html </h1>No context found for request" + e;
+            }
         }
         if (responseCode == 200)
         {
@@ -78,6 +98,9 @@ public class ServerHandler implements HttpHandler
                 break;
             case ".jar":
                 mime = "application/java-archive";
+                break;
+            default :
+                mime = "text/html";
                 break;
         }
         return mime;
