@@ -2,6 +2,7 @@
 package server;
 
 import com.sun.net.httpserver.HttpServer;
+import controller.MusicLadderController;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
@@ -14,13 +15,11 @@ public class RESTfulAPIServer
     static String filesUri = "/";
     static final boolean DEVELOPMENT_MODE = true;
 
-    //static Facadelogic facade;
+    static MusicLadderController controller;
 
-    //Basic HTTP logic (role's implemented) "Separation logic"
     public void run() throws IOException {
         
-        //Why facade ?
-        //facade = Facadelogic.getInstance();
+        controller = MusicLadderController.getInstance();
         if (RESTfulAPIServer.DEVELOPMENT_MODE) {
             //facade.testingCode();
             System.out.println("Development!");
@@ -28,9 +27,10 @@ public class RESTfulAPIServer
         HttpServer server = HttpServer.create(new InetSocketAddress(ip, port), 0);
         //REST Routes
         server.createContext("/musicladder", new MusicLadderHandler());
+        server.createContext("/musicladderapi", new MusicLadderAPIHandler());
         //server.createContext("/whatever", new whateverHandler());
 
-        //HTTP Server Routes
+        //HTTP Server Routes 
         server.createContext(filesUri, new ServerHandler());
 
         server.start();
