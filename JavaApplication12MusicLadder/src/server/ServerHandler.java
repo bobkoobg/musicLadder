@@ -17,7 +17,6 @@ public class ServerHandler implements HttpHandler
     @Override
     public void handle(HttpExchange he) throws IOException
     {
-        System.out.println("Hi");
         int responseCode = 500;
         //Set initial error values if an un expected problem occurs
         String errorMsg = null;
@@ -25,44 +24,56 @@ public class ServerHandler implements HttpHandler
         String mime = null;
 
         String requestedFile = he.getRequestURI().toString();
-        System.out.println("Req. file : " + requestedFile);
+        //System.out.println("Req. file : " + requestedFile);
         String f = requestedFile.substring(requestedFile.lastIndexOf("/") + 1);
-        System.out.println("f is : " + f);
+        //System.out.println("f is : " + f);
         
-        //now this one becomes main.
-        //If not substring then redirect to main one
-        
-        //every req different than normal should not give 404 but redirect to main one.
-        //exclude pdf's etc.
-        //learn how to use javascript in this shit
+        File file;
+        BufferedInputStream bis;
+        //String extension = f.substring(f.lastIndexOf("."));
+        mime = getMime(".html");
         if( f == null || f.isEmpty() ) {
-            
-            mime = getMime(".html");
-            File file = new File(publicFolder + "index.html");
-            System.out.println(publicFolder + "index.html");
-            bytesToSend = new byte[(int) file.length()];
-            BufferedInputStream bis = new BufferedInputStream( new FileInputStream( file ) );
-            bis.read(bytesToSend, 0, bytesToSend.length);
-            responseCode = 200;
-        } else {
+            //System.out.println("I am empty");
             try
             {
-                String extension = f.substring(f.lastIndexOf("."));
-                mime = getMime(extension);
-                System.out.println("My mime : " + mime);
-                File file = new File(publicFolder + f);
-                System.out.println(publicFolder + f);
+                file = new File(publicFolder + "index.html");
+                
                 bytesToSend = new byte[(int) file.length()];
-                BufferedInputStream bis = new BufferedInputStream( new FileInputStream( file ) );
+                
+                bis = new BufferedInputStream( new FileInputStream( file ) );
                 bis.read(bytesToSend, 0, bytesToSend.length);
+                
+                responseCode = 200;
+            }
+            catch (Exception e)
+            {
+                responseCode = 500;
+                errorMsg = "<h1>500 Server Error</h1>" 
+                        + "<span>The main page does not exist. Please slap me.</span>";
+                //Log the exception!
+            }
+        } else {
+            //System.out.println("I am not empty");
+            try
+            {
+                file = new File(publicFolder + f);
+                
+                bytesToSend = new byte[(int) file.length()];
+                
+                bis = new BufferedInputStream( new FileInputStream( file ) );
+                bis.read(bytesToSend, 0, bytesToSend.length);
+                
                 responseCode = 200;
             }
             catch (Exception e)
             {
                 responseCode = 404;
-                errorMsg = "<h1>404 Not Found Hint, try : http://localhost:8084/pages/index.html </h1>No context found for request" + e;
+                errorMsg = "<h1>404 Not Found</h1>" 
+                        + "<span>No context erfound for request" + he.getRequestURI().toString() + "</span>";
+                //Log the exception!
             }
         }
+        
         if (responseCode == 200)
         {
             Headers h = he.getResponseHeaders();
@@ -72,7 +83,9 @@ public class ServerHandler implements HttpHandler
         {
             bytesToSend = errorMsg.getBytes();
         }
+        
         he.sendResponseHeaders(responseCode, bytesToSend.length);
+        
         try (OutputStream os = he.getResponseBody())
         {
             os.write(bytesToSend, 0, bytesToSend.length);
