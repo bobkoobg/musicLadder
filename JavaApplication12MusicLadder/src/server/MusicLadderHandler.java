@@ -95,7 +95,7 @@ public class MusicLadderHandler implements HttpHandler
                         System.out.println("NOT API Called");
                         try
                         {
-                            file = new File(publicFolder + "/musicLadder/"+f);
+                            file = new File(publicFolder + requestedFile);
 
                             bytesToSend = new byte[(int) file.length()];
 

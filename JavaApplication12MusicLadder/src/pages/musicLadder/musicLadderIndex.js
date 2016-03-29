@@ -1,6 +1,7 @@
 console.log('hi musicLadderIndex.js');
 
 var $songList;
+var $slider;
 
 function evaluateRating( currentRating, formerRating ) {
     if ( currentRating > formerRating ) {
@@ -14,7 +15,6 @@ function evaluateRating( currentRating, formerRating ) {
 
 function displaySongs( data ) {
     $.each(data, function(k, v) {
-        console.log("k is ", k, " v is : ", v );
         var style = "style=\"border: 1px solid black;\"";
         var style2 = "style=\"border: 1px solid black;width: 20px;background-color:"+evaluateRating(v.currentRating, v.formerRating)+"\"";
         var content = "<tr>"
@@ -33,11 +33,10 @@ function displaySongs( data ) {
 }
 
 function loadSongs() {
-    console.log('hi loadSongs');
     //Send the AJAX call to the server
     $.ajax( {
         //The URL to process the request
-        'url' : '/musicladderapi',
+        'url' : '/musicLadderapi',
         //The type of request, also known as the "method" in HTML forms
         //Can be 'GET' or 'POST'
         'type' : 'GET',
@@ -57,6 +56,35 @@ function load() {
     loadSongs();
     
     $songList = $("#songsList");
+    $( ".sliderr" ).slider({
+        value: 5,
+        min: 1,
+        max: 10,
+        step: 1
+    })
+    .each(function() {
+
+        // Add labels to slider whose values 
+        // are specified by min, max
+
+        // Get the options for this slider (specified above)
+        var opt = $(this).data().uiSlider.options;
+
+        // Get the number of possible values
+        var vals = opt.max - opt.min;
+
+        // Position the labels
+        for (var i = 0; i <= vals; i++) {
+
+            // Create a new element and position it with percentages
+            var el = $("<label style=\"position: absolute;width: 20px;margin-top: 20px;margin-left: -10px;text-align: center;\">" + (i + opt.min) + "</label>").css("left", (i/vals*100) + "%");
+
+            // Add the element inside #slider
+            $(".sliderr").append(el);
+
+        }
+
+    });
 }
 
-load();
+$( document ).ready( load );

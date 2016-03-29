@@ -3,24 +3,33 @@
         <title>Music Ladder 0.11</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
-        <script type="text/javascript" src="musicladder/musicLadderIndex.js"></script>
+        
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+        <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+        <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+        
+        <script type="text/javascript" src="musicLadder/musicLadderIndex.js"></script>
+        
+
     </head>
-    <body>
+    <body id="musicLadderIndexWrapper">
         <div>Welcome to music Ladder index</div>
-        <table id="songsList" style="border: 1px solid;border-collapse: collapse;">
-            <thead>
-            <tr>
-                <th>Rank</th>
-                <th>Name</th>
-                <th>Matches</th>
-                <th>Wins</th>
-                <th>Draws</th>
-                <th>Losses</th>
-                <th colspan="2" style="color:red">Rating</th>
-            </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div class="sliderr" style="margin-bottom: 50px;"></div>
+        <div id="rankingsWrapper">
+            <table id="songsList" style="border: 1px solid;border-collapse: collapse;">
+                <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Name</th>
+                    <th>Matches</th>
+                    <th>Wins</th>
+                    <th>Draws</th>
+                    <th>Losses</th>
+                    <th colspan="2" style="color:red">Rating</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </body>
 </html>

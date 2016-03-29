@@ -24,14 +24,14 @@ public class ServerHandler implements HttpHandler
         String mime = null;
 
         String requestedFile = he.getRequestURI().toString();
-        //System.out.println("Req. file : " + requestedFile);
+        System.out.println("ServerHandler Req. file : " + requestedFile);
         String f = requestedFile.substring(requestedFile.lastIndexOf("/") + 1);
-        //System.out.println("f is : " + f);
+        System.out.println("ServerHandler f is : " + f);
         
         File file;
         BufferedInputStream bis;
-        //String extension = f.substring(f.lastIndexOf("."));
-        mime = getMime(".html");
+        String extension = f.substring(f.lastIndexOf("."));
+        mime = getMime(extension);
         if( f == null || f.isEmpty() ) {
             //System.out.println("I am empty");
             try
@@ -53,7 +53,7 @@ public class ServerHandler implements HttpHandler
                 //Log the exception!
             }
         } else {
-            //System.out.println("I am not empty");
+            System.out.println("ServerHandler I am not empty" + mime);
             try
             {
                 file = new File(publicFolder + f);
@@ -111,6 +111,9 @@ public class ServerHandler implements HttpHandler
                 break;
             case ".jar":
                 mime = "application/java-archive";
+                break;
+            case ".css":
+                mime = "text/css";
                 break;
             default :
                 mime = "text/html";
