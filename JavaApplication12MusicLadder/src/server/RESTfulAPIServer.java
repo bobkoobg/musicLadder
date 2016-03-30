@@ -27,7 +27,7 @@ public class RESTfulAPIServer
         HttpServer server = HttpServer.create(new InetSocketAddress(ip, port), 0);
         //REST Routes
         server.createContext("/musicLadder", new MusicLadderHandler());
-        server.createContext("/musicLadderapi", new MusicLadderAPIHandler());
+        server.createContext("/musicLadderAPI", new MusicLadderAPIHandler());
         //server.createContext("/whatever", new whateverHandler());
 
         //HTTP Server Routes 

@@ -36,7 +36,7 @@ function loadSongs() {
     //Send the AJAX call to the server
     $.ajax( {
         //The URL to process the request
-        'url' : '/musicLadderapi',
+        'url' : '/musicLadderAPI/all/songs/1',
         //The type of request, also known as the "method" in HTML forms
         //Can be 'GET' or 'POST'
         'type' : 'GET',

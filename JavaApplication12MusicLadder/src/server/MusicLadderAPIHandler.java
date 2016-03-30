@@ -14,73 +14,140 @@ public class MusicLadderAPIHandler implements HttpHandler
     @Override
     public void handle(HttpExchange he) throws IOException
     {
+        //ALL
         String response = "";
         int status = 200;
         String method = he.getRequestMethod().toUpperCase();
+        String path;
+        String[] parts;
+        
+        //POST, PUT, (DELETE?)
+        InputStreamReader isr;
+        BufferedReader br;
+        String jsonQuery;
         switch (method)
         {
             case "GET":
-                try
-                {
-                    String path = he.getRequestURI().getPath();
-                    int lastIndex = path.lastIndexOf("/");
-                    if (lastIndex > 0)
-                    {
-                        String idString = path.substring(lastIndex + 1);
-
-                        int id = Integer.parseInt(idString);
-                        response = new Gson().toJson( RESTfulAPIServer.controller.getSongByID( id ) );
+                path = he.getRequestURI().getPath();
+                parts = path.split("/");
+                
+                if ( parts.length > 2 && parts[2] != null && "all".equals( parts[2] ) ) {
+                    if( parts.length > 3 && parts[3] != null && "songs".equals( parts[3] ) ) {
+                        if ( parts.length > 4 && parts[4] != null && isNumeric( parts[4] ) ) {
+                            response = new Gson().toJson( RESTfulAPIServer.controller.loadSongs( Integer.parseInt( parts[4] ) ) );
+                        } else {
+                            response = "404 Not found";
+                            status = 404;
+                        }
+                    } else if( parts.length > 3 && parts[3] != null && "duelsToPlay".equals( parts[3] ) ) {
+                        if ( parts.length > 4 && parts[4] != null && isNumeric( parts[4] ) ) {
+                            response = new Gson().toJson( RESTfulAPIServer.controller.loadNDuelsToPlay( Integer.parseInt( parts[4] ) ) );
+                        } else {
+                            response = "404 Not found";
+                            status = 404;
+                        }
+                    } else if( parts.length > 3 && parts[3] != null && "duelsPlayed".equals( parts[3] ) ) {
+                        if ( parts.length > 4 && parts[4] != null && isNumeric( parts[4] ) ) {
+                            response = new Gson().toJson( RESTfulAPIServer.controller.loadNPlayedDuels( Integer.parseInt( parts[4] ) ) );
+                        } else {
+                            response = "404 Not found";
+                            status = 404;
+                        }
+                    } else {
+                        response = "404 Not found";
+                        status = 404;
                     }
-                    else
-                    {
-                        response = new Gson().toJson( RESTfulAPIServer.controller.loadSongs( 1 ) );
+                } else if ( parts.length > 2 && parts[2] != null && "song".equals( parts[2] ) ) {
+                    if ( parts.length > 3 && parts[3] != null && isNumeric( parts[3] ) ) {
+                        response = new Gson().toJson( RESTfulAPIServer.controller.getSongByID( Integer.parseInt( parts[3] ) ) );
+                    } else {
+                        response = "404 Not found";
+                        status = 404;
                     }
-                }
-                catch (NumberFormatException nfe)
-                {
-                    response = "Id is not a number";
+                } else if ( parts.length > 2 && parts[2] != null && "duel".equals( parts[2] ) ) {
+                    if ( parts.length > 3 && parts[3] != null && isNumeric( parts[3] ) ) {
+                        response = "500 Not supported";
+                        status = 500;
+                    } else {
+                        response = "404 Not found";
+                        status = 404;
+                    }
+                } else {
+                    response = "404 Not found";
                     status = 404;
                 }
                 break;
             case "POST":
-//                InputStreamReader isr = new InputStreamReader(he.getRequestBody(), "utf-8");
-//                BufferedReader br = new BufferedReader(isr);
-//                String jsonQuery = br.readLine();
-//                //Person p = RestFileServer.facade.addPersonFromJSON(jsonQuery);
-//                //response = new Gson().toJson(p);
+                path = he.getRequestURI().getPath();
+                parts = path.split("/");
+                
+                isr = new InputStreamReader(he.getRequestBody(), "utf-8");
+                br = new BufferedReader(isr);
+                jsonQuery = br.readLine();
+                
+                 if ( parts.length > 2 && parts[2] != null && "song".equals( parts[2] ) ) {
+                    response = new Gson().toJson( RESTfulAPIServer.controller.createAndLoadSongs( jsonQuery ) );
+                    status = 201;
+                 } else if ( parts.length > 2 && parts[2] != null && "duel".equals( parts[2] ) ) {
+                     if ( parts.length > 3 && parts[3] != null && isNumeric( parts[3] ) ) {
+                        response = new Gson().toJson( RESTfulAPIServer.controller.generateDuels( Integer.parseInt( parts[3] ) ) );
+                        status = 201;
+                     } else {
+                         response = "404 Not found";
+                        status = 404;
+                     }
+                 } else {
+                    response = "404 Not found";
+                    status = 404;
+                 }
                 break;
             case "PUT":
+                path = he.getRequestURI().getPath();
+                parts = path.split("/");
+                
+                isr = new InputStreamReader(he.getRequestBody(), "utf-8");
+                br = new BufferedReader(isr);
+                jsonQuery = br.readLine();
+                
+                if ( parts.length > 2 && parts[2] != null && "duel".equals( parts[2] ) ) {
+                    if ( parts.length > 4 && parts[3] != null && isNumeric( parts[3] ) &&
+                            parts[4] != null && isNumeric( parts[4] ) ) {
+                        response = new Gson().toJson( RESTfulAPIServer.controller.generateResultsAndUpdateDuel( jsonQuery, Integer.parseInt( parts[3] ), Integer.parseInt( parts[4] ) ) );
+                        status = 201;
+                    } else {
+                        response = "404 Not found";
+                        status = 404;
+                    }
+                } else {
+                    response = "404 Not found";
+                    status = 404;
+                }
                 break;
             case "DELETE":
-//                try
-//                {
-//                    String path = he.getRequestURI().getPath();
-//                    int lastIndex = path.lastIndexOf("/");
-//                    if (lastIndex > 0)
-//                    {  //person/id
-//                        int id = Integer.parseInt(path.substring(lastIndex + 1));
-//                        //Person pDeleted = RestFileServer.facade.deletePersonFromJSON(id);
-//                        //response = new Gson().toJson(pDeleted);
-//                    }
-//                    else
-//                    {
-//                        status = 400;
-//                        response = "<h1>Bad Request</h1>No id supplied with request";
-//                    }
-//                }
-//                catch (NumberFormatException nfe)
-//                {
-//                    response = "Id is not a number";
-//                    status = 404;
-//                }
+                status = 500;
+                response = "not supported";
                 break;
         }
+        
         he.getResponseHeaders().add("Content-Type", "application/json");
         he.sendResponseHeaders(status, 0);
         try (OutputStream os = he.getResponseBody())
         {
             os.write(response.getBytes());
         }
+    }
+    
+    private static Boolean isNumeric(String str)  
+    {  
+      try  
+      {  
+        Integer d = Integer.parseInt( str );  
+      }  
+      catch(NumberFormatException nfe)  
+      {  
+        return false;  
+      }  
+      return true;  
     }
 
 }

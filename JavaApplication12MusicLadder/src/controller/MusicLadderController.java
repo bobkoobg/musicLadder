@@ -1,5 +1,7 @@
 package controller;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import entity.Duel;
 import entity.Song;
 import java.io.File;
@@ -47,6 +49,7 @@ public class MusicLadderController
     private EloRatingSystemCalculator eloRSC = null;
     private DuelGenerator dG = null;
     private SongReader sr = null;
+    private Gson gson = null;
 
     private MusicLadderController()
     {
@@ -63,6 +66,8 @@ public class MusicLadderController
         eloRSC = EloRatingSystemCalculator.getInstance();
         dG = DuelGenerator.getInstance();
         sr = new SongReader();
+        
+        gson = new Gson();
 
     }
 
@@ -102,8 +107,23 @@ public class MusicLadderController
                 model.saveSong( new Song( songId, songFiles[i].getName() ) );
             } else {
                 //Please cry!
-                System.out.println("Please cry!");
+                System.out.println("insertAndLoadSongs Please cry!");
             }
+        }
+        List<Song> songList = model.getSongs();
+        return songList;
+    }
+    
+    public List<Song> createAndLoadSongs( String jQueryObject ) {
+        
+        localSong jsonObject = gson.fromJson( jQueryObject , localSong.class );
+        
+        Integer songId = facade.insertSong(logger, jsonObject.getName() );
+        if (songId != -1 ) {
+            model.saveSong( new Song( songId, jsonObject.getName() ) );
+        } else {
+            //Please cry!
+            System.out.println("createAndLoadSongs Please cry!");
         }
         List<Song> songList = model.getSongs();
         return songList;
@@ -122,9 +142,11 @@ public class MusicLadderController
                 model.addDuel( duel );
             } else {
                 //Please cry!
+                System.out.println("generateDuels Please cry!");
             }
         }
-         List<Duel> duels = model.getDuels();
+        //invent better solution
+         List<Duel> duels = loadNDuelsToPlay( 100 );
         return duels;
     }
     
@@ -142,6 +164,58 @@ public class MusicLadderController
         duel.setSong1AfterMatchRating( newSongRatings[0] );
         duel.setSong2AfterMatchRating( newSongRatings[1] );
 
+        Song s1 = model.getSongByID( duel.getSong1ID() );
+        Song s2 = model.getSongByID( duel.getSong2ID() );
+        
+        if( song1Score > song2Score ) {
+            s1.incrementWins();
+            s2.incrementLoses();
+        } else if ( song1Score < song2Score ) {
+            s1.incrementLoses();
+            s2.incrementWins();
+        } else  {
+            s1.incremenetDraws();
+            s2.incremenetDraws();
+        }
+        
+        s1.setFormerRating( s1.getCurrentRating() );
+        s1.setCurrentRating( newSongRatings[0] );
+        s2.setFormerRating( s2.getCurrentRating() );
+        s2.setCurrentRating( newSongRatings[1] );
+        
+        facade.updateSong(logger, s1);
+        facade.updateSong(logger, s2);
+        facade.updateDuel(logger, duel);
+        
+        //No inner error handling at any point
+        model.updateSong(s1);
+        model.updateSong(s2);
+        
+        return getSongs();
+    }
+    
+    //Very same but with String jQueryObject
+    public List<Song> generateResultsAndUpdateDuel(String jQueryObject, Integer song1Score, Integer song2Score) {
+        //No inner error handling at any point
+        Duel duel = null;
+        try {
+            duel = gson.fromJson( jQueryObject , Duel.class );
+        }
+        catch (JsonParseException e) {
+            System.out.println("exception : " + e);
+        }
+        
+        duel.setSong1Score( song1Score );
+        duel.setSong2Score( song2Score );
+        
+        float[] newSongRatings = eloRSC.calculate( duel );
+        
+        duel.setSong1AfterMatchRating( newSongRatings[0] );
+        duel.setSong2AfterMatchRating( newSongRatings[1] );
+        
+        //invent better solution
+        loadSongs( 1 );
+        
         Song s1 = model.getSongByID( duel.getSong1ID() );
         Song s2 = model.getSongByID( duel.getSong2ID() );
         
@@ -192,5 +266,19 @@ public class MusicLadderController
     public void clearSystem() {
         model.clearDuels();
         model.clearSongs();
+    }
+    
+    private class localSong {
+        private String name;
+
+        public localSong(String name)
+        {
+            this.name = name;
+        }
+
+        public String getName()
+        {
+            return name;
+        }
     }
 }

@@ -692,7 +692,11 @@ public class MusicLadder extends javax.swing.JFrame
             if( songs.size() > 0 ) {
                 jButtonSaveResult.setEnabled(true);
                 //Load Duels
-                duels = controller.generateDuels( 5 );
+                duels = controller.loadNDuelsToPlay( 5 );
+                if (duels.size() < 5 ) {
+                    controller.generateDuels( ( 5 - duels.size() ) );
+                }
+                duels = controller.loadNDuelsToPlay( 5 );
                 populatejTableDuels( duels );
                 
                 //set current duel GUI settings
