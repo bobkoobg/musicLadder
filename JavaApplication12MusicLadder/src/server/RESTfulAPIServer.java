@@ -37,7 +37,7 @@ public class RESTfulAPIServer
         System.out.println("Server started, listening on port: " + port);
 
     }
-//The magic starts here ;)
+    
     public static void main(String[] args) throws IOException {
         if (args.length >= 3) {
             port = Integer.parseInt(args[0]);

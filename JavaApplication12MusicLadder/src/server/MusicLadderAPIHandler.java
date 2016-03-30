@@ -96,6 +96,9 @@ public class MusicLadderAPIHandler implements HttpHandler
                          response = "404 Not found";
                         status = 404;
                      }
+                 } else if ( parts.length > 2 && parts[2] != null && "probability".equals( parts[2] ) ) {
+                    response = RESTfulAPIServer.controller.predictDuelResults( jsonQuery );
+                    status = 201;
                  } else {
                     response = "404 Not found";
                     status = 404;

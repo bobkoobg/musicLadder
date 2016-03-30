@@ -116,7 +116,7 @@ public class MusicLadderController
     
     public List<Song> createAndLoadSongs( String jQueryObject ) {
         
-        localSong jsonObject = gson.fromJson( jQueryObject , localSong.class );
+        LocalSong jsonObject = gson.fromJson( jQueryObject , LocalSong.class );
         
         Integer songId = facade.insertSong(logger, jsonObject.getName() );
         if (songId != -1 ) {
@@ -258,6 +258,39 @@ public class MusicLadderController
         return eloRSC.calculate(duel);
     }
     
+    private List<Float> generateResults( Duel duel ) {
+        List<Float> possibilities = new ArrayList();
+        Integer[] song1Scores = {10, 5, 0};
+        Integer[] song2Scores = {0, 5, 10};
+        
+        for (int i = 0; i < song1Scores.length; i++)
+        {
+            duel.setSong1Score( song1Scores[i] );
+            duel.setSong2Score( song2Scores[i] );
+
+            float[] calcResults = eloRSC.calculate(duel);
+
+            possibilities.add( calcResults[0] );
+            possibilities.add( calcResults[1] );
+        }
+        return possibilities;
+    }
+    
+    public String predictDuelResults( String jQueryObject ) {
+        //No inner error handling at any point
+        Duel duel = null;
+        try {
+            duel = gson.fromJson( jQueryObject , Duel.class );
+        }
+        catch (JsonParseException e) {
+            System.out.println("exception : " + e);
+        }
+        
+        List<Float> possibilities = generateResults( duel );
+        
+        return gson.toJson( possibilities );
+    }
+    
     public void closeConnection() {
         facade.closeConnection(logger);
     }
@@ -268,10 +301,10 @@ public class MusicLadderController
         model.clearSongs();
     }
     
-    private class localSong {
+    private class LocalSong {
         private String name;
 
-        public localSong(String name)
+        public LocalSong(String name)
         {
             this.name = name;
         }

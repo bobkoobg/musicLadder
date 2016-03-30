@@ -9,24 +9,59 @@
         <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
         
         <script type="text/javascript" src="musicLadder/musicLadderIndex.js"></script>
-        
-
     </head>
     <body id="musicLadderIndexWrapper">
         <div>Welcome to music Ladder index</div>
-        <div class="sliderr" style="margin-bottom: 50px;"></div>
+        <div id="currentDuelWrapper">
+            <div>
+                <div>
+                    <span id="competitor1Name" style="border: 1px solid;"></span>
+                    <span id="competitor1Rating" style="border: 1px solid;"></span>
+                </div>
+                <div>
+                    <span id="competitor2Name" style="border: 1px solid;"></span>
+                    <span id="competitor2Rating" style="border: 1px solid;"></span>
+                </div>
+            </div>
+            <div style="display: inline-block;text-align: center;overflow: hidden;width: 100%;">
+                <span id="prediction1Win" style="float:left"></span>
+                <span id="prediction1Draw"></span>
+                <span id="prediction1Loss" style="float:right"></span>
+            </div>
+            <div class="sliderr" style="margin-bottom: 50px;"></div>
+            <div style="display: inline-block;text-align: center;overflow: hidden;width: 100%;">
+                <span id="prediction2Loss" style="float:left"></span>
+                <span id="prediction2Draw"></span>
+                <span id="prediction2Win" style="float:right"></span>
+            </div>
+        </div>
+        <div id="duelsToPlayWrapper">
+            <table id="duelsToPlayList" style="border: 1px solid;border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Competitor 1 Name</th>
+                        <th>Competitor 1 Rating</th>
+                        <th>-</th>
+                        <th>Competitor 2 Rating</th>
+                        <th>Competitor 2 Name</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
         <div id="rankingsWrapper">
             <table id="songsList" style="border: 1px solid;border-collapse: collapse;">
                 <thead>
-                <tr>
-                    <th>Rank</th>
-                    <th>Name</th>
-                    <th>Matches</th>
-                    <th>Wins</th>
-                    <th>Draws</th>
-                    <th>Losses</th>
-                    <th colspan="2" style="color:red">Rating</th>
-                </tr>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Name</th>
+                        <th>Matches</th>
+                        <th>Wins</th>
+                        <th>Draws</th>
+                        <th>Losses</th>
+                        <th colspan="2" style="color:red">Rating</th>
+                    </tr>
                 </thead>
                 <tbody></tbody>
             </table>
