@@ -30,12 +30,13 @@ public class ServerHandler implements HttpHandler
         
         File file;
         BufferedInputStream bis;
-        String extension = f.substring(f.lastIndexOf("."));
-        mime = getMime(extension);
+
+        System.out.println("hi");
         if( f == null || f.isEmpty() ) {
-            //System.out.println("I am empty");
+            System.out.println("I am empty");
             try
             {
+                mime = ".html";
                 file = new File(publicFolder + "index.html");
                 
                 bytesToSend = new byte[(int) file.length()];
@@ -53,6 +54,13 @@ public class ServerHandler implements HttpHandler
                 //Log the exception!
             }
         } else {
+            int lastIndex = f.lastIndexOf(".");
+            
+            if( lastIndex > -1) {
+                mime = f.substring(f.lastIndexOf("."));
+            } else {
+                mime = getMime(".html");
+            }
             System.out.println("ServerHandler I am not empty" + mime);
             try
             {
