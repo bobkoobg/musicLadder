@@ -17,29 +17,6 @@ import utils.SongReader;
 public class MusicLadderController
 {
     
-    /*
-    * Testing purposes
-    * /
-    
-    public static void main(String[] args)
-    {
-        new MusicLadderController().helloWorld();
-    }
-    
-    private void helloWorld() {
-        System.out.println("Hello World!");   
-        
-        PerformanceLogger pl = new PerformanceLogger();
-        Logger logger = pl.logMessage();
-        Facade f = Facade.getInstance();
-        
-        f.initializeConnection(logger);
-        f.wipeDuelDatabases(logger);
-        f.wipeSongDatabases(logger);
-        f.closeConnection(logger);
-    }
-    */
-    
     private static MusicLadderController instance = null;
     
     private PerformanceLogger pl = null;
@@ -80,114 +57,84 @@ public class MusicLadderController
         return instance;
     }
     
+    /*
+    * Correct way of loading songs
+    *   Missing : Error handling
+    */
     public List<Song> loadSongs( Integer ladderId ) {
-        List<Song> localSongs = facade.getSongs(logger, ladderId );
-        model.setSongs(localSongs);
-        return model.getSongs();
+        return facade.getSongs(logger, ladderId );
     }
     
+    /*
+    * Correct way of loading songs
+    *   Missing : Error handling
+    */
     public List<Duel> loadNPlayedDuels( Integer amount ) {
-        List<Duel> duels = facade.getNPlayedDuels(logger, amount);
-        model.joinDuelsLists(duels);
-        return duels;
+        return facade.getNPlayedDuels(logger, amount);
     }
     
+    /*
+    * Correct way of loading songs
+    *   1 ) Load from DB
+    *     Missing : Error handling
+    */
     public List<Duel> loadNDuelsToPlay( Integer amount ) {
-        List<Duel> duels = facade.getNDuelsToPlay(logger, amount);
-        model.joinDuelsLists(duels);
-        return duels;
+        return facade.getNDuelsToPlay(logger, amount);
     }
     
-    public List<Song> insertAndLoadSongs( String path) {
+    /*
+    * Correct way of creating songs from file
+    *   1 ) Find in local folder
+    *   2 ) Loop through result
+    *   3 ) Insert elem by elem in db
+    *   4 ) Check if correct ***MISSING***
+    *   5 ) Error handling ***MISSING***
+    */
+    public Boolean createSongs( String path ) {
         File[] songFiles = sr.finder( path );
         for (int i = 0; i < songFiles.length; i++)
         {
             Integer songId = facade.insertSong(logger, songFiles[i].getName());
-            if (songId != -1 ) {
-                model.saveSong( new Song( songId, songFiles[i].getName() ) );
-            } else {
-                //Please cry!
-                System.out.println("insertAndLoadSongs Please cry!");
-            }
+            //Error handling
         }
-        List<Song> songList = model.getSongs();
-        return songList;
+        return true;
     }
     
-    public List<Song> createAndLoadSongs( String jQueryObject ) {
-        
-        LocalSong jsonObject = gson.fromJson( jQueryObject , LocalSong.class );
+    /*
+    * Correct way of creating a song via API
+    *   1 ) Create object from Json
+    *   2 ) Insert it in the db
+    *   3 ) Check if correct ***MISSING***
+    *   4 ) Error handling ***MISSING***
+    */
+    public Boolean createSongAPI( String jQueryObject ) {
+        Song jsonObject = gson.fromJson( jQueryObject , Song.class );
         
         Integer songId = facade.insertSong(logger, jsonObject.getName() );
-        if (songId != -1 ) {
-            model.saveSong( new Song( songId, jsonObject.getName() ) );
-        } else {
-            //Please cry!
-            System.out.println("createAndLoadSongs Please cry!");
-        }
-        List<Song> songList = model.getSongs();
-        return songList;
+        //Error handling
+        return true;
     }
     
-    private Integer getDuelsMatchMax() {
-        return model.getDuelsMatchMax();
+    private int getDuelsMatchMax( List<Song> songs ) {
+        return model.getDuelsMatchMax( songs );
     }
     
-    public List<Duel> generateDuels(Integer amount) {
+    public boolean generateDuels(Integer ladderId, Integer amount) {
+        List<Song> songs = facade.getSongs(logger, ladderId);
         for (int i = 0; i < amount; i++)
         {
-            Duel duel = dG.generator( model.getSongs(), getDuelsMatchMax() );
-            duel = facade.insertDuel(logger, duel);
-            if ( duel != null ) {
-                model.addDuel( duel );
-            } else {
-                //Please cry!
-                System.out.println("generateDuels Please cry!");
+            Duel duel = dG.generator( songs, getDuelsMatchMax( songs ) );
+            if ( duel == null ) {
+                System.out.println("Error : generateDuels no duel generated.");
+                return false;
+            } 
+            
+            if (  ! facade.insertDuel(logger, duel) ) {
+                System.out.println("Error : duel not inserted in database");
+                return false;
             }
         }
-        //invent better solution
-         List<Duel> duels = loadNDuelsToPlay( 100 );
-        return duels;
-    }
-    
-    public List<Song> generateResultsAndUpdateDuel(Duel duel, Integer song1Score, Integer song2Score) {
-        
-        duel.setSong1Score( song1Score );
-        duel.setSong2Score( song2Score );
-        
-        float[] newSongRatings = eloRSC.calculate( duel );
-        
-        duel.setSong1AfterMatchRating( newSongRatings[0] );
-        duel.setSong2AfterMatchRating( newSongRatings[1] );
-
-        Song s1 = model.getSongByID( duel.getSong1ID() );
-        Song s2 = model.getSongByID( duel.getSong2ID() );
-        
-        if( song1Score > song2Score ) {
-            s1.incrementWins();
-            s2.incrementLoses();
-        } else if ( song1Score < song2Score ) {
-            s1.incrementLoses();
-            s2.incrementWins();
-        } else  {
-            s1.incremenetDraws();
-            s2.incremenetDraws();
-        }
-        
-        s1.setFormerRating( s1.getCurrentRating() );
-        s1.setCurrentRating( newSongRatings[0] );
-        s2.setFormerRating( s2.getCurrentRating() );
-        s2.setCurrentRating( newSongRatings[1] );
-        
-        facade.updateSong(logger, s1);
-        facade.updateSong(logger, s2);
-        facade.updateDuel(logger, duel);
-        
-        //No inner error handling at any point
-        model.updateSong(s1);
-        model.updateSong(s2);
-        
-        return loadSongs(1);
+        return true;
     }
     
     public Duel getDuel( Integer duelID ) {
@@ -247,10 +194,6 @@ public class MusicLadderController
         return facade.getSong(logger, songID);
     }
     
-    public List<Duel> getDuels( Integer amount ) {
-        return model.getDuels( amount );
-    }
-    
     public float[] predictDuelResults( Duel duel ) {
         return eloRSC.calculate(duel);
     }
@@ -290,25 +233,5 @@ public class MusicLadderController
     
     public void closeConnection() {
         facade.closeConnection(logger);
-    }
-    
-    //Cleanup before insert
-    public void clearSystem() {
-        model.clearDuels();
-        model.clearSongs();
-    }
-    
-    private class LocalSong {
-        private String name;
-
-        public LocalSong(String name)
-        {
-            this.name = name;
-        }
-
-        public String getName()
-        {
-            return name;
-        }
     }
 }

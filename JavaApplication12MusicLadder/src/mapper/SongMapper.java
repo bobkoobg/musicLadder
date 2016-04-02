@@ -147,7 +147,8 @@ public class SongMapper
                     + "FROM ML_SONG_TBL song "
                     + "JOIN ML_SONG_RANKING_TBL songranking "
                     + "ON song.song_id = songranking.song_id "
-                    + "WHERE song.SONG_LADDER = ?";
+                    + "WHERE song.SONG_LADDER = ? "
+                    + "ORDER BY songranking.SONG_CURRENTRATING DESC";
             
             preparedStatement = connection.prepareStatement(SQLString);
             preparedStatement.setInt(1, ladderId);
@@ -248,7 +249,7 @@ public class SongMapper
         return song;
     }
     
-    public Boolean updateSong(Logger logger, Connection connection, Song song ) {
+    public boolean updateSong(Logger logger, Connection connection, Song song ) {
             PreparedStatement preparedStatement = null;
             String insertTableSQL;
             
@@ -343,7 +344,7 @@ public class SongMapper
             return true;
     }
  
-    public Boolean wipeDatabase(Connection connection, Logger logger) {
+    public boolean wipeDatabase(Connection connection, Logger logger) {
         Statement statement = null;
         String sql;
         String[] databasesToWipe = {"ML_SONG_RANKING_TBL", "ML_SONG_TBL" };

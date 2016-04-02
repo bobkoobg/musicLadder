@@ -102,7 +102,7 @@ public class Facade
         return duelMapper.getNDuelsToPlay(logger, connection, amount);
     }
     
-    public Duel insertDuel( Logger logger, Duel duel) {
+    public Boolean insertDuel( Logger logger, Duel duel) {
         return duelMapper.insertDuel(logger, connection, duel);
     }
     

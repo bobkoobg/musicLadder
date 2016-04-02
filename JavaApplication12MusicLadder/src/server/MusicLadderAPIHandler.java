@@ -38,7 +38,12 @@ public class MusicLadderAPIHandler implements HttpHandler
         {
             case "GET":
                 
-                //"all" handling
+                /*
+                 * "all" handling
+                 * URL (1) : http://localhost:8084/musicLadderAPI/all/songs/1
+                 * URL (2) : http://localhost:8084/musicLadderAPI/all/duelsToPlay/5
+                 * URL (3) : http://localhost:8084/musicLadderAPI/all/duelsPlayed/25
+                */
                 if ( parts.length == 5 && parts[2] != null && "all".equals( parts[2] )
                     && parts[3] != null && parts[4] != null && isNumeric( parts[4] ) 
                     && ( Integer.parseInt( parts[4] ) > 0 ) ) {
@@ -59,19 +64,24 @@ public class MusicLadderAPIHandler implements HttpHandler
                                 break; 
                         }
                 } 
-                //"song handling
+                /*
+                 * "song" handling
+                 * URL : http://localhost:8084/musicLadderAPI/song/23
+                */
                 else if ( parts.length == 4 && parts[2] != null && "song".equals( parts[2] ) 
                     && parts[3] != null && isNumeric( parts[3] ) && ( Integer.parseInt( parts[3] ) > 0 ) ) {
                     
                         response = new Gson().toJson( controller.getSongByID( Integer.parseInt( parts[3] ) ) );
                 } 
-                //"duel" handling
+                /*
+                 * "duel" handling
+                 * URL : http://localhost:8084/musicLadderAPI/duel/104
+                */
                 else if ( parts.length == 4 && parts[2] != null && "duel".equals( parts[2] ) 
                     && parts[3] != null && isNumeric( parts[3] ) && ( Integer.parseInt( parts[3] ) > 0 ) ) {
                     
                         response = new Gson().toJson( controller.getDuel( Integer.parseInt( parts[3] ) ) );
-                }  else {
-                    
+                } else {
                     response = "404 Not found";
                     status = 404;
                 }
@@ -84,6 +94,11 @@ public class MusicLadderAPIHandler implements HttpHandler
                 br = new BufferedReader(isr);
                 jsonQuery = br.readLine();
                 
+                /*
+                * Update of duel ( actual matchmaking )
+                * URL : http://localhost:8084/musicLadderAPI/duel/112/6/4
+                * JSON : -none-
+                */
                 if ( parts.length == 6 && parts[2] != null && "duel".equals( parts[2] ) 
                       && parts[3] != null && isNumeric( parts[3] ) && ( Integer.parseInt( parts[3] ) > 0 ) 
                       && parts[4] != null && isNumeric( parts[4] ) 
@@ -97,10 +112,16 @@ public class MusicLadderAPIHandler implements HttpHandler
                             status = 400;
                             response = "{\"response\":\"Bad request!\"}";
                         }
-                } else if ( parts.length == 3 && parts[2] != null && "probability".equals( parts[2] ) ) {
+                } 
+                /*
+                * probabilities for possible points after a duel
+                * URL : http://localhost:8084/musicLadderAPI/probability
+                * JSON : {"song1BeforeMatchRating":800,"song2BeforeMatchRating":1200}
+                */
+                else if ( parts.length == 3 && parts[2] != null && "probability".equals( parts[2] ) ) {
                     response = controller.predictDuelResults( jsonQuery );
                     status = 201;
-                 } else {
+                } else {
                     response = "404 Not found";
                     status = 404;
                  }
@@ -112,11 +133,11 @@ public class MusicLadderAPIHandler implements HttpHandler
                 br = new BufferedReader(isr);
                 jsonQuery = br.readLine();
                 if ( parts.length > 2 && parts[2] != null && "song".equals( parts[2] ) ) {
-                    response = new Gson().toJson( controller.createAndLoadSongs( jsonQuery ) );
+                    response = new Gson().toJson( controller.createSongAPI( jsonQuery ) );
                     status = 201;
                  } else if ( parts.length > 2 && parts[2] != null && "duel".equals( parts[2] ) ) {
                      if ( parts.length > 3 && parts[3] != null && isNumeric( parts[3] ) ) {
-                        response = new Gson().toJson( controller.generateDuels( Integer.parseInt( parts[3] ) ) );
+                        //response = new Gson().toJson( controller.generateDuels( Integer.parseInt( parts[3] ) ) );
                         status = 201;
                      } else {
                          response = "404 Not found";

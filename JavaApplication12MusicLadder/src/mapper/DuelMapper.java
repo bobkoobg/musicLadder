@@ -65,7 +65,7 @@ public class DuelMapper
         return duel;
     }
     
-    public Duel insertDuel(Logger logger, Connection connection, Duel duel)
+    public boolean insertDuel(Logger logger, Connection connection, Duel duel)
     {
         PreparedStatement preparedStatement = null;
         Integer duelID = null;
@@ -84,7 +84,7 @@ public class DuelMapper
             }
         } catch (SQLException e) {
             logger.severe("Method insertDuel (Part1) - Execution SQL Exception : [ " + e + " ]");
-            return null;
+            return false;
         } finally //The statement must be closed, because of : java.sql.SQLException: ORA-01000
         {
             try
@@ -97,7 +97,7 @@ public class DuelMapper
             catch (SQLException e)
             {
                 logger.severe("Method insertDuel (Part1) - Closing SQL Exception : [ " + e + " ]");
-                return null;
+                return false;
             }
         }
         
@@ -134,7 +134,7 @@ public class DuelMapper
             catch (SQLException e)
             {
                 logger.severe("Method insertDuel (Part2) - Execution SQL Exception : [ " + e + " ], Duel content : [" + duel.toString() + "]");
-                return null;
+                return false;
             } finally //The statement must be closed, because of : java.sql.SQLException: ORA-01000
             {
                 try
@@ -147,15 +147,15 @@ public class DuelMapper
                 catch (SQLException e)
                 {
                     logger.severe("Method insertDuel (Part2) - Closing SQL Exception : [ " + e + " ], Duel content : [" + duel.toString() + "]");
-                    return null;
+                    return false;
                 }
             }
 
             logger.info( "Method insertDuel success! : [ Duel ID : " + duel.getDuelID() + "]" );
-            return duel;
+            return true;
         }
         logger.severe("Method insertDuel (Part1) - [ Duel ID : " + duelID + ", Duel : " + duel.toString() + " ]");
-        return null;
+        return false;
     }
     
     public List<Duel> getNPlayedDuels(Logger logger, Connection connection, Integer amount) {
@@ -280,7 +280,7 @@ public class DuelMapper
         return duels;
     }
         
-    public Boolean updateDuel(Logger logger, Connection connection, Duel duel ) {
+    public boolean updateDuel(Logger logger, Connection connection, Duel duel ) {
             PreparedStatement preparedStatement = null;
             String insertTableSQL;
             
@@ -333,7 +333,7 @@ public class DuelMapper
             return true;
     }
     
-    public Boolean wipeDatabase(Connection connection, Logger logger) {
+    public boolean wipeDatabase(Connection connection, Logger logger) {
         Statement statement = null;
         String sql;
         String[] databasesToWipe = {"ML_DUEL_TBL" };
