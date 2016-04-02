@@ -269,16 +269,17 @@ public class SongMapper
 
                 
                  insertTableSQL = "UPDATE ML_SONG_TBL "
-                        + "SET SONG_WINS = ?, SONG_DRAWS = ?, "
+                        + "SET SONG_NAME = ?, SONG_WINS = ?, SONG_DRAWS = ?, "
                         + "SONG_LOSSES = ? "
                         + "WHERE SONG_ID = ?";
 
                 preparedStatement = connection.prepareStatement( insertTableSQL );
                 
-                preparedStatement.setInt( 1, song.getWins());
-                preparedStatement.setInt( 2, song.getDraws());
-                preparedStatement.setInt( 3, song.getLoses());
-                preparedStatement.setInt( 4, song.getId().intValue() );
+                preparedStatement.setString( 1, song.getName() );
+                preparedStatement.setInt( 2, song.getWins() );
+                preparedStatement.setInt( 3, song.getDraws() );
+                preparedStatement.setInt( 4, song.getLoses() );
+                preparedStatement.setInt( 5, song.getId().intValue() );
 
                 // execute insert SQL stetement
                 preparedStatement.executeUpdate();

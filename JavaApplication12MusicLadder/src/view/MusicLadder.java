@@ -62,7 +62,7 @@ public class MusicLadder extends javax.swing.JFrame
 
             duels = controller.loadNDuelsToPlay( 5 );
             if (duels.size() < 5 ) {
-                controller.generateDuels( ( 5 - duels.size() ) );
+                //controller.generateDuels( ( 5 - duels.size() ) );
             }
             duels = controller.loadNDuelsToPlay( 5 );
             populatejTableDuels( duels );
@@ -621,7 +621,7 @@ public class MusicLadder extends javax.swing.JFrame
         Integer song1Score = jSliderSong1.getValue();
         Integer song2Score = jSliderSong2.getValue();
         
-        songs = controller.generateResultsAndUpdateDuel(currentDuel, song1Score, song2Score);
+//        songs = controller.generateResultsAndUpdateDuel(currentDuel, song1Score, song2Score);
 
         populatejTableSongs( songs );
         
@@ -630,7 +630,7 @@ public class MusicLadder extends javax.swing.JFrame
         
         duels = controller.loadNDuelsToPlay( 5 );
         if (duels.size() < 5 ) {
-            controller.generateDuels( ( 5 - duels.size() ) );
+            //controller.generateDuels( ( 5 - duels.size() ) );
         }
         duels = controller.loadNDuelsToPlay( 5 );
         populatejTableDuels( duels );
@@ -678,13 +678,14 @@ public class MusicLadder extends javax.swing.JFrame
             
             //Load songs
             //TODO (for cleaning GUI - Clear Duel area when pointing to directory with no songs)
-            controller.clearSystem();
+            //controller.clearSystem();
             jButtonSaveResult.setEnabled(false);
-            songs = controller.insertAndLoadSongs( currentDirectory );
+            //SHOULD BE FIXED! CORE ERROR! 
+            //songs = controller.insertAndLoadSongs( currentDirectory );
             populatejTableSongs( songs );
             
             //Load previous duels
-            previousDuels = controller.getDuels( 10 );
+            //previousDuels = controller.getDuels( 10 );
             populatejTablePreviousDuels( previousDuels );
             
             clearTable( jTableNextMatches );
@@ -694,7 +695,7 @@ public class MusicLadder extends javax.swing.JFrame
                 //Load Duels
                 duels = controller.loadNDuelsToPlay( 5 );
                 if (duels.size() < 5 ) {
-                    controller.generateDuels( ( 5 - duels.size() ) );
+                    //controller.generateDuels( ( 5 - duels.size() ) );
                 }
                 duels = controller.loadNDuelsToPlay( 5 );
                 populatejTableDuels( duels );
@@ -734,28 +735,28 @@ public class MusicLadder extends javax.swing.JFrame
         prediction1.setSong1Score( 10 );
         prediction1.setSong2Score( 0 );
 
-        float predictions1[] = controller.predictDuelResults(prediction1);
+        //float predictions1[] = controller.predictDuelResults(prediction1);
 
         prediction1.setSong1Score( 0 );
         prediction1.setSong2Score( 10 );
 
-        float predictions2[] = controller.predictDuelResults( prediction1 );
+        //float predictions2[] = controller.predictDuelResults( prediction1 );
 
         prediction1.setSong1Score( 5 );
         prediction1.setSong2Score( 5 );
 
-        float predictions3[] = controller.predictDuelResults( prediction1 );
+        //float predictions3[] = controller.predictDuelResults( prediction1 );
         
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(2);
         
-        jLabelSong1MinPts.setText( df.format( predictions2[0] - prediction1.getSong1BeforeMatchRating() ) + "" );
-        jLabelSong1AvgPts.setText( df.format( predictions3[0] - prediction1.getSong1BeforeMatchRating() ) + "" );
-        jLabelSong1MaxPts.setText( df.format( predictions1[0] - prediction1.getSong1BeforeMatchRating() ) + "" );
+        ///jLabelSong1MinPts.setText( df.format( predictions2[0] - prediction1.getSong1BeforeMatchRating() ) + "" );
+        //jLabelSong1AvgPts.setText( df.format( predictions3[0] - prediction1.getSong1BeforeMatchRating() ) + "" );
+        //jLabelSong1MaxPts.setText( df.format( predictions1[0] - prediction1.getSong1BeforeMatchRating() ) + "" );
         
-        jLabelSong2MinPts.setText( df.format( predictions1[1] - prediction1.getSong2BeforeMatchRating() ) + "" );
-        jLabelSong2AvgPts.setText( df.format( predictions3[1] - prediction1.getSong2BeforeMatchRating() ) + "" );
-        jLabelSong2MaxPts.setText( df.format( predictions2[1] -prediction1.getSong2BeforeMatchRating() ) + "" );
+        //jLabelSong2MinPts.setText( df.format( predictions1[1] - prediction1.getSong2BeforeMatchRating() ) + "" );
+        //jLabelSong2AvgPts.setText( df.format( predictions3[1] - prediction1.getSong2BeforeMatchRating() ) + "" );
+        //jLabelSong2MaxPts.setText( df.format( predictions2[1] -prediction1.getSong2BeforeMatchRating() ) + "" );
     }
     
     private void selectValueFromjTableSongs( String songName ) {

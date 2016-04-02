@@ -30,12 +30,24 @@ public class DuelGenerator
         return instance;
     }
     
+    public Integer getDuelsMatchMax(List<Song> songs) {
+        Integer max = 0, currentMax = 0;
+        for (int i = 0; i < songs.size(); i++)
+        {
+            currentMax = songs.get(i).getAmmountOfMatches();
+            if( max < currentMax ) {
+                max = currentMax;
+            }
+        }
+        return max;
+    }
+    
     /*
     * Probability generator
     */
-    public Duel generator( List<Song> songs, Integer duelsSum )
+    public Duel generator( List<Song> songs )
     {
-       
+        Integer duelsSum = getDuelsMatchMax( songs );
         List<Integer> probabilitySongMap = new ArrayList();
         Integer probabilityRange = duelsSum / probabilityRateLevels;
         Integer probabilityRate, ammountOfMatches;

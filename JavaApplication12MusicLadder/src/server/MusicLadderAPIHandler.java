@@ -97,22 +97,39 @@ public class MusicLadderAPIHandler implements HttpHandler
                 /*
                 * Update of duel ( actual matchmaking )
                 * URL : http://localhost:8084/musicLadderAPI/duel/112/6/4
+                *       where 112 is the duelID, 6 is the song1 score
+                *       and 4 is the song2 score
                 * JSON : -none-
                 */
                 if ( parts.length == 6 && parts[2] != null && "duel".equals( parts[2] ) 
-                      && parts[3] != null && isNumeric( parts[3] ) && ( Integer.parseInt( parts[3] ) > 0 ) 
-                      && parts[4] != null && isNumeric( parts[4] ) 
-                      && parts[5] != null && isNumeric( parts[5] ) ) {
+                    && parts[3] != null && isNumeric( parts[3] ) && ( Integer.parseInt( parts[3] ) > 0 ) 
+                    && parts[4] != null && isNumeric( parts[4] ) 
+                    && parts[5] != null && isNumeric( parts[5] ) ) {
                     
                         Boolean actualResponse = controller.generateResultsAndUpdateDuel( Integer.parseInt( parts[3] ), Integer.parseInt( parts[4] ), Integer.parseInt( parts[5] ) );
                         if ( actualResponse ) {
                             status = 200;
-                            response = "{\"response\":\"Updated successfully!\"}";
+                            response = "{\"response\":\"Song updated successfully!\"}";
                         } else {
                             status = 400;
                             response = "{\"response\":\"Bad request!\"}";
                         }
-                } 
+                }
+                /*
+                * Update of song 
+                * URL : http://localhost:8084/musicLadderAPI/song
+                * JSON : {"id":183,"name":"Singer - very cool song"}
+                */
+                else if ( parts[2] != null && "song".equals( parts[2] )  ) {
+                    Boolean actualResponse = controller.updateSong( jsonQuery );
+                        if ( actualResponse ) {
+                            status = 200;
+                            response = "{\"response\":\"Song updated successfully!\"}";
+                        } else {
+                            status = 400;
+                            response = "{\"response\":\"Bad request!\"}";
+                        }
+                }
                 /*
                 * probabilities for possible points after a duel
                 * URL : http://localhost:8084/musicLadderAPI/probability
@@ -121,10 +138,12 @@ public class MusicLadderAPIHandler implements HttpHandler
                 else if ( parts.length == 3 && parts[2] != null && "probability".equals( parts[2] ) ) {
                     response = controller.predictDuelResults( jsonQuery );
                     status = 201;
-                } else {
+                } 
+                // Update of Song missing (functionality exists)
+                else {
                     response = "404 Not found";
                     status = 404;
-                 }
+                }
                 break;
             case "PUT":
                 //use PUT to create resources, or use POST to update resources.
@@ -132,17 +151,34 @@ public class MusicLadderAPIHandler implements HttpHandler
                 isr = new InputStreamReader(he.getRequestBody(), "utf-8");
                 br = new BufferedReader(isr);
                 jsonQuery = br.readLine();
+                /*
+                * Create new song
+                * URL : http://localhost:8084/musicLadderAPI/song
+                * JSON : {"name":"Singer - Song title ?"}
+                */
                 if ( parts.length > 2 && parts[2] != null && "song".equals( parts[2] ) ) {
                     response = new Gson().toJson( controller.createSongAPI( jsonQuery ) );
                     status = 201;
-                 } else if ( parts.length > 2 && parts[2] != null && "duel".equals( parts[2] ) ) {
-                     if ( parts.length > 3 && parts[3] != null && isNumeric( parts[3] ) ) {
-                        //response = new Gson().toJson( controller.generateDuels( Integer.parseInt( parts[3] ) ) );
-                        status = 201;
-                     } else {
-                         response = "404 Not found";
-                        status = 404;
-                     }
+                 } 
+                /*
+                * Create new duel
+                * URL : http://localhost:8084/musicLadderAPI/duel/1/4
+                *       where "1" is the ladderId and
+                        "4" is the amount of duels to be generated.
+                * JSON : -none-
+                */
+                else if ( parts.length == 5 && parts[2] != null && "duel".equals( parts[2] ) 
+                    && parts[3] != null && isNumeric( parts[3] ) && ( Integer.parseInt( parts[3] ) > 0 ) 
+                    && parts[4] != null && isNumeric( parts[4] ) && ( Integer.parseInt( parts[4] ) > 0 ) ) {
+                        boolean actualResponse = controller.generateDuels( Integer.parseInt( parts[3] ) , Integer.parseInt( parts[4] ) );
+
+                        if ( actualResponse ) {
+                            status = 201;
+                            response = "{\"response\":\"Duel created successfully!\"}";
+                        } else {
+                            status = 400;
+                            response = "{\"response\":\"Bad request!\"}";
+                        }
                  } else {
                     response = "404 Not found";
                     status = 404;

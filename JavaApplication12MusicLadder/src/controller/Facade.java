@@ -78,6 +78,10 @@ public class Facade
         return true;
     }
     
+    public Song getSong(Logger logger, Integer songId) {
+        return songMapper.getSong(logger, connection, songId);
+    }
+    
     public List<Song> getSongs(Logger logger, Integer ladderId) {
         return songMapper.getSongs(logger, connection, ladderId);
     }
@@ -89,6 +93,8 @@ public class Facade
     public Boolean updateSong( Logger logger, Song song ) {
         return songMapper.updateSong(logger, connection, song);
     }
+    
+    //delete song
     
     public Duel getDuel( Logger logger, Integer duelID ) {
         return duelMapper.getDuel(logger, connection, duelID);
@@ -110,12 +116,10 @@ public class Facade
         return duelMapper.updateDuel(logger, connection, duel);
     }
     
+    //delete duel
+    
     //Helpful, but useless functionality for the moment getSong, 
     //  wipeDuelDatabases, wipeSongDatabases
-    public Song getSong(Logger logger, Integer songId) {
-        return songMapper.getSong(logger, connection, songId);
-    }
-    
     public Boolean wipeDuelDatabases( Logger logger ) {
         return duelMapper.wipeDatabase(connection, logger);
     }
