@@ -1,6 +1,7 @@
 console.log('hi musicLadderIndex.js');
 
 var $slider;
+var $saveDuelButton;
 
 function evaluateRating(currentRating, formerRating) {
     if (currentRating > formerRating) {
@@ -62,21 +63,21 @@ function loadPredictions(song1Rating, song2Rating, callback) {
 }
 
 function displayDuelsToPlay(data) {
-    $.each(data, function( curDuelID, curDuel) { 
+    $.each(data, function( curDuelID, curDuel) {
         loadSong(curDuel.song1ID, function (song1) {
             loadSong(curDuel.song2ID, function (song2) {
                 loadPredictions(curDuel.song1BeforeMatchRating, curDuel.song2BeforeMatchRating, function (predictions, status) {
                     if (curDuelID === 0) {
                         $("#competitor1Name").text(song1.name);
                         $("#competitor2Name").text(song2.name);
-                        $("#competitor1Rating").text(curDuel.song1BeforeMatchRating);
-                        $("#competitor2Rating").text(curDuel.song2BeforeMatchRating);
-                        $("#prediction1Win").text(predictions[0]);
-                        $("#prediction1Draw").text(predictions[2]);
-                        $("#prediction1Loss").text(predictions[4]);
-                        $("#prediction2Win").text(predictions[5]);
-                        $("#prediction2Draw").text(predictions[3]);
-                        $("#prediction2Loss").text(predictions[1]);
+                        $("#competitor1Rating").text( parseFloat(Math.round(curDuel.song1BeforeMatchRating * 100) / 100).toFixed(2) );
+                        $("#competitor2Rating").text( parseFloat(Math.round(curDuel.song2BeforeMatchRating * 100) / 100).toFixed(2) );
+                        $("#prediction1Win").text( parseFloat(Math.round( predictions[0] * 100) / 100).toFixed(2) );
+                        $("#prediction1Draw").text( parseFloat(Math.round( predictions[2] * 100) / 100).toFixed(2) );
+                        $("#prediction1Loss").text( parseFloat(Math.round( predictions[4] * 100) / 100).toFixed(2) );
+                        $("#prediction2Win").text( parseFloat(Math.round( predictions[5] * 100) / 100).toFixed(2) );
+                        $("#prediction2Draw").text( parseFloat(Math.round( predictions[3] * 100) / 100).toFixed(2) );
+                        $("#prediction2Loss").text( parseFloat(Math.round( predictions[1] * 100) / 100).toFixed(2) );
                     }
 
                     var style = "style=\"border: 1px solid black;\"";
@@ -150,14 +151,27 @@ function loadPlayedDuels(amount) {
     });
 }
 
+function saveDuel() {
+    console.log('saving...');
+    $.ajax({
+        "url": "/musicLadderAPI/duel",
+        "type": "POST",
+        "headers": {"Content-Type": "application/json"},
+        "data": 
+            JSON.stringify({ 'song1BeforeMatchRating': song1Rating,'song2BeforeMatchRating': song2Rating })
+        ,
+        "success": callback
+    });
+}
+
 function load() {
     loadSongs();
     loadDuelsToPlay(5);
     loadPlayedDuels(15);
 
-//    $songList = $("#songsList");
-//    $duelsToPlayList = $("#duelsToPlayList");
-
+    $saveDuelButton = $("#saveDuel");
+    
+    $saveDuelButton.on("click", saveDuel );
     $(".sliderr").slider({
         value: 5,
         min: 1,
@@ -189,4 +203,4 @@ function load() {
             });
 }
 
-$(document).ready(load);
+$( window ).ready(load);

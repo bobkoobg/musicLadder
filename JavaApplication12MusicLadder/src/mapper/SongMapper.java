@@ -248,7 +248,7 @@ public class SongMapper
         return song;
     }
     
-    public Song updateSong(Logger logger, Connection connection, Song song ) {
+    public Boolean updateSong(Logger logger, Connection connection, Song song ) {
             PreparedStatement preparedStatement = null;
             String insertTableSQL;
             
@@ -285,7 +285,7 @@ public class SongMapper
             catch (SQLException e)
             {
                 logger.severe("SQL Exception while updating song " + song.toString() + " into song tbl " + e);
-                return null;
+                return false;
             } finally //The statement must be closed, because of : java.sql.SQLException: ORA-01000
             {
                 try
@@ -298,7 +298,7 @@ public class SongMapper
                 catch (SQLException e)
                 {
                     logger.severe("SQL Exception while trying to close the prepared statement while updating song tbl " + e);
-                    return null;
+                    return false;
                 }
             }
             
@@ -322,7 +322,7 @@ public class SongMapper
             catch (SQLException e)
             {
                 logger.severe("SQL Exception while updating song " + song.toString() + " into song ranking tbl " + e);
-                return null;
+                return false;
             } finally //The statement must be closed, because of : java.sql.SQLException: ORA-01000
             {
                 try
@@ -335,12 +335,12 @@ public class SongMapper
                 catch (SQLException e)
                 {
                     logger.severe("SQL Exception while trying to close the prepared statement while updating song ranking tbl " + e);
-                    return null;
+                    return false;
                 }
             }
 
-            logger.info( "Successfully updated song ranking tbl, ID : " + song.getId());
-            return song;
+            logger.info( "Success updateSong : " + song.getId());
+            return true;
     }
  
     public Boolean wipeDatabase(Connection connection, Logger logger) {

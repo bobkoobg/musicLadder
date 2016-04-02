@@ -12,6 +12,59 @@ import java.util.logging.Logger;
 
 public class DuelMapper
 {
+    public Duel getDuel(Logger logger, Connection connection, Integer duelID) {
+        PreparedStatement preparedStatement = null;
+        Duel duel = null;
+        
+        try {
+            String SQLString = "SELECT * " 
+                    + "FROM ML_DUEL_TBL "
+                    + "WHERE DUEL_ID = ?";
+            
+            preparedStatement = connection.prepareStatement(SQLString);
+            preparedStatement.setInt(1, duelID);
+            
+            ResultSet rs = preparedStatement.executeQuery();
+            try {
+                while(rs.next()) {
+                    
+                        duel = new Duel();
+
+                        duel.setDuelID( rs.getInt(1) );
+                        duel.setSong1ID( rs.getInt(2) );
+                        duel.setSong2ID( rs.getInt(3) );
+                        duel.setSong1BeforeMatchRating( rs.getFloat(4) );
+                        duel.setSong2BeforeMatchRating( rs.getFloat(5) );
+                        duel.setSong1Score( rs.getInt(6) );
+                        duel.setSong2Score( rs.getInt(7) );
+                        duel.setSong1AfterMatchRating( rs.getFloat(8) );
+                        duel.setSong2AfterMatchRating( rs.getFloat(9) );
+                    }                 
+            }
+            finally {
+                try { rs.close(); } catch (Exception ignore) { }
+            }
+        } catch (Exception e) {
+            logger.severe("Statement Exception getDuel : " + e);
+            return null;
+        } finally //The statement must be closed, because of : java.sql.SQLException: ORA-01000
+        {
+            try
+            {
+                if (preparedStatement != null)
+                {
+                    preparedStatement.close();
+                }
+            }
+            catch (SQLException e)
+            {
+                logger.severe("SQL Exception getDuel : " + e);
+                return null;
+            }
+        }
+        return duel;
+    }
+    
     public Duel insertDuel(Logger logger, Connection connection, Duel duel)
     {
         PreparedStatement preparedStatement = null;
@@ -227,7 +280,7 @@ public class DuelMapper
         return duels;
     }
         
-    public Duel updateDuel(Logger logger, Connection connection, Duel duel ) {
+    public Boolean updateDuel(Logger logger, Connection connection, Duel duel ) {
             PreparedStatement preparedStatement = null;
             String insertTableSQL;
             
@@ -259,7 +312,7 @@ public class DuelMapper
             catch (SQLException e)
             {
                 logger.severe("SQL Exception while updating duel " + duel.toString() + " into duel table " + e);
-                return null;
+                return false;
             } finally //The statement must be closed, because of : java.sql.SQLException: ORA-01000
             {
                 try
@@ -272,12 +325,12 @@ public class DuelMapper
                 catch (SQLException e)
                 {
                     logger.severe("SQL Exception while trying to close the prepared statement while updating duel into duel table " + e);
-                    return null;
+                    return false;
                 }
             }
 
             logger.info( "Successfully updated duel, ID : " + duel.getDuelID() );
-            return duel;
+            return true;
     }
     
     public Boolean wipeDatabase(Connection connection, Logger logger) {

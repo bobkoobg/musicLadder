@@ -150,10 +150,6 @@ public class MusicLadderController
         return duels;
     }
     
-    private List<Song> getSongs() {
-        return model.getSongs();
-    }
-    
     public List<Song> generateResultsAndUpdateDuel(Duel duel, Integer song1Score, Integer song2Score) {
         
         duel.setSong1Score( song1Score );
@@ -191,63 +187,64 @@ public class MusicLadderController
         model.updateSong(s1);
         model.updateSong(s2);
         
-        return getSongs();
+        return loadSongs(1);
+    }
+    
+    public Duel getDuel( Integer duelID ) {
+        return facade.getDuel( logger, duelID );
     }
     
     //Very same but with String jQueryObject
-    public List<Song> generateResultsAndUpdateDuel(String jQueryObject, Integer song1Score, Integer song2Score) {
+    public Boolean generateResultsAndUpdateDuel(Integer duelID, Integer song1Score, Integer song2Score) {
         //No inner error handling at any point
-        Duel duel = null;
-        try {
-            duel = gson.fromJson( jQueryObject , Duel.class );
-        }
-        catch (JsonParseException e) {
-            System.out.println("exception : " + e);
+        Duel duel = getDuel( duelID );
+        
+        if ( duel == null ) {
+            return false;
         }
         
+        Song song1 = facade.getSong(logger, duel.getSong1ID() );
+        Song song2 = facade.getSong(logger, duel.getSong2ID() );
+
+        if ( song1 == null || song2 == null ) {
+            return false;
+        }
+
         duel.setSong1Score( song1Score );
         duel.setSong2Score( song2Score );
-        
+
         float[] newSongRatings = eloRSC.calculate( duel );
-        
+
         duel.setSong1AfterMatchRating( newSongRatings[0] );
         duel.setSong2AfterMatchRating( newSongRatings[1] );
-        
-        //invent better solution
-        loadSongs( 1 );
-        
-        Song s1 = model.getSongByID( duel.getSong1ID() );
-        Song s2 = model.getSongByID( duel.getSong2ID() );
-        
+
         if( song1Score > song2Score ) {
-            s1.incrementWins();
-            s2.incrementLoses();
+            song1.incrementWins();
+            song2.incrementLoses();
         } else if ( song1Score < song2Score ) {
-            s1.incrementLoses();
-            s2.incrementWins();
+            song1.incrementLoses();
+            song2.incrementWins();
         } else  {
-            s1.incremenetDraws();
-            s2.incremenetDraws();
+            song1.incremenetDraws();
+            song2.incremenetDraws();
         }
-        
-        s1.setFormerRating( s1.getCurrentRating() );
-        s1.setCurrentRating( newSongRatings[0] );
-        s2.setFormerRating( s2.getCurrentRating() );
-        s2.setCurrentRating( newSongRatings[1] );
-        
-        facade.updateSong(logger, s1);
-        facade.updateSong(logger, s2);
-        facade.updateDuel(logger, duel);
-        
-        //No inner error handling at any point
-        model.updateSong(s1);
-        model.updateSong(s2);
-        
-        return getSongs();
+
+        song1.setFormerRating( song1.getCurrentRating() );
+        song1.setCurrentRating( newSongRatings[0] );
+        song2.setFormerRating( song2.getCurrentRating() );
+        song2.setCurrentRating( newSongRatings[1] );
+
+        boolean isUpdatedDuel = facade.updateDuel(logger, duel);
+        if ( isUpdatedDuel ) {
+            boolean isUpdatedSong1 = facade.updateSong(logger, song1);
+            boolean isUpdatedSong2 = facade.updateSong(logger, song2); 
+            return ( isUpdatedSong1 && isUpdatedSong2 );
+        } 
+        return false;
     }
     
     public Song getSongByID( Integer songID ) {
-        return model.getSongByID(songID);
+        return facade.getSong(logger, songID);
     }
     
     public List<Duel> getDuels( Integer amount ) {

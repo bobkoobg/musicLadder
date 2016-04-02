@@ -13,21 +13,18 @@ public class RESTfulAPIServer
     static String publicFolder = "src/pages/";//"src/html/";
     static String startFile = "index.html";
     static String filesUri = "/";
-    static final boolean DEVELOPMENT_MODE = true;
 
-    static MusicLadderController controller;
+    private static MusicLadderController controller;
 
     public void run() throws IOException {
         
         controller = MusicLadderController.getInstance();
-        if (RESTfulAPIServer.DEVELOPMENT_MODE) {
-            //facade.testingCode();
-            System.out.println("Development!");
-        }
+
         HttpServer server = HttpServer.create(new InetSocketAddress(ip, port), 0);
+        
         //REST Routes
-        server.createContext("/musicLadder", new MusicLadderHandler());
-        server.createContext("/musicLadderAPI", new MusicLadderAPIHandler());
+        server.createContext("/musicLadder", new MusicLadderHandler() );
+        server.createContext("/musicLadderAPI", new MusicLadderAPIHandler( controller ));
         //server.createContext("/whatever", new whateverHandler());
 
         //HTTP Server Routes 

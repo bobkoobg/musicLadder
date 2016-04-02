@@ -86,8 +86,12 @@ public class Facade
         return songMapper.insertSong(logger, connection, name);
     }
     
-    public Song updateSong( Logger logger, Song song ) {
+    public Boolean updateSong( Logger logger, Song song ) {
         return songMapper.updateSong(logger, connection, song);
+    }
+    
+    public Duel getDuel( Logger logger, Integer duelID ) {
+        return duelMapper.getDuel(logger, connection, duelID);
     }
     
     public List<Duel> getNPlayedDuels( Logger logger, Integer amount ) {
@@ -102,7 +106,7 @@ public class Facade
         return duelMapper.insertDuel(logger, connection, duel);
     }
     
-    public Duel updateDuel( Logger logger, Duel duel ) {
+    public Boolean updateDuel( Logger logger, Duel duel ) {
         return duelMapper.updateDuel(logger, connection, duel);
     }
     
