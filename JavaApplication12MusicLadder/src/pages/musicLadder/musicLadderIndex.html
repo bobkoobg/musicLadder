@@ -3,68 +3,72 @@
         <title>Music Ladder 0.11</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
+
         <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
         <script src="//code.jquery.com/jquery-1.10.2.js"></script>
         <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-        
+
         <script type="text/javascript" src="musicLadder/musicLadderIndex.js"></script>
+
+        <script src="musicLadder/scripts/handlebars-v4.0.5.js"></script>
+        <script src="musicLadder/scripts/require.js"></script>
     </head>
     <body id="musicLadderIndexWrapper">
-        <div>Welcome to music Ladder index</div>
-        <div id="currentDuelWrapper">
-            <div>
+        <h1>Welcome to music Ladder index</h1>
+        <div class="leftWrapper" style="width: 720px;border: 1px solid black;float: left;">
+            <div id="currentDuelWrapper" style="border: 1px solid black;">
                 <div>
-                    <span id="competitor1Name" style="border: 1px solid;"></span>
-                    <span id="competitor1Rating" style="border: 1px solid;"></span>
+                    <div>
+                        <span id="competitor1Name" style="border: 1px solid;"></span>
+                        <span id="competitor1Rating" style="border: 1px solid;"></span>
+                    </div>
+                    <div>
+                        <span id="competitor2Name" style="border: 1px solid;"></span>
+                        <span id="competitor2Rating" style="border: 1px solid;"></span>
+                    </div>
                 </div>
-                <div>
-                    <span id="competitor2Name" style="border: 1px solid;"></span>
-                    <span id="competitor2Rating" style="border: 1px solid;"></span>
+                <div style="display: inline-block;text-align: center;overflow: hidden;width: 100%;">
+                    <span id="prediction1Win" style="float:left"></span>
+                    <span id="prediction1Draw"></span>
+                    <span id="prediction1Loss" style="float:right"></span>
                 </div>
+                <div class="sliderr" style="margin-bottom: 50px;"></div>
+                <div style="display: inline-block;text-align: center;overflow: hidden;width: 100%;">
+                    <span id="prediction2Loss" style="float:left"></span>
+                    <span id="prediction2Draw"></span>
+                    <span id="prediction2Win" style="float:right"></span>
+                </div>
+                <button id="saveDuel">SAVE DUEL</button>
             </div>
-            <div style="display: inline-block;text-align: center;overflow: hidden;width: 100%;">
-                <span id="prediction1Win" style="float:left"></span>
-                <span id="prediction1Draw"></span>
-                <span id="prediction1Loss" style="float:right"></span>
+            <div id="duelsToPlayWrapper">
+                <span>Upcoming duels...</span>
+                <table id="duelsToPlayList" style="border: 1px solid;border-collapse: collapse;width: 720px;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th style="color:blue">Competitor 1</th>
+                            <th>vs</th>
+                            <th style="color:red;">Competitor 2</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
-            <div class="sliderr" style="margin-bottom: 50px;"></div>
-            <div style="display: inline-block;text-align: center;overflow: hidden;width: 100%;">
-                <span id="prediction2Loss" style="float:left"></span>
-                <span id="prediction2Draw"></span>
-                <span id="prediction2Win" style="float:right"></span>
+            <div id="playedDuelsWrapper" >
+                <span>Played duels...</span>
+                <table id="playedDuelsList" style="border: 1px solid;border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th colspan="4" style="color:red;">Competitor 1</th>
+                            <th>vs</th>
+                            <th colspan="4" style="color:blue;">Competitor 2</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
-            <button id="saveDuel">SAVE DUEL</button>
         </div>
-        <div id="duelsToPlayWrapper">
-            <table id="duelsToPlayList" style="border: 1px solid;border-collapse: collapse;">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Competitor 1 Name</th>
-                        <th>Competitor 1 Rating</th>
-                        <th>-</th>
-                        <th>Competitor 2 Rating</th>
-                        <th>Competitor 2 Name</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-        <div id="playedDuelsWrapper">
-            <table id="playedDuelsList" style="border: 1px solid;border-collapse: collapse;">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th colspan="4" style="color:red;width: 300px;">Competitor 1 Name</th>
-                        <th>vs</th>
-                        <th colspan="4" style="color:blue;width: 300px;">Competitor 2</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-        <div id="rankingsWrapper">
+        <div id="rankingsWrapper" class="rightWrapper" style="width: 600px;border: 1px solid black;float: right;">
             <table id="songsList" style="border: 1px solid;border-collapse: collapse;">
                 <thead>
                     <tr>
@@ -80,5 +84,39 @@
                 <tbody></tbody>
             </table>
         </div>
+        <script id="song-row-template" type="text/x-handlebars-template">
+            <tr>
+            <td style="{{style}}">{{rank}}</td>
+            <td style="{{style}}">{{name}}</td>
+            <td style="{{style}}">{{matches}}</td>
+            <td style="{{style}}">{{wins}}</td>
+            <td style="{{style}}">{{draws}}</td>
+            <td style="{{style}}">{{losses}}</td>
+            <td style="{{style2}}"></td>
+            <td style="{{style}}">{{rating}}</td>
+            </tr>
+        </script>
+        <script id="played-duels-row-template" type="text/x-handlebars-template">
+            <tr>
+                <td style="{{style}}">{{song1Name}}</td>
+                <td style="{{style3}}">{{song1Update}}</td>
+                <td style="{{style3}}">{{song1Rating}}</td>
+                <td style="{{style}}">{{song1Score}}</td>
+                <td style="{{style2}}">vs</td>
+                <td style="{{style}}">{{song2Score}}</td>
+                <td style="{{style4}}">{{song2Rating}}</td>
+                <td style="{{style4}}">{{song2Update}}</td>
+                <td style="{{style}}">{{song2Name}}</td>
+            </tr>
+        </script>
+        <script id="duels-to-play-row-template" type="text/x-handlebars-template">
+            <tr>
+            <td style="{{style}}">{{duelID}}</td>
+            <td style="{{style}}">{{song1Name}}</td>
+            <td style="{{style2}}">vs</td>
+            <td style="{{style}}">{{song2Name}}</td>
+            </tr>
+        </script>
     </body>
 </html>
+

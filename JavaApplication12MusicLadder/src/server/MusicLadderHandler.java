@@ -16,115 +16,97 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
-import static server.RESTfulAPIServer.publicFolder;
 
-public class MusicLadderHandler implements HttpHandler
-{
+public class MusicLadderHandler implements HttpHandler {
+
+    private static String filesDirectory = "src/pages/musicLadder/";
 
     @Override
-    public void handle(HttpExchange he) throws IOException
-    {
-        
-        String response = "";
-        String method = he.getRequestMethod().toUpperCase();
-        
-        String path = he.getRequestURI().getPath();
-        int lastIndex = path.lastIndexOf("/");
+    public void handle( HttpExchange he ) throws IOException {
         
         int responseCode = 200;
-        File file;
+        String response = "";
+        String method = he.getRequestMethod().toUpperCase();
         byte[] bytesToSend = null;
-        BufferedInputStream bis;
-        
-        if( lastIndex == 0 ) {
-            file = new File(publicFolder + "musicLadder/musicLadderIndex.html");
-            bytesToSend = new byte[(int) file.length()];
-            bis = new BufferedInputStream( new FileInputStream( file ) );
-            bis.read(bytesToSend, 0, bytesToSend.length);
 
-//            Jinjava jinjava = new Jinjava();
-//            Map<String, Object> context = new HashMap<String, Object>();
-//            context.put("name", "Jared");
-//
-//            String template = Resources.toString(Resources.getResource(publicFolder + "musicLadder/musicLadderIndex.html"), Charsets.UTF_8);
-//
-//            String renderedTemplate = jinjava.render(template, context);
-//            
-//            System.out.println("*so HI * : " + renderedTemplate);
-            
-            Headers h = he.getResponseHeaders();
-            h.set("Content-Type", "text/html");
+        switch ( method ) {
+            case "GET":
+                String requestedURL = he.getRequestURI().toString();
+                String delimeter = "musicLadder/";
+                String requestedFile = requestedURL.substring( requestedURL.lastIndexOf( delimeter ) + delimeter.length() );
 
-            he.sendResponseHeaders(responseCode, bytesToSend.length);
-            try (OutputStream os = he.getResponseBody())
-            {
-                os.write(bytesToSend, 0, bytesToSend.length);
-            }
-        } else {
-            
-            switch (method)
-            {
-                case "GET":
-                    String requestedFile = he.getRequestURI().toString();
-                    String f = requestedFile.substring(requestedFile.lastIndexOf("/") + 1);
+                File file = null;
+                int fileType = requestedFile.lastIndexOf( "." );
+                String mime = "";
+                if ( fileType != -1 ) {
+                    mime = getMime( requestedFile.substring( fileType ) );
 
-                    String extension = f.substring(f.lastIndexOf("."));
-                    String mime = getMime(extension);
-                    
-                    try
-                    {
-                        file = new File(publicFolder + requestedFile);
+                    try {
+                        file = new File( filesDirectory + requestedFile );
 
-                        bytesToSend = new byte[(int) file.length()];
+                        if ( !file.exists() || file.isDirectory() ) {
+                            mime = (".html");
+                            file = new File( filesDirectory + "musicLadderIndex.html" );
+                            responseCode = 404;
 
-                        bis = new BufferedInputStream( new FileInputStream( file ) );
-                        bis.read(bytesToSend, 0, bytesToSend.length);
+                            if ( !file.exists() || file.isDirectory() ) {
+                                //very interesting to log (hackers may try to access admin.php? :D MLG!!)
+                                responseCode = 500;
+                            }
 
-                        responseCode = 200;
-                    }
-                    catch (Exception e)
-                    {
+                        } else {
+                            file = new File( filesDirectory + requestedFile );
+                            responseCode = 200;
+                        }
+                    } catch ( Exception e ) {
                         response = "Exception : " + e;
                         responseCode = 404;
                     }
 
-                    if (responseCode == 200)
-                    {
-                        Headers h = he.getResponseHeaders();
-                        h.set("Content-Type", mime);
-                    }
-                    else
-                    {
-                        bytesToSend = response.getBytes();
-                    }
+                } else {
+                    mime = (".html");
+                    file = new File( filesDirectory + "musicLadderIndex.html" );
+                }
 
-                    he.sendResponseHeaders(responseCode, bytesToSend.length);
+                bytesToSend = new byte[ ( int ) file.length() ];
 
-                    try (OutputStream os = he.getResponseBody())
-                    {
-                        os.write(bytesToSend, 0, bytesToSend.length);
-                    }
-                    
-        
-                    break;
-                    
-                case "POST":
-                    responseCode = 500;
-                    response = "not supported";
-                    break;
-                case "DELETE":
-                    responseCode = 500;
-                    response = "not supported";
-                    break;
-            }
+                BufferedInputStream bis = new BufferedInputStream( new FileInputStream( file ) );
+                bis.read( bytesToSend, 0, bytesToSend.length );
+
+                responseCode = 200;
+
+                if ( responseCode == 200 ) {
+                    Headers h = he.getResponseHeaders();
+                    h.set( "Content-Type", mime );
+                } else {
+                    bytesToSend = response.getBytes();
+                }
+                break;
+
+            case "POST":
+                responseCode = 500;
+                response = "not supported";
+                break;
+            case "DELETE":
+                responseCode = 500;
+                response = "not supported";
+                break;
+            default:
+                responseCode = 500;
+                response = "not supported";
+                break;
+        }
+
+        he.sendResponseHeaders( responseCode, bytesToSend.length );
+
+        try ( OutputStream os = he.getResponseBody() ) {
+            os.write( bytesToSend, 0, bytesToSend.length );
         }
     }
-    
-    private String getMime(String extension)
-    {
+
+    private String getMime( String extension ) {
         String mime = "";
-        switch (extension)
-        {
+        switch ( extension ) {
             case ".pdf":
                 mime = "application/pdf";
                 break;
@@ -140,7 +122,7 @@ public class MusicLadderHandler implements HttpHandler
             case ".jar":
                 mime = "application/java-archive";
                 break;
-            default :
+            default:
                 mime = "text/html";
                 break;
         }

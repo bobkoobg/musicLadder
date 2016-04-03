@@ -9,102 +9,82 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class ServerHandler implements HttpHandler
-{
+public class ServerHandler implements HttpHandler {
 
-    private String publicFolder = RESTfulAPIServer.publicFolder;
+    private static String filesDirectory = "src/pages/";
 
     @Override
-    public void handle(HttpExchange he) throws IOException
-    {
-        int responseCode = 500;
-        //Set initial error values if an un expected problem occurs
+    public void handle( HttpExchange he ) throws IOException {
+        int responseCode = 200;
+
         String errorMsg = null;
         byte[] bytesToSend = "<h1>Internal Error </h1><p>We are sorry. The server encountered an unexpected problem</p>".getBytes();
         String mime = null;
 
         String requestedFile = he.getRequestURI().toString();
-        System.out.println("ServerHandler Req. file : " + requestedFile);
-        String f = requestedFile.substring(requestedFile.lastIndexOf("/") + 1);
-        System.out.println("ServerHandler f is : " + f);
-        
+        String f = requestedFile.substring( requestedFile.lastIndexOf( "/" ) + 1 );
+
         File file;
         BufferedInputStream bis;
 
-        System.out.println("hi");
-        if( f == null || f.isEmpty() ) {
-            System.out.println("I am empty");
-            try
-            {
+        if ( f == null || f.isEmpty() ) {
+            try {
                 mime = ".html";
-                file = new File(publicFolder + "index.html");
-                
-                bytesToSend = new byte[(int) file.length()];
-                
+                file = new File( filesDirectory + "index.html" );
+
+                bytesToSend = new byte[ ( int ) file.length() ];
+
                 bis = new BufferedInputStream( new FileInputStream( file ) );
-                bis.read(bytesToSend, 0, bytesToSend.length);
-                
-                responseCode = 200;
-            }
-            catch (Exception e)
-            {
+                bis.read( bytesToSend, 0, bytesToSend.length );
+            } catch ( Exception e ) {
                 responseCode = 500;
-                errorMsg = "<h1>500 Server Error</h1>" 
+                errorMsg = "<h1>500 Server Error</h1>"
                         + "<span>The main page does not exist. Please slap me.</span>";
                 //Log the exception!
             }
         } else {
-            int lastIndex = f.lastIndexOf(".");
-            
-            if( lastIndex > -1) {
-                mime = f.substring(f.lastIndexOf("."));
+            int lastIndex = f.lastIndexOf( "." );
+
+            if ( lastIndex > -1 ) {
+                mime = f.substring( f.lastIndexOf( "." ) );
             } else {
-                mime = getMime(".html");
+                mime = getMime( ".html" );
             }
-            System.out.println("ServerHandler I am not empty" + mime);
-            try
-            {
-                file = new File(publicFolder + f);
-                
-                bytesToSend = new byte[(int) file.length()];
-                
+            //System.out.println("ServerHandler I am not empty" + mime);
+            try {
+                file = new File( filesDirectory + f );
+
+                bytesToSend = new byte[ ( int ) file.length() ];
+
                 bis = new BufferedInputStream( new FileInputStream( file ) );
-                bis.read(bytesToSend, 0, bytesToSend.length);
-                
+                bis.read( bytesToSend, 0, bytesToSend.length );
+
                 responseCode = 200;
-            }
-            catch (Exception e)
-            {
+            } catch ( Exception e ) {
                 responseCode = 404;
-                errorMsg = "<h1>404 Not Found</h1>" 
+                errorMsg = "<h1>404 Not Found</h1>"
                         + "<span>No context erfound for request" + he.getRequestURI().toString() + "</span>";
                 //Log the exception!
             }
         }
-        
-        if (responseCode == 200)
-        {
+
+        if ( responseCode == 200 ) {
             Headers h = he.getResponseHeaders();
-            h.set("Content-Type", mime);
-        }
-        else
-        {
+            h.set( "Content-Type", mime );
+        } else {
             bytesToSend = errorMsg.getBytes();
         }
-        
-        he.sendResponseHeaders(responseCode, bytesToSend.length);
-        
-        try (OutputStream os = he.getResponseBody())
-        {
-            os.write(bytesToSend, 0, bytesToSend.length);
+
+        he.sendResponseHeaders( responseCode, bytesToSend.length );
+
+        try ( OutputStream os = he.getResponseBody() ) {
+            os.write( bytesToSend, 0, bytesToSend.length );
         }
     }
 
-    private String getMime(String extension)
-    {
+    private String getMime( String extension ) {
         String mime = "";
-        switch (extension)
-        {
+        switch ( extension ) {
             case ".pdf":
                 mime = "application/pdf";
                 break;
@@ -123,7 +103,7 @@ public class ServerHandler implements HttpHandler
             case ".css":
                 mime = "text/css";
                 break;
-            default :
+            default:
                 mime = "text/html";
                 break;
         }

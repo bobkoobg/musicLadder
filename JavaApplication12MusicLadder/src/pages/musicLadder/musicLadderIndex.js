@@ -1,3 +1,5 @@
+'use strict';
+
 console.log('hi musicLadderIndex.js');
 
 var $slider;
@@ -13,32 +15,54 @@ function evaluateRating(currentRating, formerRating) {
     }
 }
 
-function displayPlayedDuels( data ) {
-     $.each(data, function( curDuelID, curDuel) {
-        loadSong(curDuel.song1ID, function ( song1 ) {
-            loadSong(curDuel.song2ID, function ( song2 ) {
-                var song1Points = curDuel.song1AfterMatchRating - curDuel.song1BeforeMatchRating;
-                var song1Update = parseFloat(Math.round(song1Points * 100) / 100).toFixed(2);
-                var song2Points = curDuel.song2AfterMatchRating - curDuel.song2BeforeMatchRating;
-                var song2Update = parseFloat(Math.round(song2Points * 100) / 100).toFixed(2);
-                var style = "style=\"border: 1px solid black;\"";
-                var style2 = "style=\"border: 1px solid black;font-weight: 700;\"";
-                var content = "<tr>"
-                        + "<td " + style + ">" + curDuel.duelID + "</td>"
-                        + "<td " + style + ">" + song1.name + "</td>"
-                        + "<td " + style + ">" + parseFloat(Math.round( curDuel.song1BeforeMatchRating * 100) / 100).toFixed(2) + "</td>"
-                        + "<td " + style + ">" + song1Update +"</td>"
-                        + "<td " + style + ">" + curDuel.song1Score + "</td>"
-                        + "<td " + style2 + ">vs</td>"
-                        + "<td " + style + ">" + curDuel.song2Score + "</td>"
-                        + "<td " + style + ">" + song2Update + "</td>"
-                        + "<td " + style + ">" + parseFloat(Math.round( curDuel.song2BeforeMatchRating * 100) / 100).toFixed(2) + "</td>"
-                        + "<td " + style + ">" + song2.name + "</td>"
-                        + "</tr>";
-                $("#playedDuelsList tbody").append(content);
+function displayPlayedDuels(data) {
+    var style = "border: 1px solid black;";
+    var style2 = "border: 1px solid black;font-weight: 700;";
+    var song1Points, song1Update, song2Points, song2Update, style3, style4;
+
+    $.each(data, function (curDuelID, curDuel) {
+        loadSong(curDuel.song1ID, function (song1) {
+            loadSong(curDuel.song2ID, function (song2) {
+                song1Points = curDuel.song1AfterMatchRating - curDuel.song1BeforeMatchRating;
+                song1Update = parseFloat(Math.round(song1Points * 100) / 100).toFixed(2);
+                song2Points = curDuel.song2AfterMatchRating - curDuel.song2BeforeMatchRating;
+                song2Update = parseFloat(Math.round(song2Points * 100) / 100).toFixed(2);
+
+                if (song1Update > 0) {
+                    song1Update = "+" + song1Update;
+                }
+
+                if (song2Update > 0) {
+                    song2Update = "+" + song2Update;
+                }
+
+                style3 = "border: 1px solid black;background-color: " + evaluateRating(curDuel.song1AfterMatchRating, curDuel.song1BeforeMatchRating) + ";";
+                style4 = "border: 1px solid black;background-color: " + evaluateRating(curDuel.song2AfterMatchRating, curDuel.song2BeforeMatchRating) + ";";
+
+
+                var source = $("#played-duels-row-template").html();
+                var template = Handlebars.compile(source);
+                var context = {
+                    style: style,
+                    song1Name: song1.name,
+                    style3: style3,
+                    song1Update: song1Update,
+                    song1Rating: parseFloat(Math.round(curDuel.song1AfterMatchRating * 100) / 100).toFixed(2),
+                    song1Score: curDuel.song1Score,
+                    style2: style2,
+                    song2Score: curDuel.song2Score,
+                    style4: style4,
+                    song2Rating: parseFloat(Math.round(curDuel.song2AfterMatchRating * 100) / 100).toFixed(2),
+                    song2Update: song2Update,
+                    song2Name: song2.name
+
+                };
+                var html = template(context);
+
+                $("#playedDuelsList tbody").append(html);
             });
         });
-     });
+    });
 }
 
 function loadSong(songId, callback) {
@@ -55,42 +79,50 @@ function loadPredictions(song1Rating, song2Rating, callback) {
         "url": "/musicLadderAPI/probability",
         "type": "POST",
         "headers": {"Content-Type": "application/json"},
-        "data": 
-            JSON.stringify({ 'song1BeforeMatchRating': song1Rating,'song2BeforeMatchRating': song2Rating })
+        "data":
+                JSON.stringify({'song1BeforeMatchRating': song1Rating, 'song2BeforeMatchRating': song2Rating})
         ,
         "success": callback
     });
 }
 
 function displayDuelsToPlay(data) {
-    $.each(data, function( curDuelID, curDuel) {
+    var source = $("#duels-to-play-row-template").html();
+    var template = Handlebars.compile(source);
+    var context, html;
+
+    var style = "border: 1px solid black;";
+    var style2 = "border: 1px solid black;font-weight: 700;";
+
+
+    $.each(data, function (curDuelID, curDuel) {
         loadSong(curDuel.song1ID, function (song1) {
             loadSong(curDuel.song2ID, function (song2) {
-                loadPredictions(curDuel.song1BeforeMatchRating, curDuel.song2BeforeMatchRating, function (predictions, status) {
-                    if (curDuelID === 0) {
+                if (curDuelID === 0) {
+                    loadPredictions(curDuel.song1BeforeMatchRating, curDuel.song2BeforeMatchRating, function (predictions, status) {
                         $("#competitor1Name").text(song1.name);
                         $("#competitor2Name").text(song2.name);
-                        $("#competitor1Rating").text( parseFloat(Math.round(curDuel.song1BeforeMatchRating * 100) / 100).toFixed(2) );
-                        $("#competitor2Rating").text( parseFloat(Math.round(curDuel.song2BeforeMatchRating * 100) / 100).toFixed(2) );
-                        $("#prediction1Win").text( parseFloat(Math.round( predictions[0] * 100) / 100).toFixed(2) );
-                        $("#prediction1Draw").text( parseFloat(Math.round( predictions[2] * 100) / 100).toFixed(2) );
-                        $("#prediction1Loss").text( parseFloat(Math.round( predictions[4] * 100) / 100).toFixed(2) );
-                        $("#prediction2Win").text( parseFloat(Math.round( predictions[5] * 100) / 100).toFixed(2) );
-                        $("#prediction2Draw").text( parseFloat(Math.round( predictions[3] * 100) / 100).toFixed(2) );
-                        $("#prediction2Loss").text( parseFloat(Math.round( predictions[1] * 100) / 100).toFixed(2) );
-                    }
+                        $("#competitor1Rating").text(parseFloat(Math.round(curDuel.song1BeforeMatchRating * 100) / 100).toFixed(2));
+                        $("#competitor2Rating").text(parseFloat(Math.round(curDuel.song2BeforeMatchRating * 100) / 100).toFixed(2));
+                        $("#prediction1Win").text(parseFloat(Math.round(predictions[0] * 100) / 100).toFixed(2));
+                        $("#prediction1Draw").text(parseFloat(Math.round(predictions[2] * 100) / 100).toFixed(2));
+                        $("#prediction1Loss").text(parseFloat(Math.round(predictions[4] * 100) / 100).toFixed(2));
+                        $("#prediction2Win").text(parseFloat(Math.round(predictions[5] * 100) / 100).toFixed(2));
+                        $("#prediction2Draw").text(parseFloat(Math.round(predictions[3] * 100) / 100).toFixed(2));
+                        $("#prediction2Loss").text(parseFloat(Math.round(predictions[1] * 100) / 100).toFixed(2));
+                    });
+                }
 
-                    var style = "style=\"border: 1px solid black;\"";
-                    var content = "<tr>"
-                            + "<td " + style + ">" + curDuel.duelID + "</td>"
-                            + "<td " + style + ">" + song1.name + "</td>"
-                            + "<td " + style + ">" + parseFloat(Math.round(curDuel.song1BeforeMatchRating * 100) / 100).toFixed(2) + "</td>"
-                            + "<td " + style + ">vs</td>"
-                            + "<td " + style + ">" + parseFloat(Math.round(curDuel.song2BeforeMatchRating * 100) / 100).toFixed(2) + "</td>"
-                            + "<td " + style + ">" + song2.name + "</td>"
-                            + "</tr>";
-                    $("#duelsToPlayList tbody").append(content);
-                });
+                context = {
+                    style: style,
+                    duelID: curDuel.duelID,
+                    song1Name: song1.name,
+                    style2: style2,
+                    song2Name: song2.name
+                };
+                html = template(context);
+                //$("#duelsToPlayList tbody").appendTo( html );
+                $(html).appendTo("#duelsToPlayList tbody");
             });
         });
     });
@@ -98,19 +130,24 @@ function displayDuelsToPlay(data) {
 
 function displaySongs(data) {
     $.each(data, function (k, v) {
-        var style = "style=\"border: 1px solid black;\"";
-        var style2 = "style=\"border: 1px solid black;width: 20px;background-color:" + evaluateRating(v.currentRating, v.formerRating) + "\"";
-        var content = "<tr>"
-                + "<td " + style + ">" + (k + 1) + "</td>"
-                + "<td " + style + ">" + v.name + "</td>"
-                + "<td " + style + ">" + (v.wins + v.draws + v.loses) + "</td>"
-                + "<td " + style + ">" + v.wins + "</td>"
-                + "<td " + style + ">" + v.draws + "</td>"
-                + "<td " + style + ">" + v.loses + "</td>"
-                + "<td " + style2 + "></td>"
-                + "<td " + style + ">" + parseFloat(Math.round( v.currentRating * 100) / 100).toFixed(2) + "</td>"
-                + "</tr>";
-        $("#songsList tbody").append(content);
+        var style = "border: 1px solid black;";
+        var style2 = "border: 1px solid black;width: 20px;background-color:" + evaluateRating(v.currentRating, v.formerRating) + ";";
+
+        var source = $("#song-row-template").html();
+        var template = Handlebars.compile(source);
+        var context = {
+            style: style,
+            rank: (k + 1),
+            name: v.name,
+            matches: (v.wins + v.draws + v.loses),
+            wins: v.wins,
+            draws: v.draws,
+            losses: v.loses,
+            style2: style2,
+            rating: parseFloat(Math.round(v.currentRating * 100) / 100).toFixed(2)
+        };
+        var html = template(context);
+        $("#songsList tbody").append(html);
     });
 }
 
@@ -152,27 +189,29 @@ function loadPlayedDuels(amount) {
 }
 
 function saveDuel() {
-    console.log('saving...');
-    $.ajax({
-        "url": "/musicLadderAPI/duel",
-        "type": "POST",
-        "headers": {"Content-Type": "application/json"},
-        "data": 
-            JSON.stringify({ 'song1BeforeMatchRating': song1Rating,'song2BeforeMatchRating': song2Rating })
-        ,
-        "success": callback
-    });
+    console.log('saving...', $slider.slider("value"));
+//    $.ajax({
+//        "url": "/musicLadderAPI/duel",
+//        "type": "POST",
+//        "headers": {"Content-Type": "application/json"},
+//        "data": 
+//            JSON.stringify({ 'song1BeforeMatchRating': song1Rating,'song2BeforeMatchRating': song2Rating })
+//        ,
+//        "success": callback
+//    });
 }
 
 function load() {
+
     loadSongs();
     loadDuelsToPlay(5);
     loadPlayedDuels(15);
 
     $saveDuelButton = $("#saveDuel");
-    
-    $saveDuelButton.on("click", saveDuel );
-    $(".sliderr").slider({
+    $slider = $(".sliderr");
+
+    $saveDuelButton.on("click", saveDuel);
+    $slider.slider({
         value: 5,
         min: 1,
         max: 10,
@@ -203,4 +242,4 @@ function load() {
             });
 }
 
-$( window ).ready(load);
+$(window).ready(load);
