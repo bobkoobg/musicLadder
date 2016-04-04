@@ -4,7 +4,7 @@ console.log('hi musicLadderIndex.js');
 
 var $slider;
 var $saveDuelButton;
-var initialUpdate = true;
+var initialUpdatePlayedDuels = true;
 
 function evaluateRating(currentRating, formerRating) {
     if (currentRating > formerRating) {
@@ -46,15 +46,71 @@ function loadSlider() {
     });
 }
 
-//function loadSong(songId, callback) {
-//    $.ajax({
-//        "url": "/musicLadderAPI/song/" + songId,
-//        "type": "GET",
-//        "data": {},
-//        "success": callback
-//    });
-//}
+function loadSong(songId, callback) {
+    $.ajax({
+        "url": "/musicLadderAPI/song/" + songId,
+        "type": "GET",
+        "data": {},
+        "success": callback
+    });
+}
 
+function loadNewSongs() {
+      loadSongs(1);
+//    var style = "border: 1px solid black;";
+//    var song1ID = $(".duelTemplateWrapper").data("songa");
+//    var song2ID = $(".duelTemplateWrapper").data("songb");
+//    loadSong(song1ID, function (song1data) {
+//       loadSong( song2ID, function (song2data) {
+//           $('.song').each(function(i, obj) {
+//              if( song1ID === $(obj).data('songid') ) {
+//                console.log('replace1 : ' + song1ID);
+//                var style2 = "border: 1px solid black;width: 20px;background-color:" + evaluateRating(song1data.currentRating, song1data.formerRating) + ";";
+//                var source = $("#song-row-template").html();
+//                var template = Handlebars.compile(source);
+//                var context = {
+//                    songID: song1data.id,
+//                    style: style,
+//                    rank: 'new',
+//                    name: song1data.name,
+//                    matches: (song1data.wins + song1data.draws + song1data.loses),
+//                    wins: song1data.wins,
+//                    draws: song1data.draws,
+//                    losses: song1data.loses,
+//                    style2: style2,
+//                    rating: parseFloat(Math.round(song1data.currentRating * 100) / 100).toFixed(2)
+//                };
+//                var html = template(context);
+//                
+//                $(obj).replaceWith( html );
+//                
+//              } else if ( song2ID === $(obj).data('songid') ) {
+//                  console.log('replace2 : ' + song2ID);
+//                  
+//                var style2 = "border: 1px solid black;width: 20px;background-color:" + evaluateRating(song2data.currentRating, song2data.formerRating) + ";";
+//                var source = $("#song-row-template").html();
+//                var template = Handlebars.compile(source);
+//                var context = {
+//                    songID: song2data.id,
+//                    style: style,
+//                    rank: 'new',
+//                    name: song2data.name,
+//                    matches: (song2data.wins + song2data.draws + song2data.loses),
+//                    wins: song2data.wins,
+//                    draws: song2data.draws,
+//                    losses: song2data.loses,
+//                    style2: style2,
+//                    rating: parseFloat(Math.round(song2data.currentRating * 100) / 100).toFixed(2)
+//                };
+//                var html = template(context);
+//                
+//                $(obj).replaceWith( html );
+//              }
+//           });
+//       });
+//    });
+}
+//Songs functionality ***END***
 //Generate duels ***START***
 function loadDuel( duelId, callback ) {
     $.ajax({
@@ -75,7 +131,6 @@ function evaluateDuelGeneration( data ) {
         
         loadDuel( data[i], function( duelData ) {
             
-            console.log('duelData : ', duelData);
             source = $("#duels-to-play-row-template").html();
             template = Handlebars.compile(source);
 
@@ -107,7 +162,7 @@ function generateDuels( amount ) {
 //Save duel functionality ***START***
 function evaluateDuelSave( data ) {
     var amountOfDuelsToPlay = 5;
-    console.log('data is : ' + JSON.stringify(data) );
+    
     var curAmountOfDuels = 0;
     $('.duelToPlay').each(function(i, obj) {
         if ( $(obj).data('duelid') === $('.duelTemplateWrapper').data("currduelid") ) {
@@ -116,9 +171,11 @@ function evaluateDuelSave( data ) {
             curAmountOfDuels++;
         }
     });
-    console.log('Wanna load duels ? : ', (amountOfDuelsToPlay - curAmountOfDuels));
-    initialUpdate = false;
+    
+    initialUpdatePlayedDuels = false;
     loadDuelsToPlay( amountOfDuelsToPlay );
+    loadPlayedDuels( 15 );
+    loadNewSongs();
 }
 
 function saveDuel() {
@@ -149,7 +206,6 @@ function loadPredictions(song1Rating, song2Rating, callback) {
 }
 
 function displayDuelsToPlayFunc( data ) {
-    console.log( 'displayDuelsToPlay triggered');
     var source, template, context, html, elements = 0;
 
     var style = "border: 1px solid black;";
@@ -165,6 +221,8 @@ function displayDuelsToPlayFunc( data ) {
 
                 context = {
                     duelId: curDuel.duelID,
+                    song1ID: curDuel.song1ID,
+                    song2ID: curDuel.song2ID,
                     song1Name: curDuel.song1Name,
                     song1Rating: curDuel.song1BeforeMatchRating,
                     song2Name: curDuel.song2Name,
@@ -188,15 +246,12 @@ function displayDuelsToPlayFunc( data ) {
         $('.duelToPlay').each(function(i, obj) {
 
             if ( $(obj).data('duelid') === curDuel.duelID ) {
-                console.log('I exist', curDuel.duelID);
                 exists = true;
                 return false;
             }
         });
             
         if( !exists ) {
-            console.log('I DO NOT exist', curDuel.duelID);
-            
             source = $("#duels-to-play-row-template").html();
             template = Handlebars.compile(source);
 
@@ -214,7 +269,6 @@ function displayDuelsToPlayFunc( data ) {
     });
     
     if( elements < 5 ) {
-        console.log('I need to add a new one');
         generateDuels( 5 - elements );
     }
     
@@ -236,47 +290,67 @@ function displayPlayedDuels( data ) {
     var style = "border: 1px solid black;";
     var style2 = "border: 1px solid black;font-weight: 700;";
     var song1Points, song1Update, song2Points, song2Update, style3, style4;
-    $("#playedDuelsList tbody").empty();
-    $.each(data, function (curDuelID, curDuel) {
+
+    $.each(data, function (index, curDuel) {
+
+        var exists = false;
         
-        song1Points = curDuel.song1AfterMatchRating - curDuel.song1BeforeMatchRating;
-        song1Update = parseFloat(Math.round(song1Points * 100) / 100).toFixed(2);
-        song2Points = curDuel.song2AfterMatchRating - curDuel.song2BeforeMatchRating;
-        song2Update = parseFloat(Math.round(song2Points * 100) / 100).toFixed(2);
+        $('.playedDuel').each(function(i, obj) {
 
-        if (song1Update > 0) {
-            song1Update = "+" + song1Update;
+            if ( $(obj).data('playedduelid') === curDuel.duelID ) {
+                exists = true;
+                return false;
+            }
+            if( i >= 14 ) {
+                $(obj).remove();
+                return false;
+            }
+        });
+            
+        if( !exists ) {
+
+            song1Points = curDuel.song1AfterMatchRating - curDuel.song1BeforeMatchRating;
+            song1Update = parseFloat(Math.round(song1Points * 100) / 100).toFixed(2);
+            song2Points = curDuel.song2AfterMatchRating - curDuel.song2BeforeMatchRating;
+            song2Update = parseFloat(Math.round(song2Points * 100) / 100).toFixed(2);
+
+            if (song1Update > 0) {
+                song1Update = "+" + song1Update;
+            }
+
+            if (song2Update > 0) {
+                song2Update = "+" + song2Update;
+            }
+
+            style3 = "border: 1px solid black;background-color: " + evaluateRating(curDuel.song1AfterMatchRating, curDuel.song1BeforeMatchRating) + ";";
+            style4 = "border: 1px solid black;background-color: " + evaluateRating(curDuel.song2AfterMatchRating, curDuel.song2BeforeMatchRating) + ";";
+
+            var source = $("#played-duels-row-template").html();
+            var template = Handlebars.compile(source);
+            var context = {
+                duelId: curDuel.duelID,
+                style: style,
+                song1Name: curDuel.song1Name,
+                style3: style3,
+                song1Update: song1Update,
+                song1Rating: parseFloat(Math.round(curDuel.song1AfterMatchRating * 100) / 100).toFixed(2),
+                song1Score: curDuel.song1Score,
+                style2: style2,
+                song2Score: curDuel.song2Score,
+                style4: style4,
+                song2Rating: parseFloat(Math.round(curDuel.song2AfterMatchRating * 100) / 100).toFixed(2),
+                song2Update: song2Update,
+                song2Name: curDuel.song2Name
+
+            };
+            var html = template(context);
+            
+            if( initialUpdatePlayedDuels ) {
+                $("#playedDuelsList tbody").append(html);
+            } else {
+                $(html).prependTo( $("#playedDuelsList tbody") );
+            }
         }
-
-        if (song2Update > 0) {
-            song2Update = "+" + song2Update;
-        }
-
-        style3 = "border: 1px solid black;background-color: " + evaluateRating(curDuel.song1AfterMatchRating, curDuel.song1BeforeMatchRating) + ";";
-        style4 = "border: 1px solid black;background-color: " + evaluateRating(curDuel.song2AfterMatchRating, curDuel.song2BeforeMatchRating) + ";";
-
-
-        var source = $("#played-duels-row-template").html();
-        var template = Handlebars.compile(source);
-        var context = {
-            duelId: curDuel.duelID,
-            style: style,
-            song1Name: curDuel.song1Name,
-            style3: style3,
-            song1Update: song1Update,
-            song1Rating: parseFloat(Math.round(curDuel.song1AfterMatchRating * 100) / 100).toFixed(2),
-            song1Score: curDuel.song1Score,
-            style2: style2,
-            song2Score: curDuel.song2Score,
-            style4: style4,
-            song2Rating: parseFloat(Math.round(curDuel.song2AfterMatchRating * 100) / 100).toFixed(2),
-            song2Update: song2Update,
-            song2Name: curDuel.song2Name
-
-        };
-        var html = template(context);
-
-        $("#playedDuelsList tbody").append(html);
     });
 }
 
@@ -291,6 +365,7 @@ function loadPlayedDuels(amount) {
 //Played Duels functionality ***END***
 //Songs functionality ***START***
 function displaySongs(data) {
+    $("#songsList tbody").empty();
     $.each(data, function (k, v) {
         var style = "border: 1px solid black;";
         var style2 = "border: 1px solid black;width: 20px;background-color:" + evaluateRating(v.currentRating, v.formerRating) + ";";
@@ -298,6 +373,7 @@ function displaySongs(data) {
         var source = $("#song-row-template").html();
         var template = Handlebars.compile(source);
         var context = {
+            songID: v.id,
             style: style,
             rank: (k + 1),
             name: v.name,

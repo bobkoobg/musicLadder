@@ -26,7 +26,7 @@ public class DuelMapper {
                     + "JOIN ML_SONG_TBL songA "
                     + "ON duel.SONG1_ID = songA.SONG_ID "
                     + "JOIN ML_SONG_TBL songB "
-                    + "ON duel.SONG1_ID = songB.SONG_ID "
+                    + "ON duel.SONG2_ID = songB.SONG_ID "
                     + "WHERE DUEL_ID = ?";
 
             preparedStatement = connection.prepareStatement( SQLString );

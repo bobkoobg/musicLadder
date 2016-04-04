@@ -63,7 +63,7 @@
             </table>
         </div>
         <script id="song-row-template" type="text/x-handlebars-template">
-            <tr>
+            <tr class="song" data-songid="{{songID}}">
             <td style="{{style}}">{{rank}}</td>
             <td style="{{style}}">{{name}}</td>
             <td style="{{style}}">{{matches}}</td>
@@ -75,7 +75,7 @@
             </tr>
         </script>
         <script id="played-duels-row-template" type="text/x-handlebars-template">
-            <tr data-playedduelid="{{duelId}}">
+            <tr class="playedDuel" data-playedduelid="{{duelId}}">
                 <td style="{{style}}">{{song1Name}}</td>
                 <td style="{{style3}}">{{song1Update}}</td>
                 <td style="{{style3}}">{{song1Rating}}</td>
@@ -95,7 +95,7 @@
             </tr>
         </script>
         <script id="current-duel-template" type="text/x-handlebars-template">
-            <div class="duelTemplateWrapper" data-currduelid="{{duelId}}">
+            <div class="duelTemplateWrapper" data-currduelid="{{duelId}}" data-songa="{{song1ID}}" data-songb="{{song2ID}}">
                 <div>
                     <span style="border: 1px solid;">{{song1Name}}</span>
                     <span style="border: 1px solid;">{{song1Rating}} {{duelId}}</span>
