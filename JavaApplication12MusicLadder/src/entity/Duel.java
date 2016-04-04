@@ -15,9 +15,11 @@ public class Duel
     private float song1AfterMatchRating;
     private float song2AfterMatchRating;
     private Date matchTime;
+    private String song1Name;
+    private String song2Name;
 
     /*
-     * Minimal requirements constructor
+     * Duel generation constructor
      */
     public Duel(Integer song1ID, Integer song2ID, float song1BeforeMatchRating, float song2BeforeMatchRating)
     {
@@ -122,14 +124,35 @@ public class Duel
         this.song2AfterMatchRating = song2NewRating;
     }
 
-    @Override
-    public String toString()
-    {
-        return "Duel{" + "duelID=" + duelID + ", song1ID=" + song1ID
-                + ", song2ID=" + song2ID + ", song1OldRating=" + song1BeforeMatchRating
-                + ", song2OldRating=" + song2BeforeMatchRating + ", song1Score=" + song1Score
-                + ", song2Score=" + song2Score + ", song1NewRating=" + song1AfterMatchRating
-                + ", song2NewRating=" + song2AfterMatchRating + ", matchTime=" + matchTime + '}';
+    public void setSong1Name( String song1Name ) {
+        this.song1Name = song1Name;
     }
+
+    public void setSong2Name( String song2Name ) {
+        this.song2Name = song2Name;
+    }
+
+    public String getSong1Name() {
+        return song1Name;
+    }
+
+    public String getSong2Name() {
+        return song2Name;
+    }
+
+    @Override
+    public String toString() {
+        return "Duel{" + "duelID=" + duelID + ", song1ID=" + song1ID + ", song2ID=" 
+                + song2ID + ", song1BeforeMatchRating=" + song1BeforeMatchRating 
+                + ", song2BeforeMatchRating=" + song2BeforeMatchRating + ", song1Score=" 
+                + song1Score + ", song2Score=" + song2Score + ", song1AfterMatchRating=" 
+                + song1AfterMatchRating + ", song2AfterMatchRating=" + song2AfterMatchRating
+                + ", matchTime=" + matchTime + ", song1Name=" + song1Name + ", song2Name=" 
+                + song2Name + '}';
+    }
+
+    
+
+   
 
 }

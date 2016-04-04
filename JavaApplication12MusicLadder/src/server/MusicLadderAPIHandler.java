@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.List;
 
 public class MusicLadderAPIHandler implements HttpHandler {
 
@@ -155,11 +156,11 @@ public class MusicLadderAPIHandler implements HttpHandler {
                  */ else if ( parts.length == 5 && parts[ 2 ] != null && "duel".equals( parts[ 2 ] )
                         && parts[ 3 ] != null && isNumeric( parts[ 3 ] ) && (Integer.parseInt( parts[ 3 ] ) > 0)
                         && parts[ 4 ] != null && isNumeric( parts[ 4 ] ) && (Integer.parseInt( parts[ 4 ] ) > 0) ) {
-                    boolean actualResponse = controller.generateDuels( Integer.parseInt( parts[ 3 ] ), Integer.parseInt( parts[ 4 ] ) );
+                    List<Integer> generatedDuelIds = controller.generateDuels( Integer.parseInt( parts[ 3 ] ), Integer.parseInt( parts[ 4 ] ) );
 
-                    if ( actualResponse ) {
+                    if ( generatedDuelIds != null ) {
                         status = 201;
-                        response = "{\"response\":\"Duel created successfully!\"}";
+                        response = new Gson().toJson( generatedDuelIds );
                     } else {
                         status = 400;
                         response = "{\"response\":\"Bad request!\"}";

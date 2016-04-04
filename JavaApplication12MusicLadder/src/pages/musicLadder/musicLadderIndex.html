@@ -75,7 +75,7 @@
             </tr>
         </script>
         <script id="played-duels-row-template" type="text/x-handlebars-template">
-            <tr>
+            <tr data-playedduelid="{{duelId}}">
                 <td style="{{style}}">{{song1Name}}</td>
                 <td style="{{style3}}">{{song1Update}}</td>
                 <td style="{{style3}}">{{song1Rating}}</td>
@@ -95,10 +95,10 @@
             </tr>
         </script>
         <script id="current-duel-template" type="text/x-handlebars-template">
-            <div class="duelTemplateWrapper" data-duelid="{{duelId}}">
+            <div class="duelTemplateWrapper" data-currduelid="{{duelId}}">
                 <div>
                     <span style="border: 1px solid;">{{song1Name}}</span>
-                    <span style="border: 1px solid;">{{song1Rating}}</span>
+                    <span style="border: 1px solid;">{{song1Rating}} {{duelId}}</span>
                 </div>
                 <div>
                     <span style="border: 1px solid;">{{song2Name}}</span>

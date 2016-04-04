@@ -129,22 +129,25 @@ public class MusicLadderController
     *   4 ) save it
     *   4.1 ) Error handling ***MISSING***
     */
-    public boolean generateDuels(Integer ladderId, Integer amount) {
+    public List<Integer> generateDuels(Integer ladderId, Integer amount) {
+        List<Integer> duelIds = new ArrayList();
         List<Song> songs = facade.getSongs(logger, ladderId);
         for (int i = 0; i < amount; i++)
         {
             Duel duel = dG.generator( songs );
             if ( duel == null ) {
                 System.out.println("Error : generateDuels no duel generated.");
-                return false;
+                return null;
             } 
-            
-            if (  ! facade.insertDuel(logger, duel) ) {
+            Integer duelId = facade.insertDuel(logger, duel);
+            if (  duelId == 0  ) {
                 System.out.println("Error : duel not inserted in database");
-                return false;
+                return null;
+            } else {
+                duelIds.add( duelId );
             }
         }
-        return true;
+        return duelIds;
     }
     
     /*
@@ -263,8 +266,8 @@ public class MusicLadderController
 
             float[] calcResults = eloRSC.calculate(duel);
 
-            possibilities.add( calcResults[0] );
-            possibilities.add( calcResults[1] );
+            possibilities.add( calcResults[0] - duel.getSong1BeforeMatchRating() );
+            possibilities.add( calcResults[1] - duel.getSong2BeforeMatchRating() );
         }
         return possibilities;
     }
