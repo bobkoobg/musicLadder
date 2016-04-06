@@ -8,7 +8,7 @@ import java.net.InetSocketAddress;
 public class RESTfulAPIServer {
 
     private static int port = 8084;
-    private static String ip = "127.0.0.1";
+    private static String ip = "127.0.0.1";//"10.20.145.128";
 
     private static MusicLadderController controller;
 

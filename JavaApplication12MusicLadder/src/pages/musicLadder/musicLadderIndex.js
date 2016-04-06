@@ -46,6 +46,32 @@ function loadSlider() {
     });
 }
 
+//Handlebars functionality ***START***
+function generateDuelsToPlayHTML( duelData ) {
+    
+    var source, template, context, html;
+    var style = "border: 1px solid black;";
+    var style2 = "border: 1px solid black;font-weight: 700;";
+    
+    source = $("#duels-to-play-row-template").html();
+    template = Handlebars.compile(source);
+
+    context = {
+        duelID: duelData.duelID,
+        style: style,
+        song1Name: duelData.song1Name,
+        style2: style2,
+        song2Name: duelData.song2Name
+    };
+    html = template(context);
+    return html;
+}
+
+function generatePlayedDuels( duelData ) {
+    
+}
+//Hanlebars functionality ***END***
+
 function loadSong(songId, callback) {
     $.ajax({
         "url": "/musicLadderAPI/song/" + songId,
@@ -122,29 +148,11 @@ function loadDuel( duelId, callback ) {
 }
 
 function evaluateDuelGeneration( data ) {
-    
-    var source, template, context, html;
-    var style = "border: 1px solid black;";
-    var style2 = "border: 1px solid black;font-weight: 700;";
-    
-    for (var i = 0; i < data.length; i++) {
-        
+    var html;
+    for (var i = 0; i < data.length; i++) {    
         loadDuel( data[i], function( duelData ) {
-            
-            source = $("#duels-to-play-row-template").html();
-            template = Handlebars.compile(source);
-
-            context = {
-                duelID: duelData.duelID,
-                style: style,
-                song1Name: duelData.song1Name,
-                style2: style2,
-                song2Name: duelData.song2Name
-            };
-            html = template(context);
-            
-            $(html).appendTo("#duelsToPlayList tbody");
-        
+            html = generateDuelsToPlayHTML( duelData );
+            $(html).appendTo("#duelsToPlayList tbody");      
         });
     }
 }
@@ -152,7 +160,7 @@ function evaluateDuelGeneration( data ) {
 function generateDuels( amount ) {
     $.ajax({
         "url": "/musicLadderAPI/duel/1/" + amount,
-        "type": "PUT",
+        "type": "POST",
         "headers": {"Content-Type": "application/json"},
         "data": JSON.stringify({}),
         "success": evaluateDuelGeneration
@@ -174,7 +182,7 @@ function evaluateDuelSave( data ) {
     
     initialUpdatePlayedDuels = false;
     loadDuelsToPlay( amountOfDuelsToPlay );
-    loadPlayedDuels( 15 );
+    loadPlayedDuels( 1 );
     loadNewSongs();
 }
 
@@ -184,7 +192,7 @@ function saveDuel() {
     
     $.ajax({
         "url": "/musicLadderAPI/duel/" + duelId + "/" + Math.abs(0 - sliderScore) + "/" + Math.abs(sliderScore - 10 ),
-        "type": "POST",
+        "type": "PUT",
         "headers": {"Content-Type": "application/json"},
         "data": JSON.stringify({}),
         "success": evaluateDuelSave
@@ -196,7 +204,7 @@ function saveDuel() {
 function loadPredictions(song1Rating, song2Rating, callback) {
     $.ajax({
         "url": "/musicLadderAPI/probability",
-        "type": "POST",
+        "type": "PUT",
         "headers": {"Content-Type": "application/json"},
         "data":
                 JSON.stringify({'song1BeforeMatchRating': song1Rating, 'song2BeforeMatchRating': song2Rating})
@@ -206,10 +214,7 @@ function loadPredictions(song1Rating, song2Rating, callback) {
 }
 
 function displayDuelsToPlayFunc( data ) {
-    var source, template, context, html, elements = 0;
-
-    var style = "border: 1px solid black;";
-    var style2 = "border: 1px solid black;font-weight: 700;";
+    var html, source, template, context, elements = 0;
 
     $.each(data, function (index, curDuel) {
         elements++;
@@ -252,17 +257,7 @@ function displayDuelsToPlayFunc( data ) {
         });
             
         if( !exists ) {
-            source = $("#duels-to-play-row-template").html();
-            template = Handlebars.compile(source);
-
-            context = {
-                duelID: curDuel.duelID,
-                style: style,
-                song1Name: curDuel.song1Name,
-                style2: style2,
-                song2Name: curDuel.song2Name
-            };
-            html = template(context);
+            html = generateDuelsToPlayHTML( curDuel )
             
             $(html).appendTo("#duelsToPlayList tbody");
         }
@@ -307,7 +302,7 @@ function displayPlayedDuels( data ) {
             }
         });
             
-        if( !exists ) {
+        if( ! exists ) {
 
             song1Points = curDuel.song1AfterMatchRating - curDuel.song1BeforeMatchRating;
             song1Update = parseFloat(Math.round(song1Points * 100) / 100).toFixed(2);
@@ -403,17 +398,6 @@ function load() {
     loadSongs( 1 );
     loadPlayedDuels( 15 );
     loadDuelsToPlay( 5 );
-    
-    //ok we are deleting the one which was inserted
-    //now,we should ask the db if it has more stuff to give me
-    //then load them, look through what you have on the page
-    //  if they match, drop them
-    //  if they do not match -add them
-    //if the final amount is lower than 5 (the value on like 2,3)
-    //  generate new duel
-    //get the id when it returns
-    //load it, add it to the others
-    //done
 
     $saveDuelButton = $("#saveDuel");
     $slider = $(".sliderr");
