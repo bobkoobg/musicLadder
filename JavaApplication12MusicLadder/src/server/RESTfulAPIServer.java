@@ -8,7 +8,7 @@ import java.net.InetSocketAddress;
 public class RESTfulAPIServer {
 
     private static int port = 8084;
-    private static String ip = "127.0.0.1";//"10.20.145.128";
+    private static String ip = "10.20.164.101";//"127.0.0.1";//"10.20.145.128";
 
     private static MusicLadderController controller;
 
@@ -19,11 +19,11 @@ public class RESTfulAPIServer {
         HttpServer server = HttpServer.create( new InetSocketAddress( ip, port ), 0 );
 
         //REST Routes
-        server.createContext( "/musicLadder", new MusicLadderHandler() );
         server.createContext( "/musicLadderAPI", new MusicLadderAPIHandler( controller ) );
-        //server.createContext("/whatever", new whateverHandler());
+        server.createContext( "/musicLadder", new MusicLadderHandler() );
 
         //HTTP Server Routes 
+        server.createContext( "/api", new ServerAPIHandler( controller ) );
         server.createContext( "/", new ServerHandler() );
 
         server.start();

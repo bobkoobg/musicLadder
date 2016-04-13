@@ -4,144 +4,189 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import entity.Duel;
 import entity.Song;
+import entity.User;
+import entity.UserIdentifiers;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.mindrot.jbcrypt.BCrypt;
 import utils.DuelGenerator;
 import utils.EloRatingSystemCalculator;
 import utils.PerformanceLogger;
 import utils.SongRatingComparator;
 import utils.SongReader;
 
-public class MusicLadderController
-{
-    
+public class MusicLadderController {
+
     private static MusicLadderController instance = null;
-    
+
     private PerformanceLogger pl = null;
     private Logger logger = null;
-    private Facade facade = null; 
+    private Facade facade = null;
     private EloRatingSystemCalculator eloRSC = null;
     private DuelGenerator dG = null;
     private SongReader sr = null;
     private Gson gson = null;
     private SongRatingComparator src = null;
-        
-    private MusicLadderController()
-    {
+    private List<UserIdentifiers> userIdentifiers;
+
+    private MusicLadderController() {
         // Exists only to defeat instantiation.
-        
+
         //Logger functionality
         pl = new PerformanceLogger();
         logger = pl.logMessage();
-        
+
         facade = Facade.getInstance();
-        facade.initializeConnection(logger);
-        
+        facade.initializeConnection( logger );
+
         eloRSC = EloRatingSystemCalculator.getInstance();
         dG = DuelGenerator.getInstance();
         sr = new SongReader();
         src = new SongRatingComparator();
-        
+
+        userIdentifiers = new ArrayList();
+
         gson = new Gson();
 
     }
 
-    public static MusicLadderController getInstance()
-    {
-        if (instance == null)
-        {
+    public static MusicLadderController getInstance() {
+        if ( instance == null ) {
             instance = new MusicLadderController();
         }
         return instance;
     }
-    
+
+    public boolean createUserIdentifierObj( String clientReqIP, int curServerID ) {
+        userIdentifiers.add( new UserIdentifiers( clientReqIP, curServerID, new Date() ) );
+        return true;
+    }
+
+    public boolean addClientId( String clientReqIP, int curClientID ) {
+        long MAX_DURATION = MILLISECONDS.convert( 1, MINUTES );
+        Date now = new Date();
+        boolean isFound = false;
+        for ( int i = 0; i < userIdentifiers.size(); i++ ) {
+            if ( userIdentifiers.get( i ).getClientReqIP().equals( clientReqIP ) ) {
+                userIdentifiers.get( i ).setCurClientId( curClientID );
+                isFound = true;
+            }
+            if ( now.getTime() - userIdentifiers.get( i ).getCurDate().getTime() >= MAX_DURATION ) {
+                userIdentifiers.remove( i );
+            }
+        }
+        if ( isFound ) {
+            return true;
+        }
+        return false;
+    }
+
+    public User loginUser( String jQueryObject ) {
+        User jsonObject = gson.fromJson( jQueryObject, User.class );
+        System.out.println( "String ? : " + jsonObject.toString() );
+        System.out.println( "length ? : " + jsonObject.getPassword().length() );
+        if ( jsonObject.getPassword().length() != 62 ) {
+            //flow - what if the hacked user password is exactly 62 chars ?
+            return null;
+        }
+        // Hash the password again
+        String hashedPassword = BCrypt.hashpw( jsonObject.getPassword(), BCrypt.gensalt() );
+        
+        User currUser = facade.getUser( logger, jsonObject.getUsername(), hashedPassword );
+
+        System.out.println( "hashed ? : " + hashedPassword );
+
+        return currUser;
+    }
+
     /*
-    * Correct way of loading songs
-    *   Missing : Error handling
-    */
+     * Correct way of loading songs
+     *   Missing : Error handling
+     */
     public List<Song> loadSongs( Integer ladderId ) {
-        List<Song> songs = facade.getSongs(logger, ladderId );
+        List<Song> songs = facade.getSongs( logger, ladderId );
         Collections.sort( songs, new SongRatingComparator() );
         return songs;
     }
-    
+
     /*
-    * Correct way of loading songs
-    *   Missing : Error handling
-    */
+     * Correct way of loading songs
+     *   Missing : Error handling
+     */
     public List<Duel> loadNPlayedDuels( Integer amount ) {
-        return facade.getNPlayedDuels(logger, amount);
+        return facade.getNPlayedDuels( logger, amount );
     }
-    
+
     /*
-    * Correct way of loading songs
-    *   1 ) Load from DB
-    *     Missing : Error handling
-    */
+     * Correct way of loading songs
+     *   1 ) Load from DB
+     *     Missing : Error handling
+     */
     public List<Duel> loadNDuelsToPlay( Integer amount ) {
-        return facade.getNDuelsToPlay(logger, amount);
+        return facade.getNDuelsToPlay( logger, amount );
     }
-    
+
     /*
-    * Correct way of creating songs from file
-    *   1 ) Find in local folder
-    *   2 ) Loop through result
-    *   3 ) Insert elem by elem in db
-    *   4 ) Check if correct ***MISSING***
-    *   5 ) Error handling ***MISSING***
-    */
+     * Correct way of creating songs from file
+     *   1 ) Find in local folder
+     *   2 ) Loop through result
+     *   3 ) Insert elem by elem in db
+     *   4 ) Check if correct ***MISSING***
+     *   5 ) Error handling ***MISSING***
+     */
     public Boolean createSongs( String path ) {
         File[] songFiles = sr.finder( path );
-        for (int i = 0; i < songFiles.length; i++)
-        {
-            Integer songId = facade.insertSong(logger, songFiles[i].getName());
+        for ( int i = 0; i < songFiles.length; i++ ) {
+            Integer songId = facade.insertSong( logger, songFiles[ i ].getName() );
             //Error handling
         }
         return true;
     }
-    
+
     /*
-    * Correct way of creating a song via API
-    *   1 ) Create object from Json
-    *   2 ) Insert it in the db
-    *   3 ) Check if correct ***MISSING***
-    *   4 ) Error handling ***MISSING***
-    */
+     * Correct way of creating a song via API
+     *   1 ) Create object from Json
+     *   2 ) Insert it in the db
+     *   3 ) Check if correct ***MISSING***
+     *   4 ) Error handling ***MISSING***
+     */
     public Boolean createSongAPI( String jQueryObject ) {
-        Song jsonObject = gson.fromJson( jQueryObject , Song.class );
-        
-        Integer songId = facade.insertSong(logger, jsonObject.getName() );
+        Song jsonObject = gson.fromJson( jQueryObject, Song.class );
+
+        Integer songId = facade.insertSong( logger, jsonObject.getName() );
         //Error handling
         return true;
     }
-    
+
     /*
-    * Correct way of generating duels via api
-    *   1 ) load songs from db
-    *   2 ) iterate N amount of times
-    *   3 ) generate a duel
-    *   3.1 ) Error handling ***MISSING***
-    *   4 ) save it
-    *   4.1 ) Error handling ***MISSING***
-    */
-    public List<Integer> generateDuels(Integer ladderId, Integer amount) {
+     * Correct way of generating duels via api
+     *   1 ) load songs from db
+     *   2 ) iterate N amount of times
+     *   3 ) generate a duel
+     *   3.1 ) Error handling ***MISSING***
+     *   4 ) save it
+     *   4.1 ) Error handling ***MISSING***
+     */
+    public List<Integer> generateDuels( Integer ladderId, Integer amount ) {
         List<Integer> duelIds = new ArrayList();
-        List<Song> songs = facade.getSongs(logger, ladderId);
-        for (int i = 0; i < amount; i++)
-        {
+        List<Song> songs = facade.getSongs( logger, ladderId );
+        for ( int i = 0; i < amount; i++ ) {
             Duel duel = dG.generator( songs );
             if ( duel == null ) {
-                System.out.println("Error : generateDuels no duel generated.");
+                System.out.println( "Error : generateDuels no duel generated." );
                 return null;
-            } 
-            Integer duelId = facade.insertDuel(logger, duel);
-            if (  duelId == 0  ) {
-                System.out.println("Error : duel not inserted in database");
+            }
+            Integer duelId = facade.insertDuel( logger, duel );
+            if ( duelId == 0 ) {
+                System.out.println( "Error : duel not inserted in database" );
                 return null;
             } else {
                 duelIds.add( duelId );
@@ -149,63 +194,63 @@ public class MusicLadderController
         }
         return duelIds;
     }
-    
+
     /*
-    * Correct way of loading a duel from db
-    */
+     * Correct way of loading a duel from db
+     */
     public Duel getDuel( Integer duelID ) {
         return facade.getDuel( logger, duelID );
     }
-    
+
     /*
-    * Correct way of updating song
-    *   1 ) load new song content from json
-    *   2 ) load actual song content from db
-    *   3 ) check for differences
-    *   4 ) update if necessary
-    */
+     * Correct way of updating song
+     *   1 ) load new song content from json
+     *   2 ) load actual song content from db
+     *   3 ) check for differences
+     *   4 ) update if necessary
+     */
     public Boolean updateSong( String jQueryObject ) {
-        Song jsonObject = gson.fromJson( jQueryObject , Song.class );
-        
+        Song jsonObject = gson.fromJson( jQueryObject, Song.class );
+
         if ( jsonObject.getId() == null ) {
             return false;
         }
-        
+
         Song song = facade.getSong( logger, jsonObject.getId() );
-        
+
         if ( song == null ) {
             return false;
         }
-        
+
         boolean isChanged = false;
-        if (jsonObject.getName() != null && ! song.getName().equals( jsonObject.getName() ) ) {
+        if ( jsonObject.getName() != null && !song.getName().equals( jsonObject.getName() ) ) {
             song.setName( jsonObject.getName() );
             isChanged = true;
         }
-        
-        if( isChanged ) {
-            if ( facade.updateSong(logger, song) ) {
+
+        if ( isChanged ) {
+            if ( facade.updateSong( logger, song ) ) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
     /*
-    * Correct way of matchmaking via API
-    *   (core functionality in musicLadder 1.0)
-    */
-    public Boolean generateResultsAndUpdateDuel(Integer duelID, Integer song1Score, Integer song2Score) {
+     * Correct way of matchmaking via API
+     *   (core functionality in musicLadder 1.0)
+     */
+    public Boolean generateResultsAndUpdateDuel( Integer duelID, Integer song1Score, Integer song2Score ) {
         //No inner error handling at any point
         Duel duel = getDuel( duelID );
-        
+
         if ( duel == null ) {
             return false;
         }
-        
-        Song song1 = facade.getSong(logger, duel.getSong1ID() );
-        Song song2 = facade.getSong(logger, duel.getSong2ID() );
+
+        Song song1 = facade.getSong( logger, duel.getSong1ID() );
+        Song song2 = facade.getSong( logger, duel.getSong2ID() );
 
         if ( song1 == null || song2 == null ) {
             return false;
@@ -216,81 +261,79 @@ public class MusicLadderController
 
         float[] newSongRatings = eloRSC.calculate( duel );
 
-        duel.setSong1AfterMatchRating( newSongRatings[0] );
-        duel.setSong2AfterMatchRating( newSongRatings[1] );
+        duel.setSong1AfterMatchRating( newSongRatings[ 0 ] );
+        duel.setSong2AfterMatchRating( newSongRatings[ 1 ] );
 
-        if( song1Score > song2Score ) {
+        if ( song1Score > song2Score ) {
             song1.incrementWins();
             song2.incrementLoses();
         } else if ( song1Score < song2Score ) {
             song1.incrementLoses();
             song2.incrementWins();
-        } else  {
+        } else {
             song1.incremenetDraws();
             song2.incremenetDraws();
         }
 
         song1.setFormerRating( song1.getCurrentRating() );
-        song1.setCurrentRating( newSongRatings[0] );
+        song1.setCurrentRating( newSongRatings[ 0 ] );
         song2.setFormerRating( song2.getCurrentRating() );
-        song2.setCurrentRating( newSongRatings[1] );
+        song2.setCurrentRating( newSongRatings[ 1 ] );
 
-        boolean isUpdatedDuel = facade.updateDuel(logger, duel);
+        boolean isUpdatedDuel = facade.updateDuel( logger, duel );
         if ( isUpdatedDuel ) {
-            boolean isUpdatedSong1 = facade.updateSong(logger, song1);
-            boolean isUpdatedSong2 = facade.updateSong(logger, song2); 
-            return ( isUpdatedSong1 && isUpdatedSong2 );
-        } 
+            boolean isUpdatedSong1 = facade.updateSong( logger, song1 );
+            boolean isUpdatedSong2 = facade.updateSong( logger, song2 );
+            return (isUpdatedSong1 && isUpdatedSong2);
+        }
         return false;
     }
-    
+
     /*
-    * Correct way of loading a song by id
-    */
+     * Correct way of loading a song by id
+     */
     public Song getSongByID( Integer songID ) {
-        return facade.getSong(logger, songID);
+        return facade.getSong( logger, songID );
     }
-    
+
     /*
-    * Help function for predicting duel results
-    */
+     * Help function for predicting duel results
+     */
     private List<Float> generateResults( Duel duel ) {
         List<Float> possibilities = new ArrayList();
-        Integer[] song1Scores = {10, 5, 0};
-        Integer[] song2Scores = {0, 5, 10};
-        
-        for (int i = 0; i < song1Scores.length; i++)
-        {
-            duel.setSong1Score( song1Scores[i] );
-            duel.setSong2Score( song2Scores[i] );
+        Integer[] song1Scores = { 10, 5, 0 };
+        Integer[] song2Scores = { 0, 5, 10 };
 
-            float[] calcResults = eloRSC.calculate(duel);
+        for ( int i = 0; i < song1Scores.length; i++ ) {
+            duel.setSong1Score( song1Scores[ i ] );
+            duel.setSong2Score( song2Scores[ i ] );
 
-            possibilities.add( calcResults[0] - duel.getSong1BeforeMatchRating() );
-            possibilities.add( calcResults[1] - duel.getSong2BeforeMatchRating() );
+            float[] calcResults = eloRSC.calculate( duel );
+
+            possibilities.add( calcResults[ 0 ] - duel.getSong1BeforeMatchRating() );
+            possibilities.add( calcResults[ 1 ] - duel.getSong2BeforeMatchRating() );
         }
         return possibilities;
     }
-    
+
     /*
-    * Correct way of predicting duel results
-    */
+     * Correct way of predicting duel results
+     */
     public String predictDuelResults( String jQueryObject ) {
         //No inner error handling at any point
         Duel duel = null;
         try {
-            duel = gson.fromJson( jQueryObject , Duel.class );
+            duel = gson.fromJson( jQueryObject, Duel.class );
+        } catch ( JsonParseException e ) {
+            System.out.println( "exception : " + e );
         }
-        catch (JsonParseException e) {
-            System.out.println("exception : " + e);
-        }
-        
+
         List<Float> possibilities = generateResults( duel );
-        
+
         return gson.toJson( possibilities );
     }
-    
+
     public void closeConnection() {
-        facade.closeConnection(logger);
+        facade.closeConnection( logger );
     }
 }

@@ -2,6 +2,7 @@ package controller;
 
 import entity.Duel;
 import entity.Song;
+import entity.User;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -76,6 +77,10 @@ public class Facade
         }
         logger.info("Connection with database closed successfully!");
         return true;
+    }
+    
+    public User getUser( Logger logger, String username, String hashedPassword ){
+        return new User(username, 1 );
     }
     
     public Song getSong(Logger logger, Integer songId) {

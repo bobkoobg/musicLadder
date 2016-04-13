@@ -50,10 +50,9 @@ public class ServerHandler implements HttpHandler {
             } else {
                 mime = getMime( ".html" );
             }
-            //System.out.println("ServerHandler I am not empty" + mime);
+            
             try {
                 file = new File( filesDirectory + f );
-
                 bytesToSend = new byte[ ( int ) file.length() ];
 
                 bis = new BufferedInputStream( new FileInputStream( file ) );
