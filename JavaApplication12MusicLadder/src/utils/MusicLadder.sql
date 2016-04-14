@@ -11,8 +11,26 @@ DROP SEQUENCE subladder_id;
 DROP TABLE ML_LADDER_TBL;
 DROP SEQUENCE ladder_id;
 
+DROP TABLE  ML_USER_TBL;
+DROP SEQUENCE user_id;
+
 --missing stuff : genres / song country / singer country
 --NB : Genre is different from ladder (or should it be different? - TO DESIDE)
+
+CREATE SEQUENCE user_id
+  MINVALUE 1
+  MAXVALUE 99999999999999
+  START WITH 1
+  INCREMENT BY 1;
+
+CREATE TABLE ML_USER_TBL (
+ user_id NUMBER PRIMARY KEY,
+ username VARCHAR2(255) UNIQUE NOT NULL,
+ hashed_password VARCHAR(255) NOT NULL,
+ user_creationDate TIMESTAMP NOT NULL,
+ user_lastLogin TIMESTAMP,
+ user_level NUMBER
+);
 
 --Will use a single ladder for version 1.0
 CREATE SEQUENCE ladder_id
