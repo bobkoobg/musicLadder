@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import controller.MusicLadderController;
+import entity.User;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -31,8 +32,6 @@ public class ServerAPIHandler implements HttpHandler {
         String path = he.getRequestURI().getPath();
         String[] parts = path.split( "/" );
         String address = he.getRemoteAddress().toString();
-        System.out.println("SServerAPI : server Client ip is: " +  address);
-        
 
         //POST, PUT, (DELETE?)
         InputStreamReader isr;
@@ -45,12 +44,17 @@ public class ServerAPIHandler implements HttpHandler {
                  * Generate server identifier and send to client
                  * URL : http://localhost:8084/api/loginId
                  */
-                if ( parts.length > 2 && parts[ 2 ] != null && "serverId".equals( parts[ 2 ] ) ) {
-                    //response = new Gson().toJson( controller.createSongAPI( jsonQuery ) );
+                if ( parts.length > 2 && parts[ 2 ] != null && "loginServerId".equals( parts[ 2 ] ) ) {
+
                     int curServerId = random.nextInt( 10 - 1 ) + 1;
-                    System.out.println( "hi" );
-                    if( controller.createUserIdentifierObj( address , curServerId ) ) {
-                        System.out.println( "GET Path is : " + path );
+                    if ( controller.createUserIdentifierObj( address, curServerId, "login" ) ) {
+                        response = new Gson().toJson( curServerId );
+                        status = 201;
+                    }
+                } else if ( parts.length > 2 && parts[ 2 ] != null && "registerServerId".equals( parts[ 2 ] ) ) {
+
+                    int curServerId = random.nextInt( 10 - 1 ) + 1;
+                    if ( controller.createUserIdentifierObj( address, curServerId, "register" ) ) {
                         response = new Gson().toJson( curServerId );
                         status = 201;
                     }
@@ -70,10 +74,8 @@ public class ServerAPIHandler implements HttpHandler {
                  */
                 if ( parts.length > 2 && parts[ 2 ] != null && "clientId".equals( parts[ 2 ] ) ) {
                     //response = new Gson().toJson( controller.createSongAPI( jsonQuery ) );
-                    System.out.println( "POST Path is : " + path );
-                    System.out.println( "POST Json is : " + jsonQuery );
                     int curClientId = Integer.parseInt( jsonQuery );
-                    if( controller.addClientId(address , curClientId ) ) {
+                    if ( controller.addClientId( address, curClientId ) ) {
                         response = new Gson().toJson( curClientId );
                         status = 201;
                     }
@@ -82,8 +84,28 @@ public class ServerAPIHandler implements HttpHandler {
                  * URL : http://localhost:8084/api/login
                  * JSON : {"username": "adminuser", "password":"$2a$05$zOsBcOSp9gpn1np..." }
                  */ else if ( parts.length > 2 && parts[ 2 ] != null && "login".equals( parts[ 2 ] ) ) {
-                    response = new Gson().toJson( controller.loginUser( jsonQuery ) );
-                    status = 201;
+                    User user = controller.loginUser( address, jsonQuery );
+                    if ( user != null ) {
+                        response = new Gson().toJson( user );
+                        status = 201;
+                    } else {
+                        response = "{\"error\":\"Incorrect login info, Unauthorized\"}";
+                        status = 401;
+                    }
+                } /*
+                 * Evaluate username and password from user
+                 * URL : http://localhost:8084/api/login
+                 * JSON : {"username": "adminuser", "password":"$2a$05$zOsBcOSp9gpn1np..." }
+                 */ else if ( parts.length > 2 && parts[ 2 ] != null && "register".equals( parts[ 2 ] ) ) {
+                    boolean dbStatus = controller.registerUser( address, jsonQuery );
+                    if ( dbStatus ) {
+                        response = "{\"response\":\"Successfull registration\"}";
+                        status = 201;
+                    } else {
+                        response = "{\"response\":\"Internal server error\"}";
+                        status = 500;
+                    }
+
                 } else {
                     response = "404 Not found";
                     status = 404;

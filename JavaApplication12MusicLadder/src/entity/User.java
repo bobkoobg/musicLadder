@@ -2,6 +2,7 @@ package entity;
 
 public class User {
 
+    private int userId;
     private String username;
     private String password;
     private int userLevel;
@@ -14,6 +15,17 @@ public class User {
     public User( String username, int userLevel ) {
         this.username = username;
         this.userLevel = userLevel;
+    }
+
+    public User() {
+    }
+
+    public void setUserId( int userId ) {
+        this.userId = userId;
+    }
+
+    public int getUserId() {
+        return userId;
     }
 
     public void setPassword( String password ) {
@@ -32,9 +44,18 @@ public class User {
         return username;
     }
 
+    public void setUserLevel( int userLevel ) {
+        this.userLevel = userLevel;
+    }
+
+    public int getUserLevel() {
+        return userLevel;
+    }
+
     @Override
     public String toString() {
-        return "User{" + "username=" + username + ", password=" + password + '}';
+        return "User{" + "userId=" + userId + ", username=" + username + ", password="
+                + password + ", userLevel=" + userLevel + '}';
     }
 
 }

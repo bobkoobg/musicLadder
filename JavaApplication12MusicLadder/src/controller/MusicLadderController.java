@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.List;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.mindrot.jbcrypt.BCrypt;
 import utils.DuelGenerator;
@@ -65,8 +64,64 @@ public class MusicLadderController {
         return instance;
     }
 
-    public boolean createUserIdentifierObj( String clientReqIP, int curServerID ) {
-        userIdentifiers.add( new UserIdentifiers( clientReqIP, curServerID, new Date() ) );
+    public boolean registerUser( String clientReqIP, String jQueryObject ) {
+        User jsonObject = gson.fromJson( jQueryObject, User.class );
+        System.out.println( "registerUser receiving : " + jsonObject.getUsername() + " [with pw] " + jsonObject.getPassword() );
+        long MAX_DURATION = MILLISECONDS.convert( 1, MINUTES );
+        Date now = new Date();
+        
+        String hashedAndCryptedPassword = jsonObject.getPassword();
+        
+//        if ( hashedAndCryptedPassword.length() != 62 ) {
+//            //flow - what if the hacked user password is exactly 62 chars ?
+//            return false;
+//        }
+        
+        //decompose password
+        for ( int i = 0; i < userIdentifiers.size(); i++ ) {
+            if ( userIdentifiers.get( i ).getClientReqIP().equals( clientReqIP )
+                    && "register".equals( userIdentifiers.get( i ).getType() ) ) {
+                hashedAndCryptedPassword = hashedAndCryptedPassword.substring( 1, hashedAndCryptedPassword.length() - 1 );
+                jsonObject.setPassword( hashedAndCryptedPassword );
+            }
+            if ( now.getTime() - userIdentifiers.get( i ).getCurDate().getTime() >= MAX_DURATION ) {
+                userIdentifiers.remove( i );
+            }
+        }
+
+        // Hash the password again
+        String hashedPassword = BCrypt.hashpw( jsonObject.getPassword(), BCrypt.gensalt() );
+        jsonObject.setPassword( hashedPassword );
+        System.out.println( "registerUser sending : " + jsonObject.getUsername() + " [with pw] " + hashedPassword );
+        int status = facade.registerUser( logger, jsonObject );
+
+        if ( status == 0 ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean createUserIdentifierObj( String clientReqIP, int curServerID, String type ) {
+        boolean found = false;
+        long MAX_DURATION = MILLISECONDS.convert( 1, MINUTES );
+        Date now = new Date();
+        
+        for ( int i = 0; i < userIdentifiers.size(); i++ ) {
+            if ( userIdentifiers.get( i ).getClientReqIP().equals( clientReqIP )
+                    && userIdentifiers.get( i ).getType().equals( type ) ) {
+                
+                userIdentifiers.remove( i );
+                userIdentifiers.add( new UserIdentifiers( clientReqIP, curServerID, new Date(), type ) );
+                found = true;
+            }
+            if ( now.getTime() - userIdentifiers.get( i ).getCurDate().getTime() >= MAX_DURATION ) {
+                userIdentifiers.remove( i );
+            }
+        }
+        if ( !found ) {
+            userIdentifiers.add( new UserIdentifiers( clientReqIP, curServerID, new Date(), type ) );
+        }
         return true;
     }
 
@@ -89,20 +144,36 @@ public class MusicLadderController {
         return false;
     }
 
-    public User loginUser( String jQueryObject ) {
+    public User loginUser( String clientReqIP, String jQueryObject ) {
         User jsonObject = gson.fromJson( jQueryObject, User.class );
-        System.out.println( "String ? : " + jsonObject.toString() );
-        System.out.println( "length ? : " + jsonObject.getPassword().length() );
-        if ( jsonObject.getPassword().length() != 62 ) {
-            //flow - what if the hacked user password is exactly 62 chars ?
-            return null;
-        }
-        // Hash the password again
-        String hashedPassword = BCrypt.hashpw( jsonObject.getPassword(), BCrypt.gensalt() );
+                System.out.println( "loginUser receiving : " + jsonObject.getUsername() + " [with pw] " + jsonObject.getPassword() );
+        long MAX_DURATION = MILLISECONDS.convert( 1, MINUTES );
+        Date now = new Date();
         
-        User currUser = facade.getUser( logger, jsonObject.getUsername(), hashedPassword );
-
-        System.out.println( "hashed ? : " + hashedPassword );
+        String hashedAndCryptedPassword = jsonObject.getPassword();
+        
+//        if ( hashedAndCryptedPassword.length() != 62 ) {
+//            //flow - what if the hacked user password is exactly 62 chars ?
+//            return null;
+//        }
+        
+        //decompose password
+        for ( int i = 0; i < userIdentifiers.size(); i++ ) {
+            if ( userIdentifiers.get( i ).getClientReqIP().equals( clientReqIP )
+                    && "login".equals( userIdentifiers.get( i ).getType() ) ) {
+                hashedAndCryptedPassword = hashedAndCryptedPassword.substring( 1, hashedAndCryptedPassword.length() - 1 );
+                jsonObject.setPassword( hashedAndCryptedPassword );
+                System.out.println( "Yes!" );
+            }
+            if ( now.getTime() - userIdentifiers.get( i ).getCurDate().getTime() >= MAX_DURATION ) {
+                userIdentifiers.remove( i );
+            }
+        }
+        
+        // Hash the password again
+        //String hashedPassword = BCrypt.hashpw( jsonObject.getPassword(), BCrypt.gensalt() );
+        System.out.println( "loginUser sending : " + jsonObject.getUsername() + " [with pw] " + hashedAndCryptedPassword );
+        User currUser = facade.getUser( logger, jsonObject.getUsername(), hashedAndCryptedPassword );
 
         return currUser;
     }

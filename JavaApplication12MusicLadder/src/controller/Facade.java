@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import mapper.DuelMapper;
 import mapper.SongMapper;
+import mapper.UserMapper;
 import utils.DatabaseConnector;
 
 public class Facade
@@ -18,6 +19,7 @@ public class Facade
     private DatabaseConnector databaseConnector;  
     private SongMapper songMapper;
     private DuelMapper duelMapper;
+    private UserMapper userMapper;
     
     //Database authentication
     private static String[] databaseHost = { "jdbc:oracle:thin:@127.0.0.1:1521:XE", "jdbc:oracle:thin:@datdb.cphbusiness.dk:1521:dat"};
@@ -30,6 +32,7 @@ public class Facade
         databaseConnector = new DatabaseConnector( databaseHost[0], databaseUsername[0], databasePassword[0] );
         songMapper = new SongMapper();
         duelMapper = new DuelMapper();
+        userMapper = new UserMapper();
     }
 
     public static Facade getInstance()
@@ -79,8 +82,12 @@ public class Facade
         return true;
     }
     
+    public int registerUser( Logger logger, User user ) {
+        return userMapper.registerUser( logger, connection, user );
+    }
+    
     public User getUser( Logger logger, String username, String hashedPassword ){
-        return new User(username, 1 );
+        return userMapper.getUserByUNandPW( logger, connection, username, hashedPassword );
     }
     
     public Song getSong(Logger logger, Integer songId) {

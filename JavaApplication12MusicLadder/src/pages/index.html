@@ -14,14 +14,10 @@
         <script type="text/javascript" src="index.js"></script>
         
     <style type="text/css">
-        #progressbar {
-            width: 400px;
-        }
     </style>
     </head>
     <body>
         <h1>Main Page</h1>
-        <span>Go to : <a href="/musicLadder">Music Ladder</a></span>
         <form id="login-form">
             <div>
                 <span>Username:</span>
@@ -31,29 +27,9 @@
                 <span>Password:</span>
                 <input type="password" name="password" placeholder="Insert your password">
             </div>
-            <div>
-                <label for="rounds">Rounds: </label>
-                <select id="rounds" name="rounds">
-                    <option value=5>5</option>
-                    <option value=6>6</option>
-                    <option value=7>7</option>
-                    <option value=8>8</option>
-                    <option value=9>9</option>
-                    <option value=10>10</option>
-                    <option value=11>11</option>
-                    <option value=32>32</option>
-                </select>
-            </div>
-            <div>
-                <label for="salt">Salt (Optional): </label>
-                <input size=30 type="text" name="salt" id="salt">
-            </div>
-            <div>
-                <label for="hash">Hash: </label>
-                <input size=60 type="text" name="hash" id="hash">
-            </div>
             <input id="login-form-button" type="submit" value="Log in" disabled>
+            <span class="login-status"></span>
         </form>
-        <div id="progressbar"></div>
+        <input type="button" onclick="location.href='/register';" value="Register" />
     </body>
 </html>

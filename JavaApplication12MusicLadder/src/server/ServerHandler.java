@@ -52,6 +52,11 @@ public class ServerHandler implements HttpHandler {
             }
             
             try {
+                
+                if( "register".equals( f) ) {
+                    f = "register.html";
+                }
+                
                 file = new File( filesDirectory + f );
                 bytesToSend = new byte[ ( int ) file.length() ];
 

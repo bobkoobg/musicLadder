@@ -1,25 +1,26 @@
-console.log("Welcome to index.js");
+console.log("Namaste from register JS");
 
-var bCrypt;
-var hashedPassword;
-var $password; 
-var $username; 
+var $username;
+var $password
+var $passwordRepeated; 
+var $registrationStatus; 
+var bCrypt; 
+var hashedPassword; 
 var clientRN; 
-var serverRN; 
-var $loginStatus;
+var serverRN;
 
 function evaluateLogin( data ) {
-    if( data.userId && data.username && data.userLevel ) {
-        window.location = '/musicLadder';
+    if ( data.response === "Successfull registration" ) {
+         window.location = '/';
     } else {
-        $loginStatus.text("Incorrect login info")
+        $registrationStatus.text("Internal error");
     }
 }
 
 function execLogin( data ) {
     var password = (serverRN+"").concat( hashedPassword.concat( (clientRN+"") ) );
     $.ajax({
-        "url": "/api/login",
+        "url": "/api/register",
         "type": "POST",
         "headers": {"Content-Type": "application/json"},
         "data": JSON.stringify( {'username': $username.val(), 'password': password} ),
@@ -45,7 +46,7 @@ function getSid() {
     hashedPassword = $password.val();
     
     $.ajax({
-        "url": "/api/loginServerId",
+        "url": "/api/registerServerId",
         "type": "GET",
         "headers": {},
         "data": {},
@@ -81,19 +82,28 @@ function crypt(){
 function basicCheck() {
     var username = $username.val();
     var password = $password.val();
+    var passwordRepeated = $passwordRepeated.val();
+    
     if( username.length <= 5 ) {
         alert("username.length <= 5 : " + username.length);
         return false;
     } 
-    if (password.length <= 8 ) {
+    if ( password !== passwordRepeated ) {
+        alert("password fields are not matching");
+        return false;
+    }
+    if ( password.length <= 8 || passwordRepeated.length <= 8 ) {
         alert("password.length <= 8 : " + password.length);
         return false;
     }
     var matches = password.match(/\d+/g);
-    if (matches === null) {
+    var matchesRepeated = passwordRepeated.match(/\d+/g);
+    
+    if ( matches === null || matchesRepeated === null ) {
         alert('password does not contain number(s)');
         return false;
     }
+    
     getSid();
 }
 
@@ -103,16 +113,17 @@ function trickForm() {
 }
 
 function load() {
-    $username = $("#login-form").find("input[name='username']");
-    $password = $("#login-form").find("input[name='password']");
-    $loginStatus = $(".login-status");
+    $username = $("#register-form").find("input[name='username']");
+    $password = $("#register-form").find("input[name='password']");
+    $passwordRepeated = $("#register-form").find("input[name='password-repeated']");
+    $registrationStatus = $(".registration-status");
     
     bCrypt = new bCrypt();
     if( bCrypt.ready() ){
-            $("#login-form-button").removeAttr("disabled");
+            $("#register-form-button").removeAttr("disabled");
     }
     
-    $('#login-form').submit( trickForm );
+    $('#register-form').submit( trickForm );
 }
 
-$(window).ready(load);
+$( window ).ready( load );
