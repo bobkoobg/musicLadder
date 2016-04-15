@@ -1,6 +1,5 @@
 console.log("Welcome to index.js");
 
-var bCrypt;
 var hashedPassword;
 var $password; 
 var $username; 
@@ -8,27 +7,32 @@ var clientRN;
 var serverRN; 
 var $loginStatus;
 
-function evaluateLogin( data ) {
+function evaluateLoginServerResponse( err, data ) {
+    console.log("HI DUDE");
+    console.log(" data is : ", err, data);
     if( data.userId && data.username && data.userLevel ) {
-        window.location = '/musicLadder';
+        window.location = "/musicLadder";
     } else {
-        $loginStatus.text("Incorrect login info")
+        console.log("Hello");
+        $loginStatus.html("Incorrect login information.");
     }
 }
 
-function execLogin( data ) {
+function sendLoginInformation( ignore ) {
     var password = (serverRN+"").concat( hashedPassword.concat( (clientRN+"") ) );
+    console.log("LAST CALL");
     $.ajax({
         "url": "/api/login",
         "type": "POST",
         "headers": {"Content-Type": "application/json"},
         "data": JSON.stringify( {'username': $username.val(), 'password': password} ),
-        "success": evaluateLogin
+        "success": evaluateLoginServerResponse,
+        "fail": evaluateLoginServerResponse
     });
 }
 
-function sendCid( data ) {
-    serverRN = data;
+function sendClientIdentifier( dataServerID ) {
+    serverRN = dataServerID;
     clientRN = Math.floor((Math.random() * 10) + 1);
     
     $.ajax({
@@ -36,68 +40,45 @@ function sendCid( data ) {
         "type": "POST",
         "headers": {"Content-Type": "application/json"},
         "data": JSON.stringify( clientRN ),
-        "success": execLogin
+        "success": sendLoginInformation
     });
 }
 
-function getSid() {
-    var username = $username.val();
-    hashedPassword = $password.val();
+function requestServerIdentifier() {
+    hashedPassword = sha256 ( $password.val() );
     
     $.ajax({
         "url": "/api/loginServerId",
         "type": "GET",
         "headers": {},
         "data": {},
-        "success": sendCid
+        "success": sendClientIdentifier
     });
-}
-
-function result( hash ){
-    hashedPassword = hash;
-    getSid();
-}
-
-function crypt(){
-    var salt;
-    try {
-        salt = bCrypt.gensalt( 5 );
-    } catch( err ) {
-        alert( err );
-        return;
-    }
-    try{
-        bCrypt.hashpw( 
-            $password.val(), 
-            salt, 
-            result
-        );
-    } catch( err ){
-            alert( err );
-            return;
-    }
 }
 
 function basicCheck() {
     var username = $username.val();
     var password = $password.val();
+    
     if( username.length <= 5 ) {
-        alert("username.length <= 5 : " + username.length);
+        $loginStatus.html("The length of the username should be longer than 5 symbols.");
         return false;
     } 
-    if (password.length <= 8 ) {
-        alert("password.length <= 8 : " + password.length);
+    if (password.length <= 10 ) {
+        $loginStatus.html("The length of the password should be longer than 10 symbols.");
         return false;
     }
     var matches = password.match(/\d+/g);
+    
     if (matches === null) {
-        alert('password does not contain number(s)');
+        $loginStatus.html("The password should contain at least 1 numeric value.");
         return false;
     }
-    getSid();
+    
+    requestServerIdentifier();
 }
 
-function trickForm() {
+function breakSubmitRedirect() {
     basicCheck();
     return false;
 }
@@ -107,12 +88,9 @@ function load() {
     $password = $("#login-form").find("input[name='password']");
     $loginStatus = $(".login-status");
     
-    bCrypt = new bCrypt();
-    if( bCrypt.ready() ){
-            $("#login-form-button").removeAttr("disabled");
-    }
+    $("#login-form-button").removeAttr("disabled");
     
-    $('#login-form').submit( trickForm );
+    $('#login-form').submit( breakSubmitRedirect );
 }
 
-$(window).ready(load);
+$( window ).ready( load );

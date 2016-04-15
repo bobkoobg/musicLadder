@@ -15,71 +15,99 @@ public class ServerHandler implements HttpHandler {
 
     @Override
     public void handle( HttpExchange he ) throws IOException {
-        int responseCode = 200;
+        //ALL
+        int status = 200;
+        String method = he.getRequestMethod().toUpperCase();
+        String address = he.getRemoteAddress().toString();
 
-        String errorMsg = null;
-        byte[] bytesToSend = "<h1>Internal Error </h1><p>We are sorry. The server encountered an unexpected problem</p>".getBytes();
         String mime = null;
 
-        String requestedFile = he.getRequestURI().toString();
-        String f = requestedFile.substring( requestedFile.lastIndexOf( "/" ) + 1 );
+        String path = he.getRequestURI().getPath();
+        String[] parts = path.split( "/" );
 
-        File file;
-        BufferedInputStream bis;
+        File file = null;
+        byte[] bytesToSend = null;
+        String errorMsg = null;
+        System.out.println( "Hey #M#" + method + " #PL# " + parts.length + " #P# " + path );
 
-        if ( f == null || f.isEmpty() ) {
-            try {
-                mime = ".html";
-                file = new File( filesDirectory + "index.html" );
+        switch ( method ) {
+            case "GET":
+                /*
+                 * Startup page
+                 * URL : http://localhost:8084/ OR http://localhost:8084/index
+                 */
+                if ( parts.length == 0
+                        || (parts.length == 2 && parts[ 1 ] != null && "index".equals( parts[ 1 ] )) ) {
 
-                bytesToSend = new byte[ ( int ) file.length() ];
+                    mime = getMime( ".html" );
+                    file = new File( filesDirectory + "index.html" );
 
-                bis = new BufferedInputStream( new FileInputStream( file ) );
-                bis.read( bytesToSend, 0, bytesToSend.length );
-            } catch ( Exception e ) {
-                responseCode = 500;
-                errorMsg = "<h1>500 Server Error</h1>"
-                        + "<span>The main page does not exist. Please slap me.</span>";
-                //Log the exception!
-            }
-        } else {
-            int lastIndex = f.lastIndexOf( "." );
+                } /*
+                 * Register page
+                 * URL : http://localhost:8084/register
+                 */ else if ( parts.length == 2 && parts[ 1 ] != null && "register".equals( parts[ 1 ] ) ) {
 
-            if ( lastIndex > -1 ) {
-                mime = f.substring( f.lastIndexOf( "." ) );
-            } else {
-                mime = getMime( ".html" );
-            }
-            
-            try {
-                
-                if( "register".equals( f) ) {
-                    f = "register.html";
+                    mime = getMime( ".html" );
+                    file = new File( filesDirectory + "register.html" );
+
+                }/*
+                 * Any other js, html, css, ico file
+                 */ else {
+
+                    String lastElemStr = parts[ (parts.length - 1) ];
+                    int lastElemIndex = lastElemStr.lastIndexOf( "." );
+
+                    if ( lastElemIndex > -1 ) {
+                        mime = lastElemStr.substring( lastElemStr.lastIndexOf( "." ) );
+                    } else {
+                        mime = getMime( ".html" );
+                    }
+                    file = new File( filesDirectory + lastElemStr );
+                    /*
+                     * If error on file show index page
+                     */
+                    if ( !file.exists() || file.isDirectory() ) {
+
+                        if ( "text/html".equals( mime ) ) {
+                            status = 404;
+                            file = new File( filesDirectory + "index.html" );
+                        } else {
+                            status = 404;
+                            file = new File( filesDirectory + "notfound.html" );
+                        }
+                    }
                 }
-                
-                file = new File( filesDirectory + f );
-                bytesToSend = new byte[ ( int ) file.length() ];
+                break;
+            case "POST":
+                status = 500;
+                break;
+            case "PUT":
+                status = 500;
+                break;
+            case "DELETE":
+                status = 500;
+                break;
+            default:
+                status = 500;
+                break;
+        }
+        
+        if ( status == 200 || status == 404 ) {
+            bytesToSend = new byte[ ( int ) file.length() ];
+            he.sendResponseHeaders( status, bytesToSend.length );
 
-                bis = new BufferedInputStream( new FileInputStream( file ) );
-                bis.read( bytesToSend, 0, bytesToSend.length );
+        } else if ( status == 500 ) {
 
-                responseCode = 200;
-            } catch ( Exception e ) {
-                responseCode = 404;
-                errorMsg = "<h1>404 Not Found</h1>"
-                        + "<span>No context erfound for request" + he.getRequestURI().toString() + "</span>";
-                //Log the exception!
-            }
+            bytesToSend = "<h1>500 Not supported</h1>".getBytes();
+
+            he.getResponseHeaders().add( "Content-Type", "application/json" );
+            he.sendResponseHeaders( status, 0 );
         }
 
-        if ( responseCode == 200 ) {
-            Headers h = he.getResponseHeaders();
-            h.set( "Content-Type", mime );
-        } else {
-            bytesToSend = errorMsg.getBytes();
-        }
-
-        he.sendResponseHeaders( responseCode, bytesToSend.length );
+        //***BLACK MAGIC - START ***
+        BufferedInputStream bis = new BufferedInputStream( new FileInputStream( file ) );
+        bis.read( bytesToSend, 0, bytesToSend.length );
+        //***BLACK MAGIC - END ***
 
         try ( OutputStream os = he.getResponseBody() ) {
             os.write( bytesToSend, 0, bytesToSend.length );
@@ -89,23 +117,26 @@ public class ServerHandler implements HttpHandler {
     private String getMime( String extension ) {
         String mime = "";
         switch ( extension ) {
-            case ".pdf":
-                mime = "application/pdf";
-                break;
-            case ".png":
-                mime = "image/png";
-                break;
+//            case ".pdf":
+//                mime = "application/pdf";
+//                break;
+//            case ".png":
+//                mime = "image/png";
+//                break;
+//            case ".jar":
+//                mime = "application/java-archive";
+//                break;
             case ".js":
                 mime = "text/javascript";
                 break;
             case ".html":
                 mime = "text/html";
                 break;
-            case ".jar":
-                mime = "application/java-archive";
-                break;
             case ".css":
                 mime = "text/css";
+                break;
+            case ".ico":
+                mime = "image/x-icon";
                 break;
             default:
                 mime = "text/html";

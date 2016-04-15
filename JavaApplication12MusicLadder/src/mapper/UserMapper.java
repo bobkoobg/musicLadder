@@ -5,13 +5,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.logging.Logger;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class UserMapper {
 
     public Integer registerUser( Logger logger, Connection connection, User user ) {
+        
+        user.setPassword( BCrypt.hashpw( user.getPassword(), BCrypt.gensalt() ) );
+        
         PreparedStatement preparedStatement = null;
         Integer userID = null;
 
@@ -141,8 +143,12 @@ public class UserMapper {
                 return null;
             }
         }
-        boolean isCorrectPassword = BCrypt.checkpw( password, hashedPassword );
-        System.out.println( "isCorrectPassword ? : " + isCorrectPassword );
+
+        boolean isCorrectPassword = false;
+        if ( hashedPassword != null ) {
+            isCorrectPassword = BCrypt.checkpw( password, hashedPassword );
+        }
+
         if ( isCorrectPassword ) {
             return user;
         }

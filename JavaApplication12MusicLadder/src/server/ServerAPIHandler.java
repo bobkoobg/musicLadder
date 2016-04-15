@@ -105,7 +105,6 @@ public class ServerAPIHandler implements HttpHandler {
                         response = "{\"response\":\"Internal server error\"}";
                         status = 500;
                     }
-
                 } else {
                     response = "404 Not found";
                     status = 404;

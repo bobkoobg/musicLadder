@@ -1,21 +1,13 @@
 package server;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
-import com.google.gson.Gson;
-import com.hubspot.jinjava.Jinjava;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MusicLadderHandler implements HttpHandler {
 

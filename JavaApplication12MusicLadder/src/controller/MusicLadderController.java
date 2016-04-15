@@ -7,7 +7,6 @@ import entity.Song;
 import entity.User;
 import entity.UserIdentifiers;
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -15,7 +14,6 @@ import java.util.List;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import java.util.logging.Logger;
-import org.mindrot.jbcrypt.BCrypt;
 import utils.DuelGenerator;
 import utils.EloRatingSystemCalculator;
 import utils.PerformanceLogger;
@@ -66,33 +64,28 @@ public class MusicLadderController {
 
     public boolean registerUser( String clientReqIP, String jQueryObject ) {
         User jsonObject = gson.fromJson( jQueryObject, User.class );
-        System.out.println( "registerUser receiving : " + jsonObject.getUsername() + " [with pw] " + jsonObject.getPassword() );
+        
         long MAX_DURATION = MILLISECONDS.convert( 1, MINUTES );
         Date now = new Date();
         
-        String hashedAndCryptedPassword = jsonObject.getPassword();
+        String clientSHA256PlusIdsPW = jsonObject.getPassword();
         
-//        if ( hashedAndCryptedPassword.length() != 62 ) {
-//            //flow - what if the hacked user password is exactly 62 chars ?
-//            return false;
-//        }
+        if ( clientSHA256PlusIdsPW.length() != (64+2) ) {
+            return false;
+        }
         
         //decompose password
         for ( int i = 0; i < userIdentifiers.size(); i++ ) {
             if ( userIdentifiers.get( i ).getClientReqIP().equals( clientReqIP )
                     && "register".equals( userIdentifiers.get( i ).getType() ) ) {
-                hashedAndCryptedPassword = hashedAndCryptedPassword.substring( 1, hashedAndCryptedPassword.length() - 1 );
-                jsonObject.setPassword( hashedAndCryptedPassword );
+                clientSHA256PlusIdsPW = clientSHA256PlusIdsPW.substring( 1, clientSHA256PlusIdsPW.length() - 1 );
+                jsonObject.setPassword( clientSHA256PlusIdsPW );
             }
             if ( now.getTime() - userIdentifiers.get( i ).getCurDate().getTime() >= MAX_DURATION ) {
                 userIdentifiers.remove( i );
             }
         }
-
-        // Hash the password again
-        String hashedPassword = BCrypt.hashpw( jsonObject.getPassword(), BCrypt.gensalt() );
-        jsonObject.setPassword( hashedPassword );
-        System.out.println( "registerUser sending : " + jsonObject.getUsername() + " [with pw] " + hashedPassword );
+        
         int status = facade.registerUser( logger, jsonObject );
 
         if ( status == 0 ) {
@@ -146,34 +139,29 @@ public class MusicLadderController {
 
     public User loginUser( String clientReqIP, String jQueryObject ) {
         User jsonObject = gson.fromJson( jQueryObject, User.class );
-                System.out.println( "loginUser receiving : " + jsonObject.getUsername() + " [with pw] " + jsonObject.getPassword() );
+        
         long MAX_DURATION = MILLISECONDS.convert( 1, MINUTES );
         Date now = new Date();
         
-        String hashedAndCryptedPassword = jsonObject.getPassword();
+        String clientSHA256PlusIdsPW = jsonObject.getPassword();
         
-//        if ( hashedAndCryptedPassword.length() != 62 ) {
-//            //flow - what if the hacked user password is exactly 62 chars ?
-//            return null;
-//        }
+        if ( clientSHA256PlusIdsPW.length() != (64+2) ) {
+            return null;
+        }
         
         //decompose password
         for ( int i = 0; i < userIdentifiers.size(); i++ ) {
             if ( userIdentifiers.get( i ).getClientReqIP().equals( clientReqIP )
                     && "login".equals( userIdentifiers.get( i ).getType() ) ) {
-                hashedAndCryptedPassword = hashedAndCryptedPassword.substring( 1, hashedAndCryptedPassword.length() - 1 );
-                jsonObject.setPassword( hashedAndCryptedPassword );
-                System.out.println( "Yes!" );
+                clientSHA256PlusIdsPW = clientSHA256PlusIdsPW.substring( 1, clientSHA256PlusIdsPW.length() - 1 );
+                jsonObject.setPassword( clientSHA256PlusIdsPW );
             }
             if ( now.getTime() - userIdentifiers.get( i ).getCurDate().getTime() >= MAX_DURATION ) {
                 userIdentifiers.remove( i );
             }
         }
         
-        // Hash the password again
-        //String hashedPassword = BCrypt.hashpw( jsonObject.getPassword(), BCrypt.gensalt() );
-        System.out.println( "loginUser sending : " + jsonObject.getUsername() + " [with pw] " + hashedAndCryptedPassword );
-        User currUser = facade.getUser( logger, jsonObject.getUsername(), hashedAndCryptedPassword );
+        User currUser = facade.getUser( logger, jsonObject.getUsername(),  jsonObject.getPassword() );
 
         return currUser;
     }

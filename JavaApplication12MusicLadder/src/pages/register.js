@@ -3,8 +3,7 @@ console.log("Namaste from register JS");
 var $username;
 var $password
 var $passwordRepeated; 
-var $registrationStatus; 
-var bCrypt; 
+var $registrationStatus;
 var hashedPassword; 
 var clientRN; 
 var serverRN;
@@ -42,8 +41,7 @@ function sendCid( data ) {
 }
 
 function getSid() {
-    var username = $username.val();
-    hashedPassword = $password.val();
+    hashedPassword = sha256( $password.val() );
     
     $.ajax({
         "url": "/api/registerServerId",
@@ -52,31 +50,6 @@ function getSid() {
         "data": {},
         "success": sendCid
     });
-}
-
-function result( hash ){
-    hashedPassword = hash;
-    getSid();
-}
-
-function crypt(){
-    var salt;
-    try {
-        salt = bCrypt.gensalt( 5 );
-    } catch( err ) {
-        alert( err );
-        return;
-    }
-    try{
-        bCrypt.hashpw( 
-            $password.val(), 
-            salt, 
-            result
-        );
-    } catch( err ){
-            alert( err );
-            return;
-    }
 }
 
 function basicCheck() {
@@ -117,12 +90,9 @@ function load() {
     $password = $("#register-form").find("input[name='password']");
     $passwordRepeated = $("#register-form").find("input[name='password-repeated']");
     $registrationStatus = $(".registration-status");
-    
-    bCrypt = new bCrypt();
-    if( bCrypt.ready() ){
-            $("#register-form-button").removeAttr("disabled");
-    }
-    
+
+    $("#register-form-button").removeAttr("disabled");
+
     $('#register-form').submit( trickForm );
 }
 
