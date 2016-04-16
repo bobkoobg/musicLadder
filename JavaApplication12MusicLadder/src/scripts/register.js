@@ -5,6 +5,7 @@ var $registrationStatus;
 var hashedPassword; 
 var clientRN; 
 var serverRN;
+var cookieName = "musicladder-user-sessionid";
 
 function evaluateRegistrationServerResponse( object, status ) {
     if ( status === "success" && object != null ) {
@@ -84,17 +85,34 @@ function breakSubmitRedirect() {
     return false;
 }
 
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+    }
+    return "";
+}
+
 function load() {
-    $username = $("#register-form").find("input[name='username']");
-    $password = $("#register-form").find("input[name='password']");
-    $passwordRepeated = $("#register-form").find("input[name='password-repeated']");
-    $registrationStatus = $(".registration-status");
-
-    $("#register-form-button").removeAttr("disabled");
-
-    $('#register-form').submit( breakSubmitRedirect );
-    
     console.log("register.js loaded...");
+    
+    var cookie = getCookie( cookieName );
+    if ( cookie ) {
+        window.location = "/musicLadder";
+    } else {
+    
+        $username = $("#register-form").find("input[name='username']");
+        $password = $("#register-form").find("input[name='password']");
+        $passwordRepeated = $("#register-form").find("input[name='password-repeated']");
+        $registrationStatus = $(".registration-status");
+
+        $("#register-form-button").removeAttr("disabled");
+
+        $('#register-form').submit( breakSubmitRedirect );
+    }
 }
 
 $( window ).ready( load );

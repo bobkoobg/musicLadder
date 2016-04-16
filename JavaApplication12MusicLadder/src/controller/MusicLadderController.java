@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 import utils.DuelGenerator;
 import utils.EloRatingSystemCalculator;
 import utils.PerformanceLogger;
+import utils.SessionIDsGenerator;
 import utils.SongRatingComparator;
 import utils.SongReader;
 
@@ -33,6 +34,7 @@ public class MusicLadderController {
     private Gson gson = null;
     private SongRatingComparator src = null;
     private List<UserIdentifiers> userIdentifiers;
+    private SessionIDsGenerator sessionIdsGen = null;
 
     private MusicLadderController() {
         // Exists only to defeat instantiation.
@@ -50,6 +52,8 @@ public class MusicLadderController {
         src = new SongRatingComparator();
 
         userIdentifiers = new ArrayList();
+        
+        sessionIdsGen = new SessionIDsGenerator();
 
         gson = new Gson();
 
@@ -62,18 +66,22 @@ public class MusicLadderController {
         return instance;
     }
 
+    public Logger getLogger() {
+        return logger;
+    }
+
     public boolean registerUser( String clientReqIP, String jQueryObject ) {
         User jsonObject = gson.fromJson( jQueryObject, User.class );
-        
+
         long MAX_DURATION = MILLISECONDS.convert( 1, MINUTES );
         Date now = new Date();
-        
+
         String clientSHA256PlusIdsPW = jsonObject.getPassword();
-        
-        if ( clientSHA256PlusIdsPW.length() != (64+2) ) {
+
+        if ( clientSHA256PlusIdsPW.length() != (64 + 2) ) {
             return false;
         }
-        
+
         //decompose password
         for ( int i = 0; i < userIdentifiers.size(); i++ ) {
             if ( userIdentifiers.get( i ).getClientReqIP().equals( clientReqIP )
@@ -85,7 +93,7 @@ public class MusicLadderController {
                 userIdentifiers.remove( i );
             }
         }
-        
+
         int status = facade.registerUser( logger, jsonObject );
 
         if ( status == 0 ) {
@@ -99,11 +107,11 @@ public class MusicLadderController {
         boolean found = false;
         long MAX_DURATION = MILLISECONDS.convert( 1, MINUTES );
         Date now = new Date();
-        
+
         for ( int i = 0; i < userIdentifiers.size(); i++ ) {
             if ( userIdentifiers.get( i ).getClientReqIP().equals( clientReqIP )
                     && userIdentifiers.get( i ).getType().equals( type ) ) {
-                
+
                 userIdentifiers.remove( i );
                 userIdentifiers.add( new UserIdentifiers( clientReqIP, curServerID, new Date(), type ) );
                 found = true;
@@ -139,16 +147,16 @@ public class MusicLadderController {
 
     public User loginUser( String clientReqIP, String jQueryObject ) {
         User jsonObject = gson.fromJson( jQueryObject, User.class );
-        
+
         long MAX_DURATION = MILLISECONDS.convert( 1, MINUTES );
         Date now = new Date();
-        
+
         String clientSHA256PlusIdsPW = jsonObject.getPassword();
-        
-        if ( clientSHA256PlusIdsPW.length() != (64+2) ) {
+
+        if ( clientSHA256PlusIdsPW.length() != (64 + 2) ) {
             return null;
         }
-        
+
         //decompose password
         for ( int i = 0; i < userIdentifiers.size(); i++ ) {
             if ( userIdentifiers.get( i ).getClientReqIP().equals( clientReqIP )
@@ -160,10 +168,19 @@ public class MusicLadderController {
                 userIdentifiers.remove( i );
             }
         }
+
+        User currUser = facade.getUser( logger, jsonObject.getUsername(), jsonObject.getPassword() );
         
-        User currUser = facade.getUser( logger, jsonObject.getUsername(),  jsonObject.getPassword() );
+        if ( currUser != null ) {
+            currUser.setSessionId(  sessionIdsGen.registerSession( clientReqIP, currUser.getUsername() ) );
+        }
 
         return currUser;
+    }
+    
+    public boolean authenticateSession( String address, String sessionId ) {
+        sessionId = sessionId.replaceAll("^\"|\"$", "");
+       return sessionIdsGen.checkSession( sessionId, address );
     }
 
     /*

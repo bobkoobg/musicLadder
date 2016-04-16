@@ -17,9 +17,6 @@ public class DatabaseConnector
     private String databaseHost;
     private String databaseUsername;
     private String databasePassword;
-//    private static String databaseHost = "jdbc:oracle:thin:@datdb.cphbusiness.dk:1521:dat";
-//    private static String databaseUsername = "cphbs96";
-//    private static String databasePassword = "cphbs96";
 
     public DatabaseConnector(String databaseHost, String databaseUsername, String databasePassword)
     {
@@ -30,41 +27,41 @@ public class DatabaseConnector
 
     
     public Boolean testJDBCdriver() {
-        System.out.println("-------- Oracle JDBC Driver Testing --------");
+        //System.out.println("-------- Oracle JDBC Driver Testing --------");
 
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
 
         } catch (ClassNotFoundException e) {
 
-            System.out.println("Where is your Oracle JDBC Driver?");
+            //System.out.println("Where is your Oracle JDBC Driver?");
             e.printStackTrace();
             return false;
 
         }
 
-        System.out.println("Oracle JDBC Driver Registered!");
+        //System.out.println("Oracle JDBC Driver Registered!");
         return true;
     }
     
     public Connection getConnection() {
-        System.out.println("-------- Oracle JDBC Connection Testing --------");
+        //System.out.println("-------- Oracle JDBC Connection Testing --------");
         Connection connection = null;
 
         try {
             connection = DriverManager.getConnection( databaseHost , databaseUsername , databasePassword );
 
         } catch (SQLException e) {
-            System.out.println("Connection Failed! Check output console");
+            //System.out.println("Connection Failed! Check output console");
             e.printStackTrace();
             return null;
         }
 
-        if (connection != null) {
-                System.out.println("You made it, take control of your database now!");
-        } else {
-                System.out.println("Failed to make connection!");
-        }
+//        if (connection != null) {
+//                System.out.println("You made it, take control of your database now!");
+//        } else {
+//                System.out.println("Failed to make connection!");
+//        }
         return connection;
     }
 }

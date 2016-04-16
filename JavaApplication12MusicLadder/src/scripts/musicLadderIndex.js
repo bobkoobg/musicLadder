@@ -5,6 +5,8 @@ console.log('hi musicLadderIndex.js');
 var $slider;
 var $saveDuelButton;
 var initialUpdatePlayedDuels = true;
+var $logout;
+var cookieName = "musicladder-user-sessionid";
 
 function evaluateRating(currentRating, formerRating) {
     if (currentRating > formerRating) {
@@ -393,16 +395,46 @@ function loadSongs( ladderId ) {
 }
 //Songs functionality ***END***
 
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+    }
+    return "";
+}
+
+function deleteCookie( name ) {
+  document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+}
+
+function logOut() {
+    deleteCookie( cookieName );
+    window.location = "/";
+}
+
 function load() {
-    //Load pre-generated data
-    loadSongs( 1 );
-    loadPlayedDuels( 15 );
-    loadDuelsToPlay( 5 );
+    console.log("musicLadderIndex.js loaded...");
+    
+    var cookie = getCookie( cookieName );
+    if ( !cookie ) {
+        window.location = "/";
+    } else {
+        loadSongs( 1 );
+        loadPlayedDuels( 15 );
+        loadDuelsToPlay( 5 );
 
-    $saveDuelButton = $("#saveDuel");
-    $slider = $(".sliderr");
+        $saveDuelButton = $("#saveDuel");
+        $slider = $(".sliderr");
+        $logout = $(".logout");
 
-    $saveDuelButton.on("click", saveDuel);
+        $saveDuelButton.on("click", saveDuel);
+        $logout.on("click", logOut);
+    }
+    
+    
 }
 
 $(window).ready(load);

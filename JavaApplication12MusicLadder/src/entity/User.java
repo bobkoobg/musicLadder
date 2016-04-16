@@ -6,6 +6,7 @@ public class User {
     private String username;
     private String password;
     private int userLevel;
+    private String sessionId;
 
     public User( String username, String password ) {
         this.username = username;
@@ -52,10 +53,18 @@ public class User {
         return userLevel;
     }
 
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId( String sessionId ) {
+        this.sessionId = sessionId;
+    }
+
     @Override
     public String toString() {
         return "User{" + "userId=" + userId + ", username=" + username + ", password="
-                + password + ", userLevel=" + userLevel + '}';
+                + password + ", userLevel=" + userLevel + ", sessionId=" + sessionId + '}';
     }
 
 }

@@ -31,7 +31,8 @@ public class ServerAPIHandler implements HttpHandler {
         String method = he.getRequestMethod().toUpperCase();
         String path = he.getRequestURI().getPath();
         String[] parts = path.split( "/" );
-        String address = he.getRemoteAddress().toString();
+        String ipport = he.getRemoteAddress().toString();
+        String address = ipport.substring(0, ipport.indexOf(":"));
 
         //POST, PUT, (DELETE?)
         InputStreamReader isr;
@@ -87,7 +88,7 @@ public class ServerAPIHandler implements HttpHandler {
                     User user = controller.loginUser( address, jsonQuery );
                     if ( user != null ) {
                         response = new Gson().toJson( user );
-                        status = 201;
+                        status = 200;
                     } else {
                         response = "{\"error\":\"Incorrect login info, Unauthorized\"}";
                         status = 401;
@@ -102,8 +103,17 @@ public class ServerAPIHandler implements HttpHandler {
                         response = "{\"response\":\"Successfull registration\"}";
                         status = 201;
                     } else {
-                        response = "{\"response\":\"Internal server error\"}";
+                        response = "{\"error\":\"Internal server error\"}";
                         status = 500;
+                    }
+                } else if ( parts.length > 2 && parts[ 2 ] != null && "session".equals( parts[ 2 ] ) ) {
+                    boolean dbStatus = controller.authenticateSession( address, jsonQuery );
+                    if ( dbStatus ) {
+                        response = "{\"response\":\"Successfull session id authentication\"}";
+                        status = 200;
+                    } else {
+                        response = "{\"error\":\"Expired, incorrect or non-existing session id, please relog.\"}";
+                        status = 401;
                     }
                 } else {
                     response = "404 Not found";
