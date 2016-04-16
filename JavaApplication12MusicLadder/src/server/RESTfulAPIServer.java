@@ -20,7 +20,6 @@ public class RESTfulAPIServer {
 
         //REST Routes
         server.createContext( "/musicLadderAPI", new MusicLadderAPIHandler( controller ) );
-        server.createContext( "/musicLadder", new MusicLadderHandler() );
 
         //HTTP Server Routes 
         server.createContext( "/api", new ServerAPIHandler( controller ) );

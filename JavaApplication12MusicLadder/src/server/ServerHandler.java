@@ -8,10 +8,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ServerHandler implements HttpHandler {
 
-    private static String filesDirectory = "src/pages/";
+    private static String pagesDirectory = "src/pages/";
+    private static String scriptsDirectory = "src/scripts/";
 
     @Override
     public void handle( HttpExchange he ) throws IOException {
@@ -27,8 +31,13 @@ public class ServerHandler implements HttpHandler {
 
         File file = null;
         byte[] bytesToSend = null;
-        String errorMsg = null;
-        System.out.println( "Hey #M#" + method + " #PL# " + parts.length + " #P# " + path );
+
+        //Debug START
+        Date date = new Date();
+        DateFormat formatter = new SimpleDateFormat( "HH:mm:ss" );
+        String dateFormatted = formatter.format( date );
+        System.out.println( "DEBUG: # " + dateFormatted + " # #M#" + method + " #PL# " + parts.length + " #P# " + path );
+        //Debug END
 
         switch ( method ) {
             case "GET":
@@ -40,7 +49,7 @@ public class ServerHandler implements HttpHandler {
                         || (parts.length == 2 && parts[ 1 ] != null && "index".equals( parts[ 1 ] )) ) {
 
                     mime = getMime( ".html" );
-                    file = new File( filesDirectory + "index.html" );
+                    file = new File( pagesDirectory + "index.html" );
 
                 } /*
                  * Register page
@@ -48,21 +57,33 @@ public class ServerHandler implements HttpHandler {
                  */ else if ( parts.length == 2 && parts[ 1 ] != null && "register".equals( parts[ 1 ] ) ) {
 
                     mime = getMime( ".html" );
-                    file = new File( filesDirectory + "register.html" );
+                    file = new File( pagesDirectory + "register.html" );
+
+                } /*
+                 * Music Ladder page
+                 * URL : http://localhost:8084/musicLadder
+                 */ else if ( parts.length == 2 && parts[ 1 ] != null && "musicLadder".equals( parts[ 1 ] ) ) {
+
+                    mime = getMime( ".html" );
+                    file = new File( pagesDirectory + "musicLadder/musicLadderIndex.html" );
 
                 }/*
                  * Any other js, html, css, ico file
                  */ else {
-
                     String lastElemStr = parts[ (parts.length - 1) ];
                     int lastElemIndex = lastElemStr.lastIndexOf( "." );
 
                     if ( lastElemIndex > -1 ) {
-                        mime = lastElemStr.substring( lastElemStr.lastIndexOf( "." ) );
+                        mime = getMime( lastElemStr.substring( lastElemStr.lastIndexOf( "." ) ) );
                     } else {
                         mime = getMime( ".html" );
                     }
-                    file = new File( filesDirectory + lastElemStr );
+
+                    if ( "text/javascript".equals( mime ) ) {
+                        file = new File( scriptsDirectory + lastElemStr );
+                    } else {
+                        file = new File( pagesDirectory + lastElemStr );
+                    }
                     /*
                      * If error on file show index page
                      */
@@ -70,10 +91,10 @@ public class ServerHandler implements HttpHandler {
 
                         if ( "text/html".equals( mime ) ) {
                             status = 404;
-                            file = new File( filesDirectory + "index.html" );
+                            file = new File( pagesDirectory + "index.html" );
                         } else {
                             status = 404;
-                            file = new File( filesDirectory + "notfound.html" );
+                            file = new File( pagesDirectory + "notfound.html" );
                         }
                     }
                 }
@@ -91,7 +112,7 @@ public class ServerHandler implements HttpHandler {
                 status = 500;
                 break;
         }
-        
+
         if ( status == 200 || status == 404 ) {
             bytesToSend = new byte[ ( int ) file.length() ];
             he.sendResponseHeaders( status, bytesToSend.length );
