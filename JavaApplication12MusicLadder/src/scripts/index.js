@@ -29,10 +29,7 @@ function setCookie(cname, cvalue, minutes) {
 
 function evaluateLoginServerResponse(object, status) {
     if (status === "success" && object != null) {
-        console.log("status is : ", status);
-        console.log("object is : ", object);
         setCookie(cookieName, object.sessionId, 30);
-
     } else {
         $loginStatus.html(status + " - Incorrect login information.");
     }
@@ -40,7 +37,7 @@ function evaluateLoginServerResponse(object, status) {
 
 function sendLoginInformation(ignore) {
     var password = (serverRN + "").concat(hashedPassword.concat((clientRN + "")));
-    console.log("LAST CALL");
+    
     $.ajax({
         "url": "/api/login",
         "type": "POST",
@@ -103,11 +100,22 @@ function breakSubmitRedirect() {
     return false;
 }
 
+function loadComponents() {
+    $username = $("#login-form").find("input[name='username']");
+    $password = $("#login-form").find("input[name='password']");
+    $loginStatus = $(".login-status");
+    
+    $("#login-form-button").removeAttr("disabled");
+    $('#login-form').submit(breakSubmitRedirect);
+}
+
 function evaluateServerCookieResponse(object, status) {
     if (status === "success" && object != true) {
         window.location = "/musicLadder";
     } else {
+        $loginStatus = $(".login-status");
         $loginStatus.html(status + " - Incorrect session id, please relog.");
+        loadComponents();
     }
 }
 
@@ -125,17 +133,11 @@ function evaluateUserCookie(cookie) {
 function load() {
     console.log("index.js loaded...");
 
-    var cookie = getCookie(cookieName);
-    if (cookie) {
-        evaluateUserCookie(cookie);
+    var cookie = getCookie( cookieName );
+    if ( cookie ) {
+        evaluateUserCookie( cookie );
     } else {
-        $username = $("#login-form").find("input[name='username']");
-        $password = $("#login-form").find("input[name='password']");
-        $loginStatus = $(".login-status");
-
-        $("#login-form-button").removeAttr("disabled");
-
-        $('#login-form').submit(breakSubmitRedirect);
+        loadComponents();
     }
 }
 

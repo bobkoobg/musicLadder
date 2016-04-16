@@ -85,6 +85,16 @@ function breakSubmitRedirect() {
     return false;
 }
 
+function loadComponents() {
+    $username = $("#register-form").find("input[name='username']");
+    $password = $("#register-form").find("input[name='password']");
+    $passwordRepeated = $("#register-form").find("input[name='password-repeated']");
+    $registrationStatus = $(".registration-status");
+    
+    $("#register-form-button").removeAttr("disabled");
+    $('#register-form').submit( breakSubmitRedirect );
+}
+
 function getCookie(cname) {
     var name = cname + "=";
     var ca = document.cookie.split(';');
@@ -96,22 +106,35 @@ function getCookie(cname) {
     return "";
 }
 
+function evaluateServerCookieResponse(object, status) {
+    if (status === "success" && object != true) {
+        window.location = "/musicLadder";
+    } else {
+        $registrationStatus = $(".registration-status");
+        $registrationStatus.html(status + " - Incorrect session id, please relog.");
+        loadComponents();
+    }
+}
+
+function evaluateUserCookie( cookie ) {
+    $.ajax({
+        "url": "/api/session",
+        "type": "POST",
+        "headers": {"Content-Type": "application/json"},
+        "data": JSON.stringify( cookie ),
+        "success": evaluateServerCookieResponse,
+        "error": evaluateServerCookieResponse
+    });
+}
+
 function load() {
     console.log("register.js loaded...");
     
     var cookie = getCookie( cookieName );
     if ( cookie ) {
-        window.location = "/musicLadder";
+        evaluateUserCookie( cookie );
     } else {
-    
-        $username = $("#register-form").find("input[name='username']");
-        $password = $("#register-form").find("input[name='password']");
-        $passwordRepeated = $("#register-form").find("input[name='password-repeated']");
-        $registrationStatus = $(".registration-status");
-
-        $("#register-form-button").removeAttr("disabled");
-
-        $('#register-form').submit( breakSubmitRedirect );
+        loadComponents();
     }
 }
 

@@ -415,23 +415,46 @@ function logOut() {
     window.location = "/";
 }
 
+function loadComponents() {
+    loadSongs( 1 );
+    loadPlayedDuels( 15 );
+    loadDuelsToPlay( 5 );
+
+    $saveDuelButton = $("#saveDuel");
+    $slider = $(".sliderr");
+    $logout = $(".logout");
+
+    $saveDuelButton.on("click", saveDuel);
+    $logout.on("click", logOut);
+}
+
+function evaluateServerCookieResponse(object, status) {
+    if (status === "success" && object != true) {
+        loadComponents();
+    } else {
+        window.location = "/";
+    }
+}
+
+function evaluateUserCookie( cookie ) {
+    $.ajax({
+        "url": "/api/session",
+        "type": "POST",
+        "headers": {"Content-Type": "application/json"},
+        "data": JSON.stringify( cookie ),
+        "success": evaluateServerCookieResponse,
+        "error": evaluateServerCookieResponse
+    });
+}
+
 function load() {
     console.log("musicLadderIndex.js loaded...");
     
     var cookie = getCookie( cookieName );
-    if ( !cookie ) {
-        window.location = "/";
+    if ( cookie ) {
+        evaluateUserCookie( cookie );
     } else {
-        loadSongs( 1 );
-        loadPlayedDuels( 15 );
-        loadDuelsToPlay( 5 );
-
-        $saveDuelButton = $("#saveDuel");
-        $slider = $(".sliderr");
-        $logout = $(".logout");
-
-        $saveDuelButton.on("click", saveDuel);
-        $logout.on("click", logOut);
+        window.location = "/";
     }
     
     
