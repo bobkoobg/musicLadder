@@ -3,6 +3,12 @@ package utils;
 import entity.Duel;
 
 /**
+ * This class possesses the core functionality of the music ladder application.
+ * It receives a duel from the controller. The duel contains ratings and scores
+ * of songs. Those parameters will be evaluated and depending on that, the
+ * calculate method will return new ratings, which should be assignment to the
+ * songs, corresponding to the ID's in the Duel object.
+ *
  * General information - https://en.wikipedia.org/wiki/Elo_rating_system
  * Implementation -
  * https://metinmediamath.wordpress.com/2013/11/27/how-to-calculate-the-elo-rating-including-example/
@@ -33,23 +39,10 @@ public class EloRatingSystemCalculator {
         float[] playersOldRatings = { duel.getSong1BeforeMatchRating(), duel.getSong2BeforeMatchRating() };
         int[] songsPoints = { duel.getSong1Score(), duel.getSong2Score() };
 
-        //Rating cap
-        for ( int i = 0; i < playersOldRatings.length; i++ ) {
-            if ( playersOldRatings[ i ] > 10000.0f ) {
-                playersOldRatings[ i ] = 10000.f;
-            } else if ( playersOldRatings[ i ] < 1.0f ) {
-                playersOldRatings[ i ] = 1.0f;
-            }
-        }
+        //Rating check
+        playersOldRatings = checkRatingBorders( playersOldRatings );
         //Score check
-        int pointsSum = songsPoints[ 0 ] + songsPoints[ 1 ];
-        if ( pointsSum != 10 && (songsPoints[ 0 ] != songsPoints[ 1 ]) ) {
-            songsPoints[ 0 ] = Math.round( ( ( float ) songsPoints[ 0 ] / pointsSum ) * maxPoints );
-            songsPoints[ 1 ] = Math.round( ( ( float ) songsPoints[ 1 ] / pointsSum ) * maxPoints );
-        } else if ( pointsSum != 10 && (songsPoints[ 0 ] == songsPoints[ 1 ]) ) {
-            songsPoints[ 0 ] = maxPoints / 2;
-            songsPoints[ 1 ] = maxPoints / 2;
-        }
+        songsPoints = checkSongPointsBorder( songsPoints );
 
         float transformedRating1 = calculateTransformedRating( playersOldRatings[ 0 ] );
         float transformedRating2 = calculateTransformedRating( playersOldRatings[ 1 ] );
@@ -74,13 +67,51 @@ public class EloRatingSystemCalculator {
         //Rating cap
         for ( int i = 0; i < playersNewRatings.length; i++ ) {
             if ( playersNewRatings[ i ] > 10000.0f ) {
-                playersNewRatings[ i ] = 10000.f;
+                playersNewRatings[ i ] = 10000f;
             } else if ( playersNewRatings[ i ] < 1.0f ) {
-                playersNewRatings[ i ] = 1.0f;
+                playersNewRatings[ i ] = 1f;
             }
         }
 
         return playersNewRatings;
+    }
+
+    /*
+     * step 0 
+     * Check of incorrect values of rating
+     */
+    private float[] checkRatingBorders( float[] playersOldRatings ) {
+        for ( int i = 0; i < playersOldRatings.length; i++ ) {
+            if ( playersOldRatings[ i ] > 10000.0f ) {
+                playersOldRatings[ i ] = 10000.f;
+            } else if ( playersOldRatings[ i ] < 1.0f ) {
+                playersOldRatings[ i ] = 1.0f;
+            }
+        }
+        return playersOldRatings;
+    }
+
+    /*
+     * step 0 
+     * Check of incorrect values of points
+     */
+    private int[] checkSongPointsBorder( int[] songsPoints ) {
+        for ( int i = 0; i < songsPoints.length; i++ ) {
+            if ( songsPoints[ i ] < 0 ) {
+                songsPoints[ i ] = 0;
+            } else if ( songsPoints[ i ] > 10 ) {
+                songsPoints[ i ] = 10;
+            }
+        }
+        int pointsSum = songsPoints[ 0 ] + songsPoints[ 1 ];
+        if ( pointsSum != 10 && (songsPoints[ 0 ] != songsPoints[ 1 ]) ) {
+            songsPoints[ 0 ] = Math.round( (( float ) songsPoints[ 0 ] / pointsSum) * maxPoints );
+            songsPoints[ 1 ] = Math.round( (( float ) songsPoints[ 1 ] / pointsSum) * maxPoints );
+        } else if ( pointsSum != 10 && (songsPoints[ 0 ] == songsPoints[ 1 ]) ) {
+            songsPoints[ 0 ] = maxPoints / 2;
+            songsPoints[ 1 ] = maxPoints / 2;
+        }
+        return songsPoints;
     }
 
     /*
