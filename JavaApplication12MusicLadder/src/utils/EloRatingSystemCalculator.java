@@ -13,7 +13,7 @@ package utils;
  * Calculation - http://www.calculatorsoup.com/calculators/math/percentage.php
  * Singleton (Example 2) -
  * http://www.tutorialspoint.com/java/java_using_singleton.htm
- * 
+ *
  * Possible flaws : If one passes null values to calculate
  */
 public class EloRatingSystemCalculator {
@@ -119,11 +119,7 @@ public class EloRatingSystemCalculator {
         e1 = t1 / (t1 + t2);
         e2 = t2 / (t1 + t2);
 
-        float[] expected
-                = {
-                    e1, e2
-                };
-
+        float[] expected = { e1, e2 };
         return expected;
     }
 
@@ -139,7 +135,6 @@ public class EloRatingSystemCalculator {
         actualScoreSong2 = ((1 / roundValue) * song2Points) / 100;
 
         float[] actualScores = { actualScoreSong1, actualScoreSong2 };
-
         return actualScores;
     }
 
@@ -153,7 +148,6 @@ public class EloRatingSystemCalculator {
 
         float newRating = transformedRating + kFactor * (actualScore - expectedScore);
         return newRating;
-
     }
 
     /*
@@ -161,7 +155,6 @@ public class EloRatingSystemCalculator {
      * Check if the rating are exceeding the cap
      */
     private float[] checkRatingCap( float[] playersNewRatings ) {
-        //Rating cap
         for ( int i = 0; i < playersNewRatings.length; i++ ) {
             if ( playersNewRatings[ i ] > 10000.0f ) {
                 playersNewRatings[ i ] = 10000f;
@@ -169,6 +162,7 @@ public class EloRatingSystemCalculator {
                 playersNewRatings[ i ] = 1f;
             }
         }
+
         return playersNewRatings;
     }
 }
