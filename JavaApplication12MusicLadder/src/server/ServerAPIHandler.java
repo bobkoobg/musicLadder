@@ -95,7 +95,7 @@ public class ServerAPIHandler implements HttpHandler {
                     }
                 } /*
                  * Evaluate username and password from user
-                 * URL : http://localhost:8084/api/login
+                 * URL : http://localhost:8084/api/register
                  * JSON : {"username": "adminuser", "password":"$2a$05$zOsBcOSp9gpn1np..." }
                  */ else if ( parts.length > 2 && parts[ 2 ] != null && "register".equals( parts[ 2 ] ) ) {
                     boolean dbStatus = controller.registerUser( address, jsonQuery );
@@ -106,7 +106,13 @@ public class ServerAPIHandler implements HttpHandler {
                         response = "{\"error\":\"Internal server error\"}";
                         status = 500;
                     }
-                } else if ( parts.length > 2 && parts[ 2 ] != null && "session".equals( parts[ 2 ] ) ) {
+                }/*
+                 * Evaluate session user token
+                 * URL : http://localhost:8084/api/session
+                 * JSON : { qwerty12345 }
+                 */ 
+                 
+                 else if ( parts.length > 2 && parts[ 2 ] != null && "session".equals( parts[ 2 ] ) ) {
                     boolean dbStatus = controller.authenticateSession( address, jsonQuery );
                     if ( dbStatus ) {
                         response = "{\"response\":\"Successfull session id authentication\"}";
@@ -140,14 +146,4 @@ public class ServerAPIHandler implements HttpHandler {
             os.write( response.getBytes() );
         }
     }
-
-    private static Boolean isNumeric( String str ) {
-        try {
-            Integer d = Integer.parseInt( str );
-        } catch ( NumberFormatException nfe ) {
-            return false;
-        }
-        return true;
-    }
-
 }

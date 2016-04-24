@@ -1,6 +1,5 @@
 package server;
 
-import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import java.io.BufferedInputStream;
@@ -31,7 +30,7 @@ public class ServerHandler implements HttpHandler {
 
         File file = null;
         byte[] bytesToSend = null;
-
+        
         //Debug START
         Date date = new Date();
         DateFormat formatter = new SimpleDateFormat( "HH:mm:ss" );
