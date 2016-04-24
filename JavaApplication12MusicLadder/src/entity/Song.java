@@ -2,8 +2,8 @@ package entity;
 
 import java.util.List;
 
-public class Song
-{
+public class Song {
+
     private Integer id;
     private String name;
     private String alias;
@@ -18,12 +18,11 @@ public class Song
     private List<String> singers;
     private String description;
     private List<Duel> matches;
-    
+
     /*
      * Minimal requirements constructor
      */
-    public Song(Integer id, String name)
-    {
+    public Song( Integer id, String name ) {
         this.id = id;
         this.name = name;
         this.wins = 0;
@@ -33,173 +32,154 @@ public class Song
         this.formerRating = 1000;
     }
 
-    public Song()
-    {
+    /*
+     * Test constructor
+     */
+    public Song( Integer id, Integer wins, Integer draws, Integer loses, float currentRating ) {
+        this.id = id;
+        this.wins = wins;
+        this.draws = draws;
+        this.loses = loses;
+        this.currentRating = currentRating;
     }
 
-    public Integer getId()
-    {
+    public Song() {
+    }
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Integer id)
-    {
+    public void setId( Integer id ) {
         this.id = id;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public void setName(String name)
-    {
+    public void setName( String name ) {
         this.name = name;
     }
 
-    public String getAlias()
-    {
+    public String getAlias() {
         return alias;
     }
 
-    public void setAlias(String alias)
-    {
+    public void setAlias( String alias ) {
         this.alias = alias;
     }
 
-    public Integer getWins()
-    {
+    public Integer getWins() {
         return wins;
     }
 
-    public void setWins(Integer wins)
-    {
+    public void setWins( Integer wins ) {
         this.wins = wins;
     }
-    
+
     public void incrementWins() {
         this.wins++;
     }
 
-    public Integer getDraws()
-    {
+    public Integer getDraws() {
         return draws;
     }
 
-    public void setDraws(Integer draws)
-    {
+    public void setDraws( Integer draws ) {
         this.draws = draws;
     }
-    
+
     public void incremenetDraws() {
         this.draws++;
     }
 
-    public Integer getLoses()
-    {
+    public Integer getLoses() {
         return loses;
     }
 
-    public void setLoses(Integer loses)
-    {
+    public void setLoses( Integer loses ) {
         this.loses = loses;
     }
-    
+
     public void incrementLoses() {
         this.loses++;
     }
-    
+
     public Integer getAmmountOfMatches() {
-        return ( this.wins + this.draws + this.loses );
+        return (this.wins + this.draws + this.loses);
     }
 
-    public float getCurrentRating()
-    {
+    public float getCurrentRating() {
         return currentRating;
     }
 
-    public void setCurrentRating(float currentRating)
-    {
+    public void setCurrentRating( float currentRating ) {
         this.currentRating = currentRating;
     }
 
-    public float getFormerRating()
-    {
+    public float getFormerRating() {
         return formerRating;
     }
 
-    public void setFormerRating(float formerRating)
-    {
+    public void setFormerRating( float formerRating ) {
         this.formerRating = formerRating;
     }
 
-    public List<String> getGenres()
-    {
+    public List<String> getGenres() {
         return genres;
     }
 
-    public void setGenres(List<String> genres)
-    {
+    public void setGenres( List<String> genres ) {
         this.genres = genres;
     }
 
-    public List<String> getSingers()
-    {
+    public List<String> getSingers() {
         return singers;
     }
 
-    public void setSingers(List<String> singers)
-    {
+    public void setSingers( List<String> singers ) {
         this.singers = singers;
     }
 
-    public String getDescription()
-    {
+    public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description)
-    {
+    public void setDescription( String description ) {
         this.description = description;
     }
 
-    public List<Duel> getMatches()
-    {
+    public List<Duel> getMatches() {
         return matches;
     }
 
-    public void setMatches(List<Duel> matches)
-    {
+    public void setMatches( List<Duel> matches ) {
         this.matches = matches;
     }
 
-    public Integer getLadderId()
-    {
+    public Integer getLadderId() {
         return ladderId;
     }
 
-    public void setLadderId(Integer ladderId)
-    {
+    public void setLadderId( Integer ladderId ) {
         this.ladderId = ladderId;
     }
 
-    public String getYoutubeLink()
-    {
+    public String getYoutubeLink() {
         return youtubeLink;
     }
 
-    public void setYoutubeLink(String youtubeLink)
-    {
+    public void setYoutubeLink( String youtubeLink ) {
         this.youtubeLink = youtubeLink;
     }
 
     @Override
-    public String toString()
-    {
-        return "Song{" + "id=" + id + ", name=" + name + ", alias=" + alias 
-                + ", wins=" + wins + ", draws=" + draws + ", loses=" + loses 
-                + ", currentRating=" + currentRating + ", formerRating=" 
-                + formerRating + ", genres=" + genres + ", singers=" + singers 
+    public String toString() {
+        return "Song{" + "id=" + id + ", name=" + name + ", alias=" + alias
+                + ", wins=" + wins + ", draws=" + draws + ", loses=" + loses
+                + ", currentRating=" + currentRating + ", formerRating="
+                + formerRating + ", genres=" + genres + ", singers=" + singers
                 + ", description=" + description + ", matches=" + matches + '}';
     }
 
