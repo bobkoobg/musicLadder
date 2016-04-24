@@ -46,13 +46,13 @@ public class MusicLadderController {
         facade = Facade.getInstance();
         facade.initializeConnection( logger );
 
-        eloRSC = EloRatingSystemCalculator.getInstance();
+        eloRSC = new EloRatingSystemCalculator();
         dG = DuelGenerator.getInstance();
         sr = new SongReader();
         src = new SongRatingComparator();
 
         userIdentifiers = new ArrayList();
-        
+
         sessionIdsGen = new SessionIDsGenerator();
 
         gson = new Gson();
@@ -170,17 +170,17 @@ public class MusicLadderController {
         }
 
         User currUser = facade.getUser( logger, jsonObject.getUsername(), jsonObject.getPassword() );
-        
+
         if ( currUser != null ) {
-            currUser.setSessionId(  sessionIdsGen.registerSession( clientReqIP, currUser.getUsername() ) );
+            currUser.setSessionId( sessionIdsGen.registerSession( clientReqIP, currUser.getUsername() ) );
         }
 
         return currUser;
     }
-    
+
     public boolean authenticateSession( String address, String sessionId ) {
-        sessionId = sessionId.replaceAll("^\"|\"$", "");
-       return sessionIdsGen.checkSession( sessionId, address );
+        sessionId = sessionId.replaceAll( "^\"|\"$", "" );
+        return sessionIdsGen.checkSession( sessionId, address );
     }
 
     /*
@@ -335,7 +335,9 @@ public class MusicLadderController {
         duel.setSong1Score( song1Score );
         duel.setSong2Score( song2Score );
 
-        float[] newSongRatings = eloRSC.calculate( duel );
+        float[] newSongRatings = eloRSC.calculate(
+                duel.getSong1BeforeMatchRating(), duel.getSong2BeforeMatchRating(),
+                duel.getSong1Score(), duel.getSong2Score() );
 
         duel.setSong1AfterMatchRating( newSongRatings[ 0 ] );
         duel.setSong2AfterMatchRating( newSongRatings[ 1 ] );
@@ -384,7 +386,9 @@ public class MusicLadderController {
             duel.setSong1Score( song1Scores[ i ] );
             duel.setSong2Score( song2Scores[ i ] );
 
-            float[] calcResults = eloRSC.calculate( duel );
+            float[] calcResults = eloRSC.calculate(
+                    duel.getSong1BeforeMatchRating(), duel.getSong2BeforeMatchRating(),
+                    duel.getSong1Score(), duel.getSong2Score() );
 
             possibilities.add( calcResults[ 0 ] - duel.getSong1BeforeMatchRating() );
             possibilities.add( calcResults[ 1 ] - duel.getSong2BeforeMatchRating() );

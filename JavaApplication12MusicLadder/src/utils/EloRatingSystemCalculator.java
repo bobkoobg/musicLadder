@@ -1,7 +1,5 @@
 package utils;
 
-import entity.Duel;
-
 /**
  * This class possesses the core functionality of the music ladder application.
  * It receives a duel from the controller. The duel contains ratings and scores
@@ -15,40 +13,31 @@ import entity.Duel;
  * Calculation - http://www.calculatorsoup.com/calculators/math/percentage.php
  * Singleton (Example 2) -
  * http://www.tutorialspoint.com/java/java_using_singleton.htm
+ * 
+ * Possible flaws : If one passes null values to calculate
  */
 public class EloRatingSystemCalculator {
 
     private static final float kFactor = 50;
     private static final int maxPoints = 10;
 
-    private static EloRatingSystemCalculator instance = null;
+    public float[] calculate( float song1OldRating, float song2OldRating, int song1Score,
+            int song2Score ) {
 
-    private EloRatingSystemCalculator() {
-        // Exists only to defeat instantiation.
-    }
-
-    public static EloRatingSystemCalculator getInstance() {
-        if ( instance == null ) {
-            instance = new EloRatingSystemCalculator();
-        }
-        return instance;
-    }
-
-    public float[] calculate( Duel duel ) {
-
-        float[] playersOldRatings = { duel.getSong1BeforeMatchRating(), duel.getSong2BeforeMatchRating() };
-        int[] songsPoints = { duel.getSong1Score(), duel.getSong2Score() };
+        float[] playersOldRatings = { song1OldRating, song2OldRating };
+        int[] songsPoints = { song1Score, song2Score };
 
         //Rating check
-        playersOldRatings = checkRatingBorders( playersOldRatings );
+        playersOldRatings = checkOldRatingBorders( playersOldRatings );
         //Score check
         songsPoints = checkSongPointsBorder( songsPoints );
 
         float transformedRating1 = calculateTransformedRating( playersOldRatings[ 0 ] );
         float transformedRating2 = calculateTransformedRating( playersOldRatings[ 1 ] );
 
-        float[] expectedScoreList = calculateExpectedScore( transformedRating1,
-                                                            transformedRating2 );
+        float[] expectedScoreList = calculateExpectedScore(
+                transformedRating1, transformedRating2 );
+
         float expectedScore1 = expectedScoreList[ 0 ];
         float expectedScore2 = expectedScoreList[ 1 ];
 
@@ -57,30 +46,21 @@ public class EloRatingSystemCalculator {
         float song1ScoreRating = actualScores[ 0 ];
         float song2ScoreRating = actualScores[ 1 ];
 
-        float player1NewRating = calculateNewELORating( playersOldRatings[ 0 ], song1ScoreRating,
-                                                        expectedScore1 );
-        float player2NewRating = calculateNewELORating( playersOldRatings[ 1 ], song2ScoreRating,
-                                                        expectedScore2 );
+        float player1NewRating = calculateNewELORating(
+                playersOldRatings[ 0 ], song1ScoreRating, expectedScore1 );
+        float player2NewRating = calculateNewELORating(
+                playersOldRatings[ 1 ], song2ScoreRating, expectedScore2 );
 
         float[] playersNewRatings = { player1NewRating, player2NewRating };
 
-        //Rating cap
-        for ( int i = 0; i < playersNewRatings.length; i++ ) {
-            if ( playersNewRatings[ i ] > 10000.0f ) {
-                playersNewRatings[ i ] = 10000f;
-            } else if ( playersNewRatings[ i ] < 1.0f ) {
-                playersNewRatings[ i ] = 1f;
-            }
-        }
-
-        return playersNewRatings;
+        return checkRatingCap( playersNewRatings );
     }
 
     /*
-     * step 0 
+     * 1st Step
      * Check of incorrect values of rating
      */
-    private float[] checkRatingBorders( float[] playersOldRatings ) {
+    private float[] checkOldRatingBorders( float[] playersOldRatings ) {
         for ( int i = 0; i < playersOldRatings.length; i++ ) {
             if ( playersOldRatings[ i ] > 10000.0f ) {
                 playersOldRatings[ i ] = 10000.f;
@@ -92,7 +72,7 @@ public class EloRatingSystemCalculator {
     }
 
     /*
-     * step 0 
+     * 2nd Step
      * Check of incorrect values of points
      */
     private int[] checkSongPointsBorder( int[] songsPoints ) {
@@ -115,7 +95,7 @@ public class EloRatingSystemCalculator {
     }
 
     /*
-     * 1st step 
+     * 3rd Step 
      * Calculate Transformed rating based on the songs current rating
      */
     private float calculateTransformedRating( Float r ) {
@@ -130,7 +110,7 @@ public class EloRatingSystemCalculator {
     }
 
     /*
-     * 2nd step
+     * 4th Step
      * Calculate the expected scores for both songs based on the transformed rating
      */
     private float[] calculateExpectedScore( Float t1, Float t2 ) {
@@ -148,7 +128,7 @@ public class EloRatingSystemCalculator {
     }
 
     /*
-     * 3rd step
+     * 5th Step
      * Calculate their actual score based on the point they scored in the match
      */
     private float[] calculateActualScore( float song1Points, float song2Points ) {
@@ -164,7 +144,7 @@ public class EloRatingSystemCalculator {
     }
 
     /*
-     * 4th step
+     * 6th Step
      * Calculate the new ELO Rating based on the transformed rating, the actial 
      *      calculated score of the songs and the expected calculated score
      */
@@ -174,5 +154,21 @@ public class EloRatingSystemCalculator {
         float newRating = transformedRating + kFactor * (actualScore - expectedScore);
         return newRating;
 
+    }
+
+    /*
+     * 7th Step
+     * Check if the rating are exceeding the cap
+     */
+    private float[] checkRatingCap( float[] playersNewRatings ) {
+        //Rating cap
+        for ( int i = 0; i < playersNewRatings.length; i++ ) {
+            if ( playersNewRatings[ i ] > 10000.0f ) {
+                playersNewRatings[ i ] = 10000f;
+            } else if ( playersNewRatings[ i ] < 1.0f ) {
+                playersNewRatings[ i ] = 1f;
+            }
+        }
+        return playersNewRatings;
     }
 }
