@@ -21,13 +21,18 @@ public class EloRatingSystemCalculator_Test {
     private int song1Score, song2Score;
     private float[] expectedPlayersNewRatings;
 
+    private static String errorMessage = "Empty essential parameters";
+
     public EloRatingSystemCalculator_Test( float song1OldRating, float song2OldRating,
-            int song1Score, int song2Score, float[] expectedPlayersNewRatings ) {
+            int song1Score, int song2Score, Object expectedPlayersNewRatings ) {
         this.song1OldRating = song1OldRating;
         this.song2OldRating = song2OldRating;
         this.song1Score = song1Score;
         this.song2Score = song2Score;
-        this.expectedPlayersNewRatings = expectedPlayersNewRatings;
+        if ( expectedPlayersNewRatings instanceof float[] ) {
+            this.expectedPlayersNewRatings = ( float[] ) expectedPlayersNewRatings;
+        }
+
     }
 
     /**
@@ -133,13 +138,32 @@ public class EloRatingSystemCalculator_Test {
             { 1000.0f, 1000.0f, 1, 9, new float[]{ 980.0f, 1020.0f } },
             { 1000.0f, 1000.0f, 0, 10, new float[]{ 975.0f, 1025.0f } },
             //Random
-            { 1037.2383f, 987.1233f, 3, 7, new float[]{ 1024.7703f, 999.5913f } } } );
+            { 1037.2383f, 987.1233f, 3, 7, new float[]{ 1024.7703f, 999.5913f } },
+            { 1000.0f, -1.0f, 0, 10, errorMessage }
+        } );
     }
 
     @Test
     public void test_calculate() {
-        float[] result = eloRSC.calculate( song1OldRating, song2OldRating, song1Score, song2Score );
-        assertThat( result, is( expectedPlayersNewRatings ) );
+        String stringResult;
+        float[] floatArrayResult;
+        Object actualResult;
+
+        if ( song2OldRating == -1.0f ) {
+            //(hack) if -1 then set to null in order to check null values
+            actualResult = eloRSC.calculate( song1OldRating, null, song1Score, song2Score );
+        } else {
+            actualResult = eloRSC.calculate( song1OldRating, song2OldRating, song1Score, song2Score );
+        }
+        if ( actualResult instanceof float[] ) {
+            floatArrayResult = ( float[] ) actualResult;
+            assertThat( floatArrayResult, is( expectedPlayersNewRatings ) );
+
+        } else if ( actualResult instanceof String ) {
+            stringResult = ( String ) actualResult;
+            assertThat( stringResult, is( errorMessage ) );
+
+        }
     }
 
 }

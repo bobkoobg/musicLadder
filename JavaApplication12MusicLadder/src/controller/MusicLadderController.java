@@ -219,7 +219,7 @@ public class MusicLadderController {
      *   5 ) Error handling ***MISSING***
      */
     public Boolean createSongs( String path ) {
-        File[] songFiles = sr.finder( path );
+        File[] songFiles = sr.finder( path, logger );
         for ( int i = 0; i < songFiles.length; i++ ) {
             Integer songId = facade.insertSong( logger, songFiles[ i ].getName() );
             //Error handling

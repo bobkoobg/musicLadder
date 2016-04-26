@@ -9,27 +9,30 @@ import java.util.Random;
 public class DuelGenerator {
 
     private static DuelGenerator instance = null;
-    private static Integer probabilityRateLevels = 10;
+    private static Integer probabilityRateLevels;
+    private static String errorMessage;
     private Random rn;
-
-    private static String errorMessage = "The duel generator needs at least 3 songs.";
 
     private DuelGenerator() {
         // Exists only to defeat instantiation.
-
         rn = new Random();
     }
 
     public static DuelGenerator getInstance() {
         if ( instance == null ) {
             instance = new DuelGenerator();
+            probabilityRateLevels = 10;
+            errorMessage = "The duel generator needs at least 3 songs.";
 
         }
         return instance;
     }
 
     /*
-     * Probability generator
+     * A class which generates new duels from a list of songs based on the songs'
+     * previous matches.
+     * 
+     * Returns either a new Duel Object or an String error message.
      */
     public <T> T generator( List<Song> songs ) {
         //If there are less than 3 elements, then don't bother generating - return error.
@@ -43,8 +46,7 @@ public class DuelGenerator {
         int i = rn.nextInt( songProbabilityPool.size() );
         int participant1 = songProbabilityPool.get( i );
 
-        while ( songProbabilityPool.remove(
-                ( Integer ) participant1 ) );
+        while ( songProbabilityPool.remove( ( Integer ) participant1 ) );
 
         //Choose a song id again = this wil be participant2
         int j = rn.nextInt( songProbabilityPool.size() );

@@ -1,5 +1,6 @@
 package utils;
 
+import java.io.File;
 import utilities.SongReader;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,9 +28,13 @@ public class SongReader_Test {
     private static Map<String, List<String>> userPaths;
     private static String userBobkooUbuntu = "bobkooUbuntu";
 
-    public SongReader_Test( String path, int expectedListSize ) {
+    private static String errorMessage = "Incorrect path (directory).";
+
+    public SongReader_Test( String path, Object expectedListSize ) {
         this.path = path;
-        this.expectedListSize = expectedListSize;
+        if ( expectedListSize instanceof Integer ) {
+            this.expectedListSize = ( int ) expectedListSize;
+        }
     }
 
     /**
@@ -75,7 +80,9 @@ public class SongReader_Test {
                        "/media/bobkoo/SWAG/Music/Newborn/Music Stack",
                        "/media/bobkoo/SWAG/Music/Trash Collection/",
                        "/media/bobkoo/SWAG/Music/",
-                       "/media/bobkoo/SWAG/Music/asdasdf"
+                       "/media/bobkoo/SWAG/Music/asdasdf",
+                       "",
+                       "C:\\Users\\S\\Downloads\\cool stuff"
                ) );
 
         return Arrays.asList( new Object[][]{
@@ -89,14 +96,26 @@ public class SongReader_Test {
             { userPaths.get( userBobkooUbuntu ).get( 6 ), 91 },
             { userPaths.get( userBobkooUbuntu ).get( 7 ), 47 },
             //Errors
-            { userPaths.get( userBobkooUbuntu ).get( 8 ), 0 }
+            { userPaths.get( userBobkooUbuntu ).get( 8 ), 0 },
+            { userPaths.get( userBobkooUbuntu ).get( 9 ), errorMessage },
+            { userPaths.get( userBobkooUbuntu ).get( 10 ), errorMessage }
         } );
     }
 
     @Test
     public void test_finder() {
-        int result = songReader.finder( path ).length;
-        assertThat( result, is( expectedListSize ) );
-    }
+        String stringResult;
+        int fileArrayResultSize;
+        Object actualResult = songReader.finder( path, null );
 
+        if ( actualResult instanceof File[] ) {
+            fileArrayResultSize = Arrays.asList( songReader.finder( path, null ) ).size();
+            assertThat( fileArrayResultSize, is( expectedListSize ) );
+
+        } else if ( actualResult instanceof String ) {
+            stringResult = ( String ) songReader.finder( path, null );
+            assertThat( stringResult, is( errorMessage ) );
+
+        }
+    }
 }

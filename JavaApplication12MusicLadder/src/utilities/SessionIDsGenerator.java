@@ -10,15 +10,31 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class SessionIDsGenerator {
 
-    private SecureRandom random = new SecureRandom();
-    private Map<String, SessionObject> sessionsList = new HashMap();
+    private SecureRandom random;
+    private Map<String, SessionObject> sessionsList;
+    private long MAX_DURATION = MILLISECONDS.convert( 30, MINUTES );
+
+    private static String errorMessage = "Empty essential parameters";
+
+    public SessionIDsGenerator() {
+        random = new SecureRandom();
+        sessionsList = new HashMap();
+    }
+
+    public void setMAX_DURATION( long MAX_DURATION ) {
+        this.MAX_DURATION = MAX_DURATION;
+    }
 
     private String nextSessionId() {
         return new BigInteger( 130, random ).toString( 32 );
     }
 
     public String registerSession( String ipAddress, String username ) {
-        long MAX_DURATION = MILLISECONDS.convert( 30, MINUTES );
+        if ( ipAddress == null || ipAddress.isEmpty() || username == null
+                || username.isEmpty() ) {
+            return errorMessage;
+        }
+
         Date now = new Date();
 
         for ( Map.Entry<String, SessionObject> entry : sessionsList.entrySet() ) {
@@ -39,7 +55,11 @@ public class SessionIDsGenerator {
     }
 
     public boolean checkSession( String sessionId, String ipAddress ) {
-        long MAX_DURATION = MILLISECONDS.convert( 30, MINUTES );
+        if ( ipAddress == null || ipAddress.isEmpty() || sessionId == null
+                || sessionId.isEmpty() ) {
+            return false;
+        }
+
         Date now = new Date();
 
         for ( Map.Entry<String, SessionObject> entry : sessionsList.entrySet() ) {
@@ -52,8 +72,6 @@ public class SessionIDsGenerator {
                 return false;
             } else if ( sessionId.equals( key ) && ipAddress.equals( value.getIpAddress() ) ) {
                 return true;
-            } else {
-                System.out.println( "Error!" );
             }
         }
         return false;

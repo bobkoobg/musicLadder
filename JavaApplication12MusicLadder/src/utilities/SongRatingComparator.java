@@ -7,6 +7,14 @@ public class SongRatingComparator implements Comparator<Song> {
 
     @Override
     public int compare( Song song1, Song song2 ) {
+        if ( song1 != null && song2 == null ) {
+            return 1;
+        } else if ( song1 == null && song2 == null ) {
+            return 0;
+        } else if ( song1 == null && song2 != null ) {
+            return -1;
+        }
+
         Float song1Rating = song1.getCurrentRating();
         Float song2Rating = song2.getCurrentRating();
 
@@ -17,7 +25,7 @@ public class SongRatingComparator implements Comparator<Song> {
         //only if it the sum of the song's matches is 0.
         boolean isSong1Newbie = song1Rating == 1000 && song1Matches == 0 ? true : false;
         boolean isSong2Newbie = song2Rating == 1000 && song2Matches == 0 ? true : false;
-
+        
         if ( isSong1Newbie && !isSong2Newbie ) {
             return -1;
         } else if ( !isSong1Newbie && isSong2Newbie ) {

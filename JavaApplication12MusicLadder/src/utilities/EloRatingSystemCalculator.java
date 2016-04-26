@@ -21,8 +21,15 @@ public class EloRatingSystemCalculator {
     private static final float kFactor = 50;
     private static final int maxPoints = 10;
 
-    public float[] calculate( float song1OldRating, float song2OldRating, int song1Score,
-            int song2Score ) {
+    private static String errorMessage = "Empty essential parameters";
+
+    public <T> T calculate( Float song1OldRating, Float song2OldRating, Integer song1Score,
+            Integer song2Score ) {
+
+        if ( song1OldRating == null || song2OldRating == null || song1Score == null
+                || song2Score == null ) {
+            return ( T ) errorMessage;
+        }
 
         float[] playersOldRatings = { song1OldRating, song2OldRating };
         int[] songsPoints = { song1Score, song2Score };
@@ -53,7 +60,7 @@ public class EloRatingSystemCalculator {
 
         float[] playersNewRatings = { player1NewRating, player2NewRating };
 
-        return checkRatingCap( playersNewRatings );
+        return ( T ) checkRatingCap( playersNewRatings );
     }
 
     /*

@@ -69,7 +69,11 @@ public class SongRatingComparator_Test {
             //Equal rating, different match sum
             { new Song( 1, 1, 0, 0, 1000.0f ), new Song( 2, 0, 0, 0, 1000.0f ), 1 },
             { new Song( 1, 0, 0, 0, 1000.0f ), new Song( 2, 1, 0, 0, 1000.0f ), -1 },
-            { new Song( 1, 1, 0, 0, 1000.0f ), new Song( 2, 1, 0, 0, 1000.0f ), 0 }
+            { new Song( 1, 1, 0, 0, 1000.0f ), new Song( 2, 1, 0, 0, 1000.0f ), 0 },
+            //Errors
+            { null, null, 0 },
+            { new Song( 1, 1, 0, 0, 1000.0f ), null, 1 },
+            { null, new Song( 2, 1, 0, 0, 1000.0f ), -1 }
         } );
     }
 
