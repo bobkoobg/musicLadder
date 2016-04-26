@@ -14,12 +14,12 @@ import java.util.List;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import java.util.logging.Logger;
-import utils.DuelGenerator;
-import utils.EloRatingSystemCalculator;
-import utils.PerformanceLogger;
-import utils.SessionIDsGenerator;
-import utils.SongRatingComparator;
-import utils.SongReader;
+import utilities.DuelGenerator;
+import utilities.EloRatingSystemCalculator;
+import utilities.PerformanceLogger;
+import utilities.SessionIDsGenerator;
+import utilities.SongRatingComparator;
+import utilities.SongReader;
 
 public class MusicLadderController {
 

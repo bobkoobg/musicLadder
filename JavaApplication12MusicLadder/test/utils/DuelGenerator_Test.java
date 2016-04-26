@@ -1,5 +1,6 @@
 package utils;
 
+import utilities.DuelGenerator;
 import entity.Duel;
 import entity.Song;
 import java.util.ArrayList;

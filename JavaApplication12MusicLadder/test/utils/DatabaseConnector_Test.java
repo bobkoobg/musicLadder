@@ -1,5 +1,6 @@
 package utils;
 
+import utilities.DatabaseConnector;
 import java.sql.Connection;
 import java.util.logging.Logger;
 import static org.hamcrest.CoreMatchers.is;

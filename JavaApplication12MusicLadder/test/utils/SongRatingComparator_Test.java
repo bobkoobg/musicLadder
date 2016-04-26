@@ -1,5 +1,6 @@
 package utils;
 
+import utilities.SongRatingComparator;
 import entity.Song;
 import java.util.Arrays;
 import java.util.Collection;

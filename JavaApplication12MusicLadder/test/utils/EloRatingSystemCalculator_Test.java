@@ -1,5 +1,6 @@
 package utils;
 
+import utilities.EloRatingSystemCalculator;
 import java.util.Arrays;
 import java.util.Collection;
 import static org.hamcrest.CoreMatchers.is;
