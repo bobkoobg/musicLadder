@@ -4,13 +4,13 @@ import java.util.Date;
 
 public class Duel {
 
-    private Integer duelID;
-    private Integer song1ID;
-    private Integer song2ID;
+    private int duelID;
+    private int song1ID;
+    private int song2ID;
     private float song1BeforeMatchRating;
     private float song2BeforeMatchRating;
-    private Integer song1Score;
-    private Integer song2Score;
+    private int song1Score;
+    private int song2Score;
     private float song1AfterMatchRating;
     private float song2AfterMatchRating;
     private Date matchTime;
@@ -20,7 +20,7 @@ public class Duel {
     /*
      * Duel generation constructor
      */
-    public Duel( Integer song1ID, Integer song2ID, float song1BeforeMatchRating, float song2BeforeMatchRating ) {
+    public Duel( int song1ID, int song2ID, float song1BeforeMatchRating, float song2BeforeMatchRating ) {
         this.song1ID = song1ID;
         this.song2ID = song2ID;
         this.song1BeforeMatchRating = song1BeforeMatchRating;
@@ -29,7 +29,7 @@ public class Duel {
     }
 
     //Testing constructor
-    public Duel( float song1BeforeMatchRating, float song2BeforeMatchRating, Integer song1Score, Integer song2Score ) {
+    public Duel( float song1BeforeMatchRating, float song2BeforeMatchRating, int song1Score, int song2Score ) {
         this.song1BeforeMatchRating = song1BeforeMatchRating;
         this.song2BeforeMatchRating = song2BeforeMatchRating;
         this.song1Score = song1Score;
@@ -39,27 +39,27 @@ public class Duel {
     public Duel() {
     }
 
-    public Integer getDuelID() {
+    public int getDuelID() {
         return duelID;
     }
 
-    public void setDuelID( Integer duelID ) {
+    public void setDuelID( int duelID ) {
         this.duelID = duelID;
     }
 
-    public Integer getSong1ID() {
+    public int getSong1ID() {
         return song1ID;
     }
 
-    public void setSong1ID( Integer song1ID ) {
+    public void setSong1ID( int song1ID ) {
         this.song1ID = song1ID;
     }
 
-    public Integer getSong2ID() {
+    public int getSong2ID() {
         return song2ID;
     }
 
-    public void setSong2ID( Integer song2ID ) {
+    public void setSong2ID( int song2ID ) {
         this.song2ID = song2ID;
     }
 
@@ -79,19 +79,19 @@ public class Duel {
         this.song2BeforeMatchRating = song2OldRating;
     }
 
-    public Integer getSong1Score() {
+    public int getSong1Score() {
         return song1Score;
     }
 
-    public void setSong1Score( Integer song1Score ) {
+    public void setSong1Score( int song1Score ) {
         this.song1Score = song1Score;
     }
 
-    public Integer getSong2Score() {
+    public int getSong2Score() {
         return song2Score;
     }
 
-    public void setSong2Score( Integer song2Score ) {
+    public void setSong2Score( int song2Score ) {
         this.song2Score = song2Score;
     }
 
