@@ -1,4 +1,4 @@
-package utils;
+package utilities;
 
 import java.io.File;
 import utilities.SongReader;
@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import static org.hamcrest.CoreMatchers.is;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -24,17 +25,22 @@ public class SongReader_Test {
 
     private String path;
     private int expectedListSize;
+    private boolean toUseLogger;
 
     private static Map<String, List<String>> userPaths;
     private static String userBobkooUbuntu = "bobkooUbuntu";
 
     private static String errorMessage = "Incorrect path (directory).";
 
-    public SongReader_Test( String path, Object expectedListSize ) {
+    private String loggerName = "testChillMaster";
+    private String loggerPath = "/MyTestLogFile.log";
+
+    public SongReader_Test( String path, Object expectedListSize, boolean toUseLogger ) {
         this.path = path;
         if ( expectedListSize instanceof Integer ) {
             this.expectedListSize = ( int ) expectedListSize;
         }
+        this.toUseLogger = toUseLogger;
     }
 
     /**
@@ -87,33 +93,42 @@ public class SongReader_Test {
 
         return Arrays.asList( new Object[][]{
             //Basic check of all my local folders (for mp3 and MP3 files)
-            { userPaths.get( userBobkooUbuntu ).get( 0 ), 100 },
-            { userPaths.get( userBobkooUbuntu ).get( 1 ), 119 },
-            { userPaths.get( userBobkooUbuntu ).get( 2 ), 183 },
-            { userPaths.get( userBobkooUbuntu ).get( 3 ), 50 },
-            { userPaths.get( userBobkooUbuntu ).get( 4 ), 108 },
-            { userPaths.get( userBobkooUbuntu ).get( 5 ), 10 },
-            { userPaths.get( userBobkooUbuntu ).get( 6 ), 91 },
-            { userPaths.get( userBobkooUbuntu ).get( 7 ), 47 },
+            { userPaths.get( userBobkooUbuntu ).get( 0 ), 100, false },
+            { userPaths.get( userBobkooUbuntu ).get( 1 ), 119, false },
+            { userPaths.get( userBobkooUbuntu ).get( 2 ), 183, false },
+            { userPaths.get( userBobkooUbuntu ).get( 3 ), 50, false },
+            { userPaths.get( userBobkooUbuntu ).get( 4 ), 108, false },
+            { userPaths.get( userBobkooUbuntu ).get( 5 ), 10, false },
+            { userPaths.get( userBobkooUbuntu ).get( 6 ), 91, false },
+            { userPaths.get( userBobkooUbuntu ).get( 7 ), 47, false },
             //Errors
-            { userPaths.get( userBobkooUbuntu ).get( 8 ), 0 },
-            { userPaths.get( userBobkooUbuntu ).get( 9 ), errorMessage },
-            { userPaths.get( userBobkooUbuntu ).get( 10 ), errorMessage }
+            { userPaths.get( userBobkooUbuntu ).get( 8 ), 0, false },
+            { userPaths.get( userBobkooUbuntu ).get( 9 ), errorMessage, false },
+            { userPaths.get( userBobkooUbuntu ).get( 10 ), errorMessage, false },
+            { userPaths.get( userBobkooUbuntu ).get( 8 ), 0, true },
+            { userPaths.get( userBobkooUbuntu ).get( 8 ), 0, true }
         } );
     }
 
     @Test
     public void test_finder() {
+        Logger logger = null;
+        if ( toUseLogger ) {
+
+            PerformanceLogger performanceLogger = new PerformanceLogger();
+            logger = performanceLogger.initLogger( loggerName, loggerPath );
+        }
+
         String stringResult;
         int fileArrayResultSize;
-        Object actualResult = songReader.finder( path, null );
+        Object actualResult = songReader.finder( path, logger );
 
         if ( actualResult instanceof File[] ) {
-            fileArrayResultSize = Arrays.asList( songReader.finder( path, null ) ).size();
+            fileArrayResultSize = Arrays.asList( songReader.finder( path, logger ) ).size();
             assertThat( fileArrayResultSize, is( expectedListSize ) );
 
         } else if ( actualResult instanceof String ) {
-            stringResult = ( String ) songReader.finder( path, null );
+            stringResult = ( String ) songReader.finder( path, logger );
             assertThat( stringResult, is( errorMessage ) );
 
         }

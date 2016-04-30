@@ -1,4 +1,4 @@
-package utils;
+package utilities;
 
 import utilities.EloRatingSystemCalculator;
 import java.util.Arrays;
@@ -117,6 +117,8 @@ public class EloRatingSystemCalculator_Test {
             { 1000.0f, 1000.0f, -6, -10, new float[]{ 1000.0f, 1000.0f } },
             { 1000.0f, 1000.0f, -6, -5, new float[]{ 1000.0f, 1000.0f } },
             { 1000.0f, 1000.0f, -6, -1, new float[]{ 1000.0f, 1000.0f } },
+            //Below high score (10) sum of points (2 participants)
+            { 1000.0f, 1000.0f, 4, 4, new float[]{ 1000.0f, 1000.0f } },
             //Above high score (10) borders (only 1 participant)
             { 1000.0f, 1000.0f, 10000, 0, new float[]{ 1025.0f, 975.0f } },
             { 1000.0f, 1000.0f, 1000, 5, new float[]{ 1010.0f, 990.0f } }, //evaluate to 10:5 then to 7:3
@@ -139,7 +141,10 @@ public class EloRatingSystemCalculator_Test {
             { 1000.0f, 1000.0f, 0, 10, new float[]{ 975.0f, 1025.0f } },
             //Random
             { 1037.2383f, 987.1233f, 3, 7, new float[]{ 1024.7703f, 999.5913f } },
-            { 1000.0f, -1.0f, 0, 10, errorMessage }
+            { 1000.0f, -1.0f, 0, 10, errorMessage },
+            { -1.0f, 1000.0f, 0, 10, errorMessage },
+            { 1000.0f, 1000.0f, -35, 10, errorMessage },
+            { 1000.0f, 1000.0f, 0, -35, errorMessage }
         } );
     }
 
@@ -149,12 +154,19 @@ public class EloRatingSystemCalculator_Test {
         float[] floatArrayResult;
         Object actualResult;
 
-        if ( song2OldRating == -1.0f ) {
+        if ( song1OldRating == -1.0f ) {
             //(hack) if -1 then set to null in order to check null values
+            actualResult = eloRSC.calculate( null, song2OldRating, song1Score, song2Score );
+        } else if ( song2OldRating == -1.0f ) {
             actualResult = eloRSC.calculate( song1OldRating, null, song1Score, song2Score );
+        } else if ( song1Score == -35 ) {
+            actualResult = eloRSC.calculate( song1OldRating, song2OldRating, null, song2Score );
+        } else if ( song2Score == -35 ) {
+            actualResult = eloRSC.calculate( song1OldRating, song2OldRating, song1Score, null );
         } else {
             actualResult = eloRSC.calculate( song1OldRating, song2OldRating, song1Score, song2Score );
         }
+
         if ( actualResult instanceof float[] ) {
             floatArrayResult = ( float[] ) actualResult;
             assertThat( floatArrayResult, is( expectedPlayersNewRatings ) );

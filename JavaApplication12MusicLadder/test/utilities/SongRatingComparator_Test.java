@@ -1,4 +1,4 @@
-package utils;
+package utilities;
 
 import utilities.SongRatingComparator;
 import entity.Song;

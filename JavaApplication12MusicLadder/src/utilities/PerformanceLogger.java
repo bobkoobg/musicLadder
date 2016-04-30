@@ -9,41 +9,34 @@ import java.util.logging.SimpleFormatter;
 
 public class PerformanceLogger {
 
-    public Logger logMessage() {
-        File yourFile = new File( System.getProperty( "user.dir" ) + "/MyLogFile.log" );
-        Logger logger = Logger.getLogger( "chillMaster" );
+    public Logger initLogger( String loggerName, String loggerPath ) {
+        File file = new File( System.getProperty( "user.dir" ) + loggerPath );
+        Logger logger = Logger.getLogger( loggerName );
 
-        if ( !yourFile.exists() ) {
+        if ( !file.exists() ) {
             try {
-                yourFile.createNewFile();
-            } catch ( IOException ex ) {
-                Logger.getLogger( PerformanceLogger.class.getName() ).log( Level.SEVERE, null, ex );
+                file.createNewFile();
+            } catch ( IOException e ) {
+                System.out.println( "Error : Logger creation failed!" + e );
+                Logger.getLogger( PerformanceLogger.class.getName() ).log( Level.SEVERE, null, e );
             }
         }
 
         FileHandler fh;
-
         try {
-
-            /*
-             * This block configure the logger with handler and formatter.
-             *
-             * The below line is the syntax for the file handler which has the capability of 
-             * appending the logs in the file. The second argument decides the appending.
-             * FileHandler fileTxt = new FileHandler("eLog.txt", true);
-             */
-            fh = new FileHandler( System.getProperty( "user.dir" ) + "/MyLogFile.log", true );
+            fh = new FileHandler( System.getProperty( "user.dir" ) + loggerPath, true );
             logger.addHandler( fh );
             SimpleFormatter formatter = new SimpleFormatter();
             fh.setFormatter( formatter );
 
         } catch ( SecurityException | IOException e ) {
-            System.out.println( "SecurityException or IOException while trying to create and add a handler to the logger :  " + e );
+            System.out.println( "SecurityException or IOException while trying to "
+                    + "create and add a handler to the logger : " + e );
             Logger.getLogger( PerformanceLogger.class.getName() ).log( Level.SEVERE, null, e );
         }
-        logger.info( "\n***** NEW SESSION *****\n" );
-        logger.info( logger.getName() + " Logger started!" );
-        return logger;
+        logger.info( "***** NEW SESSION *****" );
+        logger.info( logger.getName() + " Logger started!\n" );
 
+        return logger;
     }
 }

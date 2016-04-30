@@ -24,6 +24,8 @@ import utilities.SongReader;
 public class MusicLadderController {
 
     private static MusicLadderController instance = null;
+    private String loggerName = "chillMaster";
+    private String loggerPath = "/MyLogFile.log";
 
     private PerformanceLogger pl = null;
     private Logger logger = null;
@@ -41,7 +43,7 @@ public class MusicLadderController {
 
         //Logger functionality
         pl = new PerformanceLogger();
-        logger = pl.logMessage();
+        logger = pl.initLogger( loggerName, loggerPath );
 
         facade = Facade.getInstance();
         facade.initializeConnection( logger );

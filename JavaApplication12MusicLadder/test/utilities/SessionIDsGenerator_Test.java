@@ -1,4 +1,4 @@
-package utils;
+package utilities;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
@@ -10,7 +10,6 @@ import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import utilities.SessionIDsGenerator;
 
 public class SessionIDsGenerator_Test {
 
@@ -131,7 +130,7 @@ public class SessionIDsGenerator_Test {
 
         assertThat( sessionIDsGen.checkSession( key, ipAddress ), is( false ) );
     }
-    
+
     @Test
     public void test_registerSession_NullValues() {
         String key = sessionIDsGen.registerSession( ipAddress, username );
@@ -139,8 +138,39 @@ public class SessionIDsGenerator_Test {
     }
 
     @Test
+    public void test_registerSession_EmptyIPValue() {
+        username = "Hear me roar";
+
+        String key = sessionIDsGen.registerSession( "", username );
+        assertThat( sessionIDsGen.registerSession( key, ipAddress ), is( errorMessage ) );
+    }
+
+    public void test_registerSession_EmptyUSernameValue() {
+        ipAddress = "123.123.123.123";
+
+        String key = sessionIDsGen.registerSession( ipAddress, "" );
+        assertThat( sessionIDsGen.registerSession( key, ipAddress ), is( errorMessage ) );
+    }
+
+    @Test
     public void test_checkSession_NullValues() {
         String key = sessionIDsGen.registerSession( ipAddress, username );
+        assertThat( sessionIDsGen.checkSession( key, ipAddress ), is( false ) );
+    }
+
+    @Test
+    public void test_checkSession_EmptyIPValue() {
+        username = "Hear me roar";
+
+        String key = sessionIDsGen.registerSession( "", username );
+        assertThat( sessionIDsGen.checkSession( key, ipAddress ), is( false ) );
+    }
+
+    @Test
+    public void test_checkSession_EmptyusernameValue() {
+        ipAddress = "123.123.123.123";
+
+        String key = sessionIDsGen.registerSession( ipAddress, "" );
         assertThat( sessionIDsGen.checkSession( key, ipAddress ), is( false ) );
     }
 }
