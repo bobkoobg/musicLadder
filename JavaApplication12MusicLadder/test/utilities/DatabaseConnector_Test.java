@@ -135,10 +135,8 @@ public class DatabaseConnector_Test {
         dbConnection = new DatabaseConnector( databaseHost, databaseUsername, databasePassword, null );
         Connection connection = dbConnection.getConnection( logger );
 
-        assertThat( connection
-                != null, is( true ) );
-        dbConnection.closeConnection( connection,
-                                      null );
+        assertThat( connection != null, is( true ) );
+        dbConnection.closeConnection( connection, null );
     }
 
     @Test

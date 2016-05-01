@@ -12,15 +12,15 @@ import java.util.logging.Logger;
 
 public class DuelMapper {
 
-    public Duel getDuel( Logger logger, Connection connection, Integer duelID ) {
+    private static String ERROR_NOELEM = "Error - not element found";
+    private static String ERROR_QUERYEXEC = "Error - during query execution";
+
+    public <T> T getDuel( Logger logger, Connection connection, int duelID ) {
         PreparedStatement preparedStatement = null;
         Duel duel = null;
 
         try {
-            String SQLString = "SELECT * "
-                    + "FROM ML_DUEL_TBL "
-                    + "WHERE DUEL_ID = ?";
-            SQLString = "SELECT duel.DUEL_ID, duel.SONG1_ID, duel.SONG2_ID, duel.SONG1_RATING_BEFORE, " 
+            String sqlQuery = "SELECT duel.DUEL_ID, duel.SONG1_ID, duel.SONG2_ID, duel.SONG1_RATING_BEFORE, "
                     + "duel.SONG2_RATING_BEFORE, songA.SONG_NAME, songB.SONG_NAME "
                     + "FROM ML_DUEL_TBL duel "
                     + "JOIN ML_SONG_TBL songA "
@@ -29,12 +29,12 @@ public class DuelMapper {
                     + "ON duel.SONG2_ID = songB.SONG_ID "
                     + "WHERE DUEL_ID = ?";
 
-            preparedStatement = connection.prepareStatement( SQLString );
+            preparedStatement = connection.prepareStatement( sqlQuery );
             preparedStatement.setInt( 1, duelID );
 
             ResultSet rs = preparedStatement.executeQuery();
             try {
-                while ( rs.next() ) {
+                if ( rs.next() ) {
 
                     duel = new Duel();
 
@@ -45,28 +45,30 @@ public class DuelMapper {
                     duel.setSong2BeforeMatchRating( rs.getFloat( 5 ) );
                     duel.setSong1Name( rs.getString( 6 ) );
                     duel.setSong2Name( rs.getString( 7 ) );
+                } else {
+                    logger.warning( "Element with duel id " + duelID + " does not exist." );
+                    return ( T ) ERROR_NOELEM;
                 }
             } finally {
                 try {
                     rs.close();
-                } catch ( Exception ignore ) {
+                } catch ( Exception e ) {
+                    logger.warning( "Result set not closed succesfully : " + e );
                 }
             }
         } catch ( Exception e ) {
             logger.severe( "Statement Exception getDuel : " + e );
-            return null;
-        } finally //The statement must be closed, because of : java.sql.SQLException: ORA-01000
-        {
+            return ( T ) ERROR_QUERYEXEC;
+        } finally {
             try {
                 if ( preparedStatement != null ) {
                     preparedStatement.close();
                 }
             } catch ( SQLException e ) {
-                logger.severe( "SQL Exception getDuel : " + e );
-                return null;
+                logger.warning( "SQL Exception - Prepared statement not closed succesfully : " + e );
             }
         }
-        return duel;
+        return ( T ) duel;
     }
 
     public Integer insertDuel( Logger logger, Connection connection, Duel duel ) {
