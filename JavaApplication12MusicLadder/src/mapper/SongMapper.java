@@ -58,7 +58,7 @@ public class SongMapper {
                 }
             }
         } catch ( Exception e ) {
-            logger.severe( "Statement Exception (getSong) " + e );
+            logger.severe( "Prepared Statement Exception (getSong) " + e );
             return ( T ) ERROR_QUERYEXEC;
         } finally {
             try {
@@ -233,23 +233,24 @@ public class SongMapper {
         return songs;
     }
 
+    /*
+     *   Not working...
+     insertTableSQL = "UPDATE ( " +
+     "SELECT * FROM ML_SONG_TBL song " +
+     "JOIN ML_SONG_RANKING_TBL ranking ON song.SONG_ID = ranking.SONG_ID " +
+     "WHERE song.SONG_ID = ? " +
+     " ) mergedSongTBL " +
+     "SET mergedSongTBL.SONG_WINS = ?, mergedSongTBL.SONG_DRAWS = ?, "
+     + "mergedSongTBL.SONG_LOSSES = ?, mergedSongTBL.SONG_PREVIOUSRATING = ?, "
+     + "mergedSongTBL.SONG_CURRENTRATING = ?";
+     Possible solution : 
+     http://www.cla5h.com/ora-01776-i-can-t-insert-on-a-view-comprised-by-two-tables.html
+     */
     public boolean updateSong( Logger logger, Connection connection, Song song ) {
         PreparedStatement preparedStatement = null;
         String insertTableSQL;
 
         try {
-            //Not working...
-            //insertTableSQL = "UPDATE ( " +
-            //    "SELECT * FROM ML_SONG_TBL song " +
-            //    "JOIN ML_SONG_RANKING_TBL ranking ON song.SONG_ID = ranking.SONG_ID " +
-            //    "WHERE song.SONG_ID = ? " +
-            //    " ) mergedSongTBL " +
-            //    "SET mergedSongTBL.SONG_WINS = ?, mergedSongTBL.SONG_DRAWS = ?, "
-            //        + "mergedSongTBL.SONG_LOSSES = ?, mergedSongTBL.SONG_PREVIOUSRATING = ?, "
-            //        + "mergedSongTBL.SONG_CURRENTRATING = ?";
-            //Possible solution : 
-            //  http://www.cla5h.com/ora-01776-i-can-t-insert-on-a-view-comprised-by-two-tables.html
-
             insertTableSQL = "UPDATE ML_SONG_TBL "
                     + "SET SONG_NAME = ?, SONG_WINS = ?, SONG_DRAWS = ?, "
                     + "SONG_LOSSES = ? "
@@ -268,8 +269,7 @@ public class SongMapper {
         } catch ( SQLException e ) {
             logger.severe( "SQL Exception while updating song " + song.toString() + " into song tbl " + e );
             return false;
-        } finally //The statement must be closed, because of : java.sql.SQLException: ORA-01000
-        {
+        } finally {
             try {
                 if ( preparedStatement != null ) {
                     preparedStatement.close();
@@ -279,8 +279,7 @@ public class SongMapper {
                 return false;
             }
         }
-
-        logger.info( "Successfully updated song tbl, ID : " + song.getId() );
+        logger.info( "Successfully updated SONG TBL, ID : " + song.getId() );
 
         try {
             insertTableSQL = "UPDATE ML_SONG_RANKING_TBL "
@@ -293,13 +292,11 @@ public class SongMapper {
             preparedStatement.setFloat( 2, song.getCurrentRating() );
             preparedStatement.setInt( 3, song.getId().intValue() );
 
-            // execute insert SQL stetement
             preparedStatement.executeUpdate();
         } catch ( SQLException e ) {
             logger.severe( "SQL Exception while updating song " + song.toString() + " into song ranking tbl " + e );
             return false;
-        } finally //The statement must be closed, because of : java.sql.SQLException: ORA-01000
-        {
+        } finally {
             try {
                 if ( preparedStatement != null ) {
                     preparedStatement.close();
@@ -310,7 +307,7 @@ public class SongMapper {
             }
         }
 
-        logger.info( "Success updateSong : " + song.getId() );
+        logger.info( "Successfully updated SONG RANKING TBL, ID : " + song.getId() );
         return true;
     }
 

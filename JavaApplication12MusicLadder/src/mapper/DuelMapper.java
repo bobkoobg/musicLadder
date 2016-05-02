@@ -14,6 +14,11 @@ public class DuelMapper {
 
     private static String ERROR_NOELEM = "Error - not element found";
     private static String ERROR_QUERYEXEC = "Error - during query execution";
+    private Integer duelID;
+
+    public Integer getDuelID() {
+        return duelID;
+    }
 
     public <T> T getDuel( Logger logger, Connection connection, int duelID ) {
         PreparedStatement preparedStatement = null;
@@ -21,7 +26,8 @@ public class DuelMapper {
 
         try {
             String sqlQuery = "SELECT duel.DUEL_ID, duel.SONG1_ID, duel.SONG2_ID, duel.SONG1_RATING_BEFORE, "
-                    + "duel.SONG2_RATING_BEFORE, songA.SONG_NAME, songB.SONG_NAME "
+                    + "duel.SONG2_RATING_BEFORE, songA.SONG_NAME, songB.SONG_NAME, duel.SONG1_RATING_AFTER, "
+                    + "duel.SONG2_RATING_AFTER, duel.SONG1_SCORE, duel.SONG2_SCORE "
                     + "FROM ML_DUEL_TBL duel "
                     + "JOIN ML_SONG_TBL songA "
                     + "ON duel.SONG1_ID = songA.SONG_ID "
@@ -45,9 +51,13 @@ public class DuelMapper {
                     duel.setSong2BeforeMatchRating( rs.getFloat( 5 ) );
                     duel.setSong1Name( rs.getString( 6 ) );
                     duel.setSong2Name( rs.getString( 7 ) );
+                    duel.setSong1AfterMatchRating( rs.getFloat( 8 ) );
+                    duel.setSong2AfterMatchRating( rs.getFloat( 9 ) );
+                    duel.setSong1Score( rs.getInt( 10 ) );
+                    duel.setSong2Score( rs.getInt( 11 ) );
                 } else {
-                    logger.warning( "Element with duel id " + duelID + " does not exist." );
-                    return ( T ) ERROR_NOELEM;
+                    logger.warning( ERROR_NOELEM + " duel ID : " + duelID );
+                    return ( T ) ( Boolean ) false;
                 }
             } finally {
                 try {
@@ -57,8 +67,8 @@ public class DuelMapper {
                 }
             }
         } catch ( Exception e ) {
-            logger.severe( "Statement Exception getDuel : " + e );
-            return ( T ) ERROR_QUERYEXEC;
+            logger.warning( ERROR_QUERYEXEC + " duel ID : " + duelID );
+            return ( T ) ( Boolean ) false;
         } finally {
             try {
                 if ( preparedStatement != null ) {
@@ -71,9 +81,9 @@ public class DuelMapper {
         return ( T ) duel;
     }
 
-    public Integer insertDuel( Logger logger, Connection connection, Duel duel ) {
+    public <T> T insertDuel( Logger logger, Connection connection, Duel duel ) {
         PreparedStatement preparedStatement = null;
-        Integer duelID = null;
+        duelID = null;
 
         String SQLString = "select DUEL_ID.nextval from dual";
         try {
@@ -86,21 +96,21 @@ public class DuelMapper {
             } finally {
                 try {
                     rs.close();
-                } catch ( Exception ignore ) {
+                } catch ( Exception e ) {
+                    logger.warning( "Exception - during retrieval of next duel id : " + e );
                 }
             }
         } catch ( SQLException e ) {
             logger.severe( "Method insertDuel (Part1) - Execution SQL Exception : [ " + e + " ]" );
-            return 0;
-        } finally //The statement must be closed, because of : java.sql.SQLException: ORA-01000
-        {
+            return ( T ) ( Boolean ) false;
+        } finally {
             try {
                 if ( preparedStatement != null ) {
                     preparedStatement.close();
                 }
             } catch ( SQLException e ) {
                 logger.severe( "Method insertDuel (Part1) - Closing SQL Exception : [ " + e + " ]" );
-                return 0;
+                return ( T ) ( Boolean ) false;
             }
         }
 
@@ -110,9 +120,8 @@ public class DuelMapper {
             duel.setDuelID( duelID );
 
             java.util.Date date = new java.util.Date();
-            long t = date.getTime();
+            long t = 1000 * (date.getTime() / 1000);
             java.sql.Timestamp sqlTimestamp = new java.sql.Timestamp( t );
-            //System.out.println("sqlTimestamp=" + sqlTimestamp); << Includes miliseconds (looks ugly)
 
             try {
                 insertTableSQL = "INSERT INTO ML_DUEL_TBL VALUES"
@@ -134,24 +143,23 @@ public class DuelMapper {
                 preparedStatement.executeUpdate();
             } catch ( SQLException e ) {
                 logger.severe( "Method insertDuel (Part2) - Execution SQL Exception : [ " + e + " ], Duel content : [" + duel.toString() + "]" );
-                return 0;
-            } finally //The statement must be closed, because of : java.sql.SQLException: ORA-01000
-            {
+                return ( T ) ( Boolean ) false;
+            } finally {
                 try {
                     if ( preparedStatement != null ) {
                         preparedStatement.close();
                     }
                 } catch ( SQLException e ) {
                     logger.severe( "Method insertDuel (Part2) - Closing SQL Exception : [ " + e + " ], Duel content : [" + duel.toString() + "]" );
-                    return 0;
+                    return ( T ) ( Boolean ) false;
                 }
             }
 
             logger.info( "Method insertDuel success! : [ Duel ID : " + duel.getDuelID() + "]" );
-            return duelID;
+            return ( T ) duelID;
         }
         logger.severe( "Method insertDuel (Part1) - [ Duel ID : " + duelID + ", Duel : " + duel.toString() + " ]" );
-        return 0;
+        return ( T ) ( Boolean ) false;
     }
 
     public List<Duel> getNPlayedDuels( Logger logger, Connection connection, Integer amount ) {
